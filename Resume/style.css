@@ -119,6 +119,7 @@ header p {
 }
 
 .social ul li{
+  font-size: .7em;
   display: block;
   margin: .5em -1em;
   background-color: rgb(252, 252, 252);
