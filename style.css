@@ -31,8 +31,13 @@ body, h2 {
 
 .container {
   max-width: 1200px;
-  margin: auto !Important;
+  margin: auto 2em; !Important;
   display: flex;
+}
+
+.media-body {
+  align-items: center;
+  margin-top: 3em;
 }
 
 .nav {
@@ -207,11 +212,9 @@ body, h2 {
     }
 
 
-
-
     .slides {
       display: flex;
-      width: 20vw;
+      width: 30vw;
   }
   
   .panel {
@@ -240,7 +243,7 @@ body, h2 {
   }
   
   .panel.active {
-    width: 10vw;
+    width: 20vw;
       flex: 5;
   }
   
