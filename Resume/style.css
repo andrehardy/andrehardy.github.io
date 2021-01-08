@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Fjalla+One&family=Raleway&display=swap');
+
+:root {
+  --modal-duration: 1s;
+  --primary-color: #b6b6b6;
+  --secondary-color: #367588;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Raleway', sans-serif;
+  letter-spacing: .1em;
+  line-height: 1.5e;
+  margin: 0em;
+  transition: transform 0.3s ease;
+}
+
+body.show-nav {
+  /* Width of nav */
+  transform: translateX(200px);
+}
+
+h2 {
+  font-family: 'Fjalla One', sans-serif;
+  margin-top: 2em;
+  color:var(--secondary-color)
+
+}
+
+
+nav {
+  background-color: var(--primary-color);
+  border-right: 2px solid rgba(200, 200, 200, 0.1);
+  color: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100%;
+  z-index: 100;
+  transform: translateX(-100%);
+}
+
+nav .logo {
+  padding: 30px 0;
+  text-align: center;
+}
+
+nav .logo img {
+  height: 75px;
+  width: 75px;
+  border-radius: 50%;
+}
+
+nav ul {
+  padding: 0;
+  list-style-type: none;
+  margin: 0;
+}
+
+nav ul li {
+  border-bottom: 2px solid rgba(200, 200, 200, 0.1);
+  padding: 20px;
+}
+
+nav ul li:first-of-type {
+  border-top: 2px solid rgba(200, 200, 200, 0.1);
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+}
+
+nav ul li a:hover {
+  text-decoration: underline;
+}
+
+header {
+  background-image: url('header.jpg');
+  color: rgb(2, 50, 70);
+  font-size: 130%;
+  position: relative;
+  padding: 5em 0em 3em 1rem;
+  text-align: left;
+}
+
+header h1 {
+  margin: 0;
+}
+
+header p {
+  margin: 1em;
+}
+
+.toggle {
+  background-color: rgba(0, 0, 0, 0.3);
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.container.main {
+  background-image: url('wallpaper.jpg');
+  padding: 1rem;
+  margin: 0 auto;
+  max-width: 100%;
+  width: 80vw;
+}
+
+.social {
+  position:fixed;
+  top:30%;
+  right:1%;
+ 
+}
+
+.social ul li{
+  display: block;
+  margin: .5em -1em;
+  background-color: rgb(252, 252, 252);
+  width: 7.5em;
+  text-align: left;
+  padding: .5em;
+  border-radius: 1em;
+  box-shadow: 0 10px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  transition: all 1s;  /* the transition property the duration of the effect */
+}
+/* the hover selector helps to style element whenever I mouse over them */
+.social ul li:hover{
+  /* translatex is a <transform-function> data type which I can use to let my element move horizontally */
+  transform: translatex(-60px);
+}
+
+.social ul li.twitter:hover{
+  background-color: rgb(255, 255, 255);
+}
+/*--this allows us to rotate the element once we mouse it-->*/
+.social ul li:hover i{
+  transform: rotate(360deg);
+  transition: all 1s;
+}
+
+.roll {
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+}

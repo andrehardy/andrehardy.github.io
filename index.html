@@ -1,209 +1,132 @@
-<!DOCTYPE HTML>
-<html>
-	<head>
-		<title>AndreHardyDev</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-		<link rel="stylesheet" id="pagestyle" href="assets/css/main.css" />
-		
-		
-		<script type="text/javascript">
-function rotateStyle () {
-  document.body.id = document.body.id == 'alternate' ? '' : 'alternate';
-}
-		</script>
-		
-	
-	
-	</head>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
 
-	<body id="body" class="is-preload">
-<button id="smallButton" class="btn btn-dark"  onclick="rotateStyle()"><i class="fas fa-sun"></i><br><i class="fas fa-moon"></i></button>	<!-- Nav -->
-			<nav id="nav">
-				<ul class="container">
-					<li><a href="#top">Home</a></li>
-					<li><a href="#portfolio">Projects</a></li>
-					<li><a href="#work">Work</a></li>
-					<li><a href="#contact">Contact</a></li>
-				</ul>
-			</nav>
+    <title>Sticky Navigation</title>
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="container">
+        <h1 class="logo"><a href="/index.html"></a></h1>
+        <ul>
+          <li><a href="index.html" class="current">0. Home</a></li>
+          <li><a href="#projects">1. Projects</a></li>
+          <li><a href="mailto:Andre.Hardy77@gmail.com">2. Contact</a></li>
+          <li><a href="Resume/index.html">3. Resume</a></li>
+        </ul>
+      </div>
+    </nav>
 
-		<!-- Home -->
-			<article id="top" class="wrapper style1">
-				<div class="container">
-					<div class="row">
-						<div class="col-8 col-7-large col-12-medium">
-							<p style="font-family: 'Josefin Sans', sans-serif;">Hi, my name is</p> 
-							<header>
-								<h1 style="font-family: 'Ultra', serif;"><strong>Andre Hardy</strong></h1>
-								<h1>I am a Web Developer</h1>
-							</header>
-							<p>This paragraph is currently nonsense. I am hoping to have at least two lines of content though. Until that time comes, however, this will have to do</p>
-							<a href="#portfolio" class="button large scrolly">Check out my projects</a>
-						</div>
-					</div>
-				</div>
-			</article>
+    <div class="hero">
+      <div class="container clearfix" style="text-align: left;">
+        <div class="row roll">
+          <div class="col-8">
+            <p style="font-family: 'Josefin Sans', sans-serif;">Helloo 👋🏾, I'm</p> 
+            <header>
+              <h1 style="font-family: 'Yeseva One', cursive;"><strong>Andre Hardy</strong></h1>
+              <h2>& I am a Software Developer</h2>
+            </header>
 
-		<!-- Portfolio -->
-			<article id="portfolio" class="wrapper style2">
-				<div class="container">
-					<header>
-						<h2>Recent Projects</h2>
-					</header>
-					<div class="row">
-						<div class="col-4 col-6-medium col-12-small">
-							<article class="box style2">
-								<a href="#" class="image featured"><img src="images/pic01.jpg" alt="" /></a>
-								<h3><a href="#">Magna feugiat</a></h3>
-								<p>Ornare nulla proin odio consequat.</p>
-							</article>
-						</div>
-						<div class="col-4 col-6-medium col-12-small">
-							<article class="box style2">
-								<a href="#" class="image featured"><img src="images/pic02.jpg" alt="" /></a>
-								<h3><a href="#">Veroeros primis</a></h3>
-								<p>Ornare nulla proin odio consequat.</p>
-							</article>
-						</div>
-						<div class="col-4 col-6-medium col-12-small">
-							<article class="box style2">
-								<a href="#" class="image featured"><img src="images/pic03.jpg" alt="" /></a>
-								<h3><a href="#">Lorem ipsum</a></h3>
-								<p>Ornare nulla proin odio consequat.</p>
-							</article>
-						</div>
-						<div class="col-4 col-6-medium col-12-small">
-							<article class="box style2">
-								<a href="#" class="image featured"><img src="images/pic04.jpg" alt="" /></a>
-								<h3><a href="#">Tempus dolore</a></h3>
-								<p>Ornare nulla proin odio consequat.</p>
-							</article>
-						</div>
-						<div class="col-4 col-6-medium col-12-small">
-							<article class="box style2">
-								<a href="#" class="image featured"><img src="images/pic05.jpg" alt="" /></a>
-								<h3><a href="#">Feugiat aliquam</a></h3>
-								<p>Ornare nulla proin odio consequat.</p>
-							</article>
-						</div>
-						<div class="col-4 col-6-medium col-12-small">
-							<article class="box style2">
-								<a href="#" class="image featured"><img src="images/pic06.jpg" alt="" /></a>
-								<h3><a href="#">Sed amet ornare</a></h3>
-								<p>Ornare nulla proin odio consequat.</p>
-							</article>
-						</div>
-					</div>
-					<footer>
-						<p>Lorem ipsum dolor sit sapien vestibulum ipsum primis?</p>
-						<a href="#work" class="button large scrolly">Skills & Abilities</a>
-					</footer>
-				</div>
-			</article>
+            <p>This paragraph is currently nonsense. I am hoping to have at least two lines of content though. Until that time comes, however, this will have to do</p>
+            
+          </div>
+        </div>
+      </div>
+    </div>
 
-		<!-- Work -->
-			<article id="work" class="wrapper style3">
-				<div class="container">
-					<header>
-						<h2>My Tools & Technologies</h2>
-						<p>Here are a few of the technologies I have experience using.</p>
-					</header>
-					<div class="row aln-center">
-						<div class="col-4 col-6-medium col-12-small">
-							<section class="box style1">
-								<span class="fas fa-mobile-alt fa-6x"></span>
-								<h3>Mobile-Friendly Design</h3>
-								<p>Ornare nulla proin odio consequat sapien vestibulum ipsum primis sed amet consequat lorem dolore.</p>
-							</section>
-						</div>
-						<div class="col-4 col-6-medium col-12-small">
-							<section class="box style1">
-								<span class="fab fa-js-square fa-6x"></span>
-								<h3>JavaScript</h3>
-								<p>Ornare nulla proin odio consequat sapien vestibulum ipsum primis sed amet consequat lorem dolore.</p>
-							</section>
-						</div>
-						<div class="col-4 col-6-medium col-12-small">
-							<section class="box style1">
-								<span class="fas fa-server fa-6x"></span>
-								<h3>Back-End Basics</h3>
-								<p>Ornare nulla proin odio consequat sapien vestibulum ipsum primis sed amet consequat lorem dolore.</p>
-							</section>
-						</div>
-					</div>
-					<footer>
-						<p>Lorem ipsum dolor sit sapien vestibulum ipsum primis?</p>
-						<a href="#contact" class="button large scrolly">Get in touch with me</a>
-					</footer>
-				</div>
-			</article>
+    <nav class="social">
+      <ul>
+          <!--In every element of my ul I'm using the Font Awesome icons thanks to the link the <head>-->
+          <li class="twitter">
+              <i class= "fa fa-github" aria-hidden="true"></i>
+              <a href="https://github.com/andrehardy" target="_blank">Github
+              </a></li>
+              <li class="twitter">
+                <i class= "fa fa-linkedin" aria-hidden="true"></i>
+                <a href="https://www.linkedin.com/in/andre-hardy-661931201/" target="_blank">Linkedin
+                </a>
+              </li>
+                <li class="twitter">
+                  <i class= "fa fa-at" aria-hidden="true"></i>
+                  <a href="mailto:Andre.Hardy77@gmail.com" target="_blank">E-Mail
+                  </a>
+                </li>
+                <li class="twitter">
+                  <i class= "fa fa-file" aria-hidden="true"></i>
+                  <a href="Resume/index.html" target="_blank">Resume
+                  </a>
+                </li>
+      </ul>
+  </nav>
+
+    <section class="container content">
+      <h2>Content One</h2>
+      <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ratione dolorem voluptates eveniet tempora ut cupiditate magnam, sapiente, hic quo in ipsum iste soluta eaque perferendis nihil recusandae dolore officia aperiam corporis similique. Facilis quos tempore labore totam! Consectetur molestiae iusto ducimus error reiciendis aspernatur dolor, modi dolorem sit architecto, voluptate magni sunt unde est quas? Voluptates a dolorum voluptatum quo perferendis aut sit. Aspernatur libero laboriosam ab eligendi omnis delectus earum labore, placeat officiis sint illum rem voluptas ipsum repellendus iste eius recusandae quae excepturi facere, iure rerum sequi? Illum velit delectus dicta et iste dolorum obcaecati minus odio eligendi!</p>
+    </section>
+
+
+    <section id="projects" class="container">
+    <ul class="list-unstyled">
+      <li class="media">
+        <img src="img/header.png" class="mr-3 responsive" alt="...">
+        <div class="media-body">
+          <h5 class="mt-0 mb-1">List-based media object</h5>
+          Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+        </div>
+      </li>
+      <li class="media my-4">
+        <img src="img/header.png" class="mr-3 responsive" alt="...">
+        <div class="media-body">
+          <h5 class="mt-0 mb-1">List-based media object</h5>
+          Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+        </div>
+      </li>
+      <li class="media">
+        <img src="img/header.png" class="mr-3 responsive" alt="...">
+        <div class="media-body">
+          <h5 class="mt-0 mb-1">List-based media object</h5>
+          Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+        </div>
+      </li>
+    </ul>
+  </section>
+
+
+    <!----FooterArea-->
+    <article class="container mx-auto">
+      <div class="row justify-content-center top-part">
+          <div class="col-md-6 text-center center-content">
+              <div class="d-flex-inline">
+                  <h3 class="footer-heading">Start a Project with itCraft</h3>
+              </div>
+              <div class="d-flex-inline">
+                  <p>We are based in Warsaw, Bydgoszcz & Torun in Poland but we are Google Cloud Partner we can arrange a meeting at Google Campus in Warsaw or in London. We are also present in Norway. Below you will find all the contact details you need.</p>
+              </div>
+              <div class="d-flex-inline pt-2"> <button class="btn-pink btn">ESTIMATE PROJECT</button> </div></br>
+                   
+        <footer id="copyright">
+          <p> &copy; All rights reserved | Created with 💖 by Andre Hardy</p>
+        </footer>
+
+          </div>
+        </article>
 
 
 
-		<!-- Contact -->
-			<article id="contact" class="wrapper style4">
-				<div class="container medium">
-					<header>
-						<h2>Would you like to contact me?</h2>
-						<p>Please use this form to send me a message, or contact me via social links below.</p>
-					</header>
-					<div class="row">
-						<div class="col-12">
-							<form method="post" action="#">
-								<div class="row">
-									<div class="col-6 col-12-small">
-										<input type="text" name="name" id="name" placeholder="Name" />
-									</div>
-									<div class="col-6 col-12-small">
-										<input type="text" name="email" id="email" placeholder="Email" />
-									</div>
-									<div class="col-12">
-										<input type="text" name="subject" id="subject" placeholder="Subject" />
-									</div>
-									<div class="col-12">
-										<textarea name="message" id="message" placeholder="Message"></textarea>
-									</div>
-									<div class="col-12">
-										<ul class="actions">
-											<li><input href="mailto:andre.hardy77@gmail.com" type="submit" value="Send" /></li>
-										</ul>
-									</div>
-								</div>
-							</form>
-						</div>
-						<div class="col-12">
-							<hr />
-							<h3>Get in touch with me</h3>
-							<ul class="social">
-								<li><a href="#" class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
-								<li><a href="#" class="icon brands fa-google-plus"><span class="label">Google+</span></a></li>
-								<li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
-								<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
 
-							</ul>
-							<hr />
-						</div>
-					</div>
-					<footer>
-						<ul id="copyright">
-							<li>&copy; AndreHardyDev. All rights reserved.</li><li>Developed By: <a href="http://andre.github.io">Andre Hardy</a></li>
-						</ul>
-					</footer>
-				</div>
-			</article>
+  </div>
 
-		<!-- Scripts -->
-		<script> 
-   
-        </script>  
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.scrolly.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
-
-	</body>
+    </div>
+  </div>
+ 
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+  </body>
 </html>
