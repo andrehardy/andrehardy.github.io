@@ -17,6 +17,7 @@ body, h2 {
 }
 
 .list-unstyled  {
+  align-content: center;
   margin: auto;
   position: aboslute;
   width: auto;
@@ -31,6 +32,7 @@ body, h2 {
 .container {
   max-width: 1200px;
   margin: auto !Important;
+  display: flex;
 }
 
 .nav {
@@ -176,31 +178,9 @@ body, h2 {
   color: #fff;
 }
 
-
-
-
 .center-content {
-  margin-top: 120px;
-  margin-bottom: 120px
-}
-
-.btn-pink {
-  border-radius: 0;
-  background-color: #FF4081;
-  color: #fff !important;
-  letter-spacing: 2px;
-  padding: 10px;
-  padding-right: 20px;
-  padding-left: 20px
-}
-
-.btn-pink:hover {
-  background-color: #008280
-}
-
-.line {
-  border-top: 1px solid #5a5959;
-  width: 90% !important
+  margin-top: 2em;
+  margin-bottom: 2em
 }
 
 .fa-mobile {
@@ -229,5 +209,54 @@ body, h2 {
 
 
 
+    .slides {
+      display: flex;
+      width: 20vw;
+  }
+  
+  .panel {
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 20vh;
+      width: 1vw;
+      border-radius: 50px;
+      color: #fff;
+      cursor: pointer;
+      flex: .5;
+      margin: .2em;
+      position: relative;
+      -webkit-transition: all 700ms ease-in;
+  
+  }
+  
+  .panel h3 {
+      font-size: 1em;
+      position: absolute;
+      bottom: 1em;
+      left: 1em;
+      margin: 0;
+      opacity: 0;
+  }
+  
+  .panel.active {
+    width: 10vw;
+      flex: 5;
+  }
+  
+  .panel.active h3 {
+      opacity:1;
+      transition: opacity 0.3s ease-in 0.4s;
+  }
+  
+  @media (max-width: 30vw) {
+      .container {
+          width: 50vw;
+      }
+      .panel:nth-of-type(4),
+      .panel:nth-of-type(5) {
+          display: none;
+      }
+  }
 
 
