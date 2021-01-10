@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Amatic+SC&family=Oswald&display=swap');
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizelegibility;
+    color: #6c6f73;
+}
+
+h1,h2,h3,h4,h5 {
+    color: #333;
+    font-family: 'Amatic SC', cursive;
+}
+
+h6, p {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.8rem;
+    letter-spacing: 0.1rem;
+}
+
+img {
+    max-width: 100%;
+}
+
+.blockquote {
+    font-size: 1.6rem;
+    color: #333;
+    border: none;
+    padding: 0;
+}
+
+.blockquote-footer {
+    margin: 1rem 0 0;
+}
+
+
+#stage {
+    background: url('img/stage.jpg') center center no-repeat;
+    background-size: cover;
+    color: white;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+#stage-caption {
+    font-size: 1.4rem;
+    font-weight: 200;
+    max-width: 60rem;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#stage-caption h1 {
+    color: rgba(129, 45, 129, 0.63);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.feature-content {
+    padding: 4rem 0;
+    overflow: hidden;
+}
+
+.feature-content img {
+    margin-bottom: 2rem;
+}
+
+.feature-dark {
+    background: #f8efd1;
+    color: rgb(99, 98, 98);
+}
+
+.feature-dark h2 {
+    color: rgb(107, 2, 90);
+}
+
+.feature-alt {
+    background-image: url("https://ymcacolumbus.org/sites/default/files/styles/media_full/public/2019-04/family-yoga2.jpg?itok=-Ar3WOJe");
+    height: 30em;
+}
+
+#feature-four .feature-content {
+    padding: 0;
+}
+
+#feature-five img {
+    margin-top: 2rem;
+}
+
+#main-footer {
+    background: #262F36;
+    color: white;
+    padding: 2rem 0;
+    font-size: 1rem;
+}
+
+#main-footer h6 {
+    color: #718FA9;
+}
+
+#main-footer a {
+    color: #6C6F73;
+}
+
+/* Media Queries */
+
+@media screen and ( min-width : 991px ) {
+    
+    .feature-content {
+        display: flex;
+        align-items: center;
+    }
+    
+}
+
+
+
+
+
