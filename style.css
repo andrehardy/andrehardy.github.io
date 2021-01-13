@@ -138,6 +138,7 @@ body, h2, p {
   position:fixed;
   top:30%;
   right:1%;
+  z-index: 1000;
  
 }
 
@@ -204,56 +205,5 @@ body, h2, p {
       font-size: 1em;
       margin: 0;
     }
-
-
-    .slides {
-      display: flex;
-      width: 30vw;
-  }
-  
-  .panel {
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
-      height: 20vh;
-      width: 1vw;
-      border-radius: 50px;
-      color: #fff;
-      cursor: pointer;
-      flex: .5;
-      margin: .2em;
-      position: relative;
-      -webkit-transition: all 700ms ease-in;
-  
-  }
-  
-  .panel h3 {
-      font-size: 1em;
-      position: absolute;
-      bottom: 1em;
-      left: 1em;
-      margin: 0;
-      opacity: 0;
-  }
-  
-  .panel.active {
-    width: 20vw;
-      flex: 5;
-  }
-  
-  .panel.active h3 {
-      opacity:1;
-      transition: opacity 0.3s ease-in 0.4s;
-  }
-  
-  @media (max-width: 30vw) {
-      .container {
-          width: 50vw;
-      }
-      .panel:nth-of-type(4),
-      .panel:nth-of-type(5) {
-          display: none;
-      }
-  }
 
 
