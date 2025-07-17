@@ -1,0 +1,367 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SymmetraTech LLC - Pioneering Thoughtful Intelligence</title>
+    <meta name="description" content="SymmetraTech LLC develops autonomous, ethical AI systems for infrastructure, healthcare, cybersecurity, and more, powered by the SETHIR framework.">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="img/favicon.ico">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+    <style>
+        body {
+            background-color: #0A0E1A; /* Deep Obsidian */
+            color: #E6E6F0; /* Soft White */
+            font-family: 'Roboto Mono', monospace;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Fira Code', monospace;
+            background: linear-gradient(90deg, #00D1FF, #7B00FF); /* Neon Cyan to Electric Purple */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .section {
+            scroll-margin-top: 80px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #00D1FF; /* Neon Cyan */
+            color: #0A0E1A;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid #7B00FF; /* Electric Purple */
+            box-shadow: 0 0 10px rgba(0, 209, 255, 0.5); /* Cyan glow */
+            transition: all 0.3s ease;
+            font-family: 'Fira Code', monospace;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background-color: #7B00FF; /* Electric Purple */
+            color: #E6E6F0;
+            box-shadow: 0 0 20px rgba(123, 0, 255, 0.7); /* Purple glow */
+            transform: scale(1.05);
+        }
+        .nav-link:hover {
+            color: #7B00FF; /* Electric Purple */
+        }
+        .typewriter-container {
+            display: inline-block;
+            min-width: 300px;
+            text-align: center;
+        }
+        .typewriter {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.5rem;
+            color: #E6E6F0;
+            overflow: hidden;
+            border-right: 2px solid #00D1FF;
+            white-space: nowrap;
+            animation: blink-caret 0.75s step-end infinite;
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #00D1FF; }
+        }
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        #home {
+            position: relative;
+            overflow: hidden;
+        }
+        .resonance-gate {
+            font-size: 1.5rem;
+            color: #00D1FF;
+            text-shadow: 0 0 10px #00D1FF;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #00D1FF, 0 0 10px #00D1FF; }
+            to { text-shadow: 0 0 10px #00D1FF, 0 0 20px #7B00FF; }
+        }
+        @media (max-width: 768px) {
+            .typewriter { font-size: 1.2rem; }
+            .typewriter-container { min-width: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-[#0A0E1A] text-[#E6E6F0] p-4 fixed top-0 w-full z-50 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">SymmetraTech LLC</h1>
+            <nav class="flex space-x-6">
+                <a href="#about" class="text-[#E6E6F0] nav-link">About</a>
+                <a href="#solutions" class="text-[#E6E6F0] nav-link">Solutions</a>
+                <a href="#mission" class="text-[#E6E6F0] nav-link">Mission</a>
+                <a href="#contact" class="text-[#E6E6F0] nav-link">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section with Cosmic Web Plasma -->
+    <section id="home" class="section min-h-screen flex items-center bg-[#0A0E1A] text-[#E6E6F0]">
+        <canvas id="hero-canvas"></canvas>
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">SymmetraTech LLC</h2>
+            <div class="typewriter-container mx-auto">
+                <span class="typewriter"></span>
+            </div>
+            <p class="text-lg md:text-xl mt-4 max-w-2xl mx-auto">Pioneering thoughtful AI systems for infrastructure, healthcare, cybersecurity, and beyond, harmonizing technology with human values.</p>
+            <a href="#contact" class="btn mt-6">Connect with Us</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section py-16 bg-[#0A0E1A]">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-8">About SymmetraTech</h3>
+            <p class="text-[#E6E6F0] max-w-3xl mx-auto">Based in New Freedom, PA, SymmetraTech LLC is a technology firm dedicated to ethical, thoughtful intelligence. Our proprietary SETHIR framework powers solutions across construction, healthcare, cybersecurity, and more, ensuring precision, integrity, and resilience. We build systems that think, adapt, and protect, aligning innovation with human dignity.</p>
+        </div>
+    </section>
+
+    <!-- Solutions Section -->
+    <section id="solutions" class="section py-16 bg-[#1A2338]">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-8">Our Solutions</h3>
+            <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-[#0A0E1A] p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                    <h4 class="text-xl font-semibold">SymmetraLabs</h4>
+                    <p class="text-[#E6E6F0] mt-2">Recursive AI and ethical development tools for autonomous systems, ensuring fairness and transparency in innovation.</p>
+                    <a href="#contact" class="btn mt-4">Learn More</a>
+                </div>
+                <div class="bg-[#0A0E1A] p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                    <h4 class="text-xl font-semibold">SymmetraTrust</h4>
+                    <p class="text-[#E6E6F0] mt-2">Cybersecurity and data integrity solutions, detecting anomalies and verifying truth in digital environments.</p>
+                    <a href="#contact" class="btn mt-4">Learn More</a>
+                </div>
+                <div class="bg-[#0A0E1A] p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                    <h4 class="text-xl font-semibold">SymmetraBuilt</h4>
+                    <p class="text-[#E6E6F0] mt-2">AI-driven infrastructure optimization, from resilient building designs to sustainable city planning.</p>
+                    <a href="#contact" class="btn mt-4">Learn More</a>
+                </div>
+                <div class="bg-[#0A0E1A] p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                    <h4 class="text-xl font-semibold">SymmetraEthics</h4>
+                    <p class="text-[#E6E6F0] mt-2">Ethical AI frameworks and policy guidance, ensuring technology respects human rights and dignity.</p>
+                    <a href="#contact" class="btn mt-4">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section id="mission" class="section py-16 bg-[#0A0E1A]">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-8">Our Mission</h3>
+            <p class="text-[#E6E6F0] max-w-3xl mx-auto">SymmetraTech LLC is a technology firm committed to the ethical development and deployment of thoughtful intelligence systems across infrastructure, healthcare, cybersecurity, science, and industrial design. Our mission is to ensure that artificial intelligence serves humanity with precision, transparency, and moral clarity—empowering societies through aligned systems rooted in data integrity and cross-disciplinary insight.</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section py-16 bg-[#0A0E1A]">
+        <div class="container mx-auto px-4 text-center">
+            <h3 class="text-3xl font-bold mb-8">Connect with Us</h3>
+            <p class="text-[#E6E6F0] mb-6">Interested in partnering on AI, cybersecurity, or infrastructure solutions? Reach out to SymmetraTech LLC.</p>
+            <div class="flex justify-center space-x-6">
+                <a href="mailto:contact@symmetratech.com" class="text-[#00D1FF] hover:text-[#7B00FF]"><i class="fas fa-envelope fa-2x"></i></a>
+                <a href="https://www.linkedin.com/company/symmetratech" class="text-[#00D1FF] hover:text-[#7B00FF]"><i class="fab fa-linkedin fa-2x"></i></a>
+                <a href="https://github.com/symmetratech" class="text-[#00D1FF] hover:text-[#7B00FF]"><i class="fab fa-github fa-2x"></i></a>
+            </div>
+            <p class="text-[#E6E6F0] mt-4">Phone: <a href="tel:+17178130188" class="text-[#00D1FF] hover:text-[#7B00FF]">717-813-0188</a></p>
+            <a href="mailto:contact@symmetratech.com" class="btn mt-6">Get in Touch</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#0A0E1A] text-[#E6E6F0] p-4 text-center">
+        <p>© 2025 SymmetraTech LLC. Built with <span class="text-[#00D1FF]">symbolic resonance</span>.</p>
+        <div class="resonance-gate mt-2">⧉</div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Dynamic typewriter effect
+        const typewriter = document.querySelector('.typewriter');
+        const phrases = [
+            'Autonomous Intelligence',
+            'Ethical Precision',
+            'Harmonized Systems',
+            'Truth in Code'
+        ];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let currentText = '';
+
+        function type() {
+            const currentPhrase = phrases[phraseIndex];
+            if (!isDeleting) {
+                if (charIndex < currentPhrase.length) {
+                    currentText = currentPhrase.substring(0, charIndex + 1);
+                    typewriter.textContent = currentText;
+                    charIndex++;
+                    setTimeout(type, 100);
+                } else {
+                    isDeleting = true;
+                    setTimeout(type, 2000); // Pause before deleting
+                }
+            } else {
+                if (charIndex > 0) {
+                    currentText = currentPhrase.substring(0, charIndex - 1);
+                    typewriter.textContent = currentText;
+                    charIndex--;
+                    setTimeout(type, 50);
+                } else {
+                    isDeleting = false;
+                    phraseIndex = (phraseIndex + 1) % phrases.length;
+                    setTimeout(type, 200);
+                }
+            }
+        }
+        type();
+
+        // p5.js Cosmic Web Plasma Effect
+        function setup() {
+            let cnv = createCanvas(windowWidth, windowHeight);
+            cnv.parent('home');
+            cnv.id('hero-canvas');
+            frameRate(30);
+            particles = [];
+            for (let i = 0; i < 80; i++) {
+                particles.push({
+                    x: random(width),
+                    y: random(height),
+                    vx: random(-1, 1),
+                    vy: random(-1, 1)
+                });
+            }
+        }
+
+        function draw() {
+            clear();
+            background(10, 14, 26, 50); // Semi-transparent Deep Obsidian
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+                stroke(0, 209, 255, 100); // Neon Cyan, semi-transparent
+                fill(0, 209, 255);
+                ellipse(p.x, p.y, 3, 3);
+            });
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    let d = dist(particles[i].x, particles[i].y, particles[j].x, particles[j].y);
+                    if (d < 100) {
+                        let alpha = map(d, 0, 100, 150, 0);
+                        stroke(123, 0, 255, alpha); // Electric Purple, fading
+                        line(particles[i].x, particles[i].y, particles[j].x, particles[j].y);
+                    }
+                }
+            }
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+</body>
+</html>
