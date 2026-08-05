@@ -48,32 +48,56 @@
         .section { scroll-margin-top: 88px; }
         .btn {
             display: inline-block;
-            background: linear-gradient(135deg, var(--cyan), #0090b8);
-            color: #041018;
-            padding: 0.8rem 1.6rem;
-            border-radius: 999px;
-            border: 1px solid rgba(126, 240, 255, 0.35);
-            box-shadow: 0 0 24px rgba(0, 198, 232, 0.25);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+            background-color: #00D1FF;
+            color: #0A0E1A;
+            padding: 0.8rem 1.65rem;
+            border-radius: 0.55rem;
+            border: 2px solid #7B00FF;
+            box-shadow: 0 0 14px rgba(0, 209, 255, 0.55);
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
             font-family: 'Space Grotesk', system-ui, sans-serif;
             font-weight: 700;
             text-decoration: none;
             font-size: 0.95rem;
+            animation: btn-pulse 3.2s ease-in-out infinite;
         }
         .btn:hover {
-            filter: brightness(1.08);
-            transform: translateY(-2px);
-            box-shadow: 0 0 32px rgba(107, 92, 255, 0.35);
-            color: #041018;
+            background-color: #7B00FF;
+            color: #E6E6F0;
+            border-color: #00D1FF;
+            box-shadow: 0 0 28px rgba(123, 0, 255, 0.75), 0 0 48px rgba(0, 209, 255, 0.35);
+            transform: scale(1.06);
+            animation: none;
+        }
+        .btn-sm {
+            padding: 0.55rem 1.2rem;
+            font-size: 0.85rem;
+        }
+        @keyframes btn-pulse {
+            0%, 100% { box-shadow: 0 0 12px rgba(0, 209, 255, 0.45); }
+            50% { box-shadow: 0 0 22px rgba(123, 0, 255, 0.55), 0 0 18px rgba(0, 209, 255, 0.4); }
+        }
+        .social-link {
+            color: #00D1FF;
+            transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.3s ease;
+            display: inline-block;
+        }
+        .social-link:hover {
+            color: #7B00FF;
+            text-shadow: 0 0 16px rgba(123, 0, 255, 0.8);
+            transform: scale(1.12);
         }
         .nav-link {
             color: var(--muted);
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 500;
-            transition: color 0.2s ease;
+            transition: color 0.2s ease, text-shadow 0.2s ease;
         }
-        .nav-link:hover { color: var(--cyan); }
+        .nav-link:hover {
+            color: #7B00FF;
+            text-shadow: 0 0 12px rgba(123, 0, 255, 0.45);
+        }
         .typewriter-container {
             display: inline-block;
             min-width: 280px;
@@ -128,11 +152,12 @@
             border: 1px solid var(--line);
             border-radius: 1.1rem;
             padding: 1.5rem;
-            transition: border-color 0.25s ease, transform 0.25s ease;
+            transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
         }
         .solution-card:hover {
-            border-color: rgba(0, 198, 232, 0.35);
-            transform: translateY(-3px);
+            border-color: rgba(0, 209, 255, 0.45);
+            transform: scale(1.03) translateY(-2px);
+            box-shadow: 0 0 28px rgba(123, 0, 255, 0.18), 0 0 18px rgba(0, 209, 255, 0.12);
         }
         .solution-card h4 {
             color: var(--ink);
@@ -147,9 +172,14 @@
             font-weight: 600;
         }
         .resonance-gate {
-            font-size: 1.35rem;
-            color: var(--cyan);
-            opacity: 0.85;
+            font-size: 1.5rem;
+            color: #00D1FF;
+            text-shadow: 0 0 10px #00D1FF;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #00D1FF, 0 0 10px #00D1FF; }
+            to { text-shadow: 0 0 12px #00D1FF, 0 0 24px #7B00FF; }
         }
         .mobile-menu {
             position: fixed;
@@ -277,28 +307,28 @@
                     <p style="color: var(--muted); line-height: 1.65;">
                         Ethical development tools for autonomous systems — fairness, transparency, and responsible innovation at the core.
                     </p>
-                    <a href="#contact" class="btn mt-5" style="padding: 0.55rem 1.2rem; font-size: 0.85rem;">Learn More</a>
+                    <a href="#contact" class="btn btn-sm mt-5">Learn More</a>
                 </article>
                 <article class="solution-card">
                     <h3 class="text-xl font-semibold mb-2">SymmetraTrust</h3>
                     <p style="color: var(--muted); line-height: 1.65;">
                         Cybersecurity and data-integrity solutions that detect anomalies and verify truth — trust as an engineering requirement.
                     </p>
-                    <a href="#contact" class="btn mt-5" style="padding: 0.55rem 1.2rem; font-size: 0.85rem;">Learn More</a>
+                    <a href="#contact" class="btn btn-sm mt-5">Learn More</a>
                 </article>
                 <article class="solution-card">
                     <h3 class="text-xl font-semibold mb-2">SymmetraBuilt</h3>
                     <p style="color: var(--muted); line-height: 1.65;">
                         Ethical AI for infrastructure — resilient design, sustainable planning, and systems that respect the people who live in them.
                     </p>
-                    <a href="#contact" class="btn mt-5" style="padding: 0.55rem 1.2rem; font-size: 0.85rem;">Learn More</a>
+                    <a href="#contact" class="btn btn-sm mt-5">Learn More</a>
                 </article>
                 <article class="solution-card">
                     <h3 class="text-xl font-semibold mb-2">SymmetraEthics</h3>
                     <p style="color: var(--muted); line-height: 1.65;">
                         Ethical AI frameworks and policy guidance so technology respects human rights, dignity, and accountability by design.
                     </p>
-                    <a href="#contact" class="btn mt-5" style="padding: 0.55rem 1.2rem; font-size: 0.85rem;">Learn More</a>
+                    <a href="#contact" class="btn btn-sm mt-5">Learn More</a>
                 </article>
             </div>
         </div>
@@ -326,13 +356,13 @@
                 Partnering on Ethical AI, cybersecurity, or infrastructure solutions? Reach out to SymmetraTech LLC.
             </p>
             <div class="flex justify-center space-x-6 mb-6">
-                <a href="mailto:contact@symmetratech.com" class="text-[#00c6e8] hover:text-[#8b7bff]" aria-label="Email SymmetraTech"><i class="fas fa-envelope fa-2x"></i></a>
-                <a href="https://www.linkedin.com/company/symmetratech" class="text-[#00c6e8] hover:text-[#8b7bff]" aria-label="SymmetraTech on LinkedIn" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin fa-2x"></i></a>
-                <a href="https://github.com/symmetratech" class="text-[#00c6e8] hover:text-[#8b7bff]" aria-label="SymmetraTech on GitHub" target="_blank" rel="noopener noreferrer"><i class="fab fa-github fa-2x"></i></a>
+                <a href="mailto:contact@symmetratech.com" class="social-link" aria-label="Email SymmetraTech"><i class="fas fa-envelope fa-2x"></i></a>
+                <a href="https://www.linkedin.com/company/symmetratech" class="social-link" aria-label="SymmetraTech on LinkedIn" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin fa-2x"></i></a>
+                <a href="https://github.com/symmetratech" class="social-link" aria-label="SymmetraTech on GitHub" target="_blank" rel="noopener noreferrer"><i class="fab fa-github fa-2x"></i></a>
             </div>
             <p style="color: var(--muted);">
                 Phone:
-                <a href="tel:+17178130188" class="text-[#00c6e8] hover:text-[#8b7bff]">717-813-0188</a>
+                <a href="tel:+17178130188" class="social-link" style="font-size: 1rem;">717-813-0188</a>
             </p>
             <a href="mailto:contact@symmetratech.com" class="btn mt-8">Get in Touch</a>
         </div>
@@ -419,7 +449,7 @@
             cnv.id('hero-canvas');
             frameRate(30);
             particles = [];
-            const count = windowWidth < 768 ? 45 : 70;
+            const count = windowWidth < 768 ? 55 : 90;
             for (let i = 0; i < count; i++) {
                 particles.push({
                     x: random(width),
