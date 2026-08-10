@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/img/favicon.ico" />
+    <link rel="icon" href="/img/favicon-16.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
@@ -20,6 +20,14 @@
       rel="stylesheet"
     />
     <title>Andre Hardy</title>
+
+    <!-- preload critical assets to start fetch earlier -->
+    <link rel="modulepreload" href="/assets/index-B3b-smS5.js" crossorigin>
+    <link rel="preload" href="/assets/index-C-1Uo4cV.css" as="style" crossorigin>
+
+    <!-- tiny critical CSS so initial paint isn't blank -->
+    <style>html,body,#root{height:100%;margin:0;background:#070b14;color:#e8eaf2;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;-webkit-font-smoothing:antialiased;}</style>
+
     <script type="module" crossorigin src="/assets/index-B3b-smS5.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-C-1Uo4cV.css">
   </head>
