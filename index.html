@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/img/favicon-16.svg" />
+    <link rel="icon" href="/img/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
@@ -13,66 +13,17 @@
       property="og:description"
       content="A personal space for systems craft — real AI, corporate security & GRC, distributed cloud and APIs."
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
     <title>Andre Hardy</title>
-
-    <!-- tiny critical CSS so initial paint isn't blank -->
-    <style>
-      html,body{height:100%;margin:0;background:#070b14;color:#e8eaf2;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;-webkit-font-smoothing:antialiased}
-      .shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px}
-      .hero{max-width:760px;text-align:center}
-      .eyebrow{color:#00D1FF;letter-spacing:0.2em;text-transform:uppercase;font-weight:600;margin-bottom:12px}
-      h1{font-size:clamp(28px,6vw,48px);margin:0 0 12px;background:linear-gradient(115deg,#7ef0ff 0%,#00c6e8 40%,#8b7bff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-      p.lead{color:#9aa3b8;line-height:1.6}
-      .cta{display:inline-block;margin-top:20px;padding:12px 22px;border-radius:12px;background:#00D1FF;color:#0A0E1A;text-decoration:none;font-weight:700}
-    </style>
-
+    <script type="module" crossorigin src="/assets/index-B3b-smS5.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-C-1Uo4cV.css">
   </head>
   <body>
-    <!-- Static fallback content so Safari gets an immediate first paint before JS hydrates -->
-    <div class="shell">
-      <div class="hero" id="hero-fallback">
-        <div class="eyebrow">Systems · Security · Intelligence</div>
-        <h1>Andre Hardy</h1>
-        <p class="lead">Personal work across real AI, corporate GRC, and distributed cloud connectivity. Welcome — explore my work on systems, security, and aligned intelligence.</p>
-        <a class="cta" href="/SymmetraTech/">SymmetraTech →</a>
-      </div>
-    </div>
-
-    <!-- app root (JS may hydrate or replace this content) -->
-    <div id="root" aria-hidden="true"></div>
-
-    <!-- Load non-critical resources asynchronously to avoid Safari blocking on resource/TLS checks -->
-    <script>
-      (function(){
-        // Asynchronously load Google Fonts (non-blocking)
-        function loadFonts(){
-          try{
-            var l = document.createElement('link');
-            l.href = 'https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&display=swap';
-            l.rel = 'stylesheet';
-            l.crossOrigin = 'anonymous';
-            document.head.appendChild(l);
-          }catch(e){/* ignore */}
-        }
-        // Defer app module load so Safari can paint immediately and avoid long TLS/blocking stalls
-        function loadApp(){
-          try{
-            var s = document.createElement('script');
-            s.type = 'module';
-            s.crossOrigin = '';
-            s.src = '/assets/index-B3b-smS5.js';
-            document.body.appendChild(s);
-          }catch(e){/* ignore */}
-        }
-        if('requestIdleCallback' in window){
-          requestIdleCallback(loadFonts, {timeout: 300});
-          requestIdleCallback(loadApp, {timeout: 700});
-        } else {
-          setTimeout(loadFonts, 300);
-          setTimeout(loadApp, 700);
-        }
-      })();
-    </script>
+    <div id="root"></div>
   </body>
 </html>
