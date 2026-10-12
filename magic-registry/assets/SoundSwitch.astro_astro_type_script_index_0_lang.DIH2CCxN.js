@@ -1,0 +1,1 @@
+import{a as e,i as t,t as n}from"./sound.CqCHCl3G.js";var r=()=>document.querySelectorAll(`[data-sound-switch]`).forEach(t=>t.setAttribute(`aria-pressed`,String(e())));document.addEventListener(`click`,n=>{(n.target instanceof Element?n.target:null)?.closest(`[data-sound-switch]`)&&t(!e())}),document.addEventListener(n,r),document.addEventListener(`astro:page-load`,r),r();
