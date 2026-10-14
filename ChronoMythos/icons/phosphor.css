@@ -1,0 +1,345 @@
+@font-face {
+  font-family: "Phosphor";
+  src: url("./Phosphor.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.ph {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: "Phosphor" !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Enable Ligatures ================ */
+  letter-spacing: 0;
+  -webkit-font-feature-settings: "liga";
+  -moz-font-feature-settings: "liga=1";
+  -moz-font-feature-settings: "liga";
+  -ms-font-feature-settings: "liga" 1;
+  font-feature-settings: "liga";
+  -webkit-font-variant-ligatures: discretionary-ligatures;
+  font-variant-ligatures: discretionary-ligatures;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ph.ph-arrow-elbow-down-right:before {
+  content: "\e046";
+}
+.ph.ph-arrow-right:before {
+  content: "\e06c";
+}
+.ph.ph-arrows-left-right:before {
+  content: "\e0a0";
+}
+.ph.ph-book-open:before {
+  content: "\e0e6";
+}
+.ph.ph-book-open-text:before {
+  content: "\e8f2";
+}
+.ph.ph-books:before {
+  content: "\e758";
+}
+.ph.ph-calendar-blank:before {
+  content: "\e10a";
+}
+.ph.ph-caret-left:before {
+  content: "\e138";
+}
+.ph.ph-caret-right:before {
+  content: "\e13a";
+}
+.ph.ph-clock-counter-clockwise:before {
+  content: "\e1a0";
+}
+.ph.ph-columns:before {
+  content: "\e546";
+}
+.ph.ph-download-simple:before {
+  content: "\e20c";
+}
+.ph.ph-film-strip:before {
+  content: "\e792";
+}
+.ph.ph-fire:before {
+  content: "\e242";
+}
+.ph.ph-game-controller:before {
+  content: "\e26e";
+}
+.ph.ph-globe-hemisphere-west:before {
+  content: "\e28c";
+}
+.ph.ph-hourglass-medium:before {
+  content: "\e2b8";
+}
+.ph.ph-hourglass-simple:before {
+  content: "\e2ba";
+}
+.ph.ph-link:before {
+  content: "\e2e2";
+}
+.ph.ph-link-simple:before {
+  content: "\e2e6";
+}
+.ph.ph-magnifying-glass:before {
+  content: "\e30c";
+}
+.ph.ph-moon-stars:before {
+  content: "\e58e";
+}
+.ph.ph-plus:before {
+  content: "\e3d4";
+}
+.ph.ph-scroll:before {
+  content: "\eb7a";
+}
+.ph.ph-sparkle:before {
+  content: "\e6a2";
+}
+.ph.ph-x:before {
+  content: "\e4f6";
+}
+.ph.ph-x-circle:before {
+  content: "\e4f8";
+}
+
+@font-face {
+  font-family: "Phosphor-Bold";
+  src: url("./Phosphor-Bold.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.ph-bold {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: "Phosphor-Bold" !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Enable Ligatures ================ */
+  letter-spacing: 0;
+  -webkit-font-feature-settings: "liga";
+  -moz-font-feature-settings: "liga=1";
+  -moz-font-feature-settings: "liga";
+  -ms-font-feature-settings: "liga" 1;
+  font-feature-settings: "liga";
+  -webkit-font-variant-ligatures: discretionary-ligatures;
+  font-variant-ligatures: discretionary-ligatures;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ph-bold.ph-arrow-elbow-down-right:before {
+  content: "\e046";
+}
+.ph-bold.ph-arrow-right:before {
+  content: "\e06c";
+}
+.ph-bold.ph-arrows-left-right:before {
+  content: "\e0a0";
+}
+.ph-bold.ph-book-open:before {
+  content: "\e0e6";
+}
+.ph-bold.ph-book-open-text:before {
+  content: "\e8f2";
+}
+.ph-bold.ph-books:before {
+  content: "\e758";
+}
+.ph-bold.ph-calendar-blank:before {
+  content: "\e10a";
+}
+.ph-bold.ph-caret-left:before {
+  content: "\e138";
+}
+.ph-bold.ph-caret-right:before {
+  content: "\e13a";
+}
+.ph-bold.ph-clock-counter-clockwise:before {
+  content: "\e1a0";
+}
+.ph-bold.ph-columns:before {
+  content: "\e546";
+}
+.ph-bold.ph-download-simple:before {
+  content: "\e20c";
+}
+.ph-bold.ph-film-strip:before {
+  content: "\e792";
+}
+.ph-bold.ph-fire:before {
+  content: "\e242";
+}
+.ph-bold.ph-game-controller:before {
+  content: "\e26e";
+}
+.ph-bold.ph-globe-hemisphere-west:before {
+  content: "\e28c";
+}
+.ph-bold.ph-hourglass-medium:before {
+  content: "\e2b8";
+}
+.ph-bold.ph-hourglass-simple:before {
+  content: "\e2ba";
+}
+.ph-bold.ph-link:before {
+  content: "\e2e2";
+}
+.ph-bold.ph-link-simple:before {
+  content: "\e2e6";
+}
+.ph-bold.ph-magnifying-glass:before {
+  content: "\e30c";
+}
+.ph-bold.ph-moon-stars:before {
+  content: "\e58e";
+}
+.ph-bold.ph-plus:before {
+  content: "\e3d4";
+}
+.ph-bold.ph-scroll:before {
+  content: "\eb7a";
+}
+.ph-bold.ph-sparkle:before {
+  content: "\e6a2";
+}
+.ph-bold.ph-x:before {
+  content: "\e4f6";
+}
+.ph-bold.ph-x-circle:before {
+  content: "\e4f8";
+}
+
+@font-face {
+  font-family: "Phosphor-Fill";
+  src: url("./Phosphor-Fill.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.ph-fill {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: "Phosphor-Fill" !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Enable Ligatures ================ */
+  letter-spacing: 0;
+  -webkit-font-feature-settings: "liga";
+  -moz-font-feature-settings: "liga=1";
+  -moz-font-feature-settings: "liga";
+  -ms-font-feature-settings: "liga" 1;
+  font-feature-settings: "liga";
+  -webkit-font-variant-ligatures: discretionary-ligatures;
+  font-variant-ligatures: discretionary-ligatures;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ph-fill.ph-arrow-elbow-down-right:before {
+  content: "\e046";
+}
+.ph-fill.ph-arrow-right:before {
+  content: "\e06c";
+}
+.ph-fill.ph-arrows-left-right:before {
+  content: "\e0a0";
+}
+.ph-fill.ph-book-open:before {
+  content: "\e0e6";
+}
+.ph-fill.ph-book-open-text:before {
+  content: "\e8f2";
+}
+.ph-fill.ph-books:before {
+  content: "\e758";
+}
+.ph-fill.ph-calendar-blank:before {
+  content: "\e10a";
+}
+.ph-fill.ph-caret-left:before {
+  content: "\e138";
+}
+.ph-fill.ph-caret-right:before {
+  content: "\e13a";
+}
+.ph-fill.ph-clock-counter-clockwise:before {
+  content: "\e1a0";
+}
+.ph-fill.ph-columns:before {
+  content: "\e546";
+}
+.ph-fill.ph-download-simple:before {
+  content: "\e20c";
+}
+.ph-fill.ph-film-strip:before {
+  content: "\e792";
+}
+.ph-fill.ph-fire:before {
+  content: "\e242";
+}
+.ph-fill.ph-game-controller:before {
+  content: "\e26e";
+}
+.ph-fill.ph-globe-hemisphere-west:before {
+  content: "\e28c";
+}
+.ph-fill.ph-hourglass-medium:before {
+  content: "\e2b8";
+}
+.ph-fill.ph-hourglass-simple:before {
+  content: "\e2ba";
+}
+.ph-fill.ph-link:before {
+  content: "\e2e2";
+}
+.ph-fill.ph-link-simple:before {
+  content: "\e2e6";
+}
+.ph-fill.ph-magnifying-glass:before {
+  content: "\e30c";
+}
+.ph-fill.ph-moon-stars:before {
+  content: "\e58e";
+}
+.ph-fill.ph-plus:before {
+  content: "\e3d4";
+}
+.ph-fill.ph-scroll:before {
+  content: "\eb7a";
+}
+.ph-fill.ph-sparkle:before {
+  content: "\e6a2";
+}
+.ph-fill.ph-x:before {
+  content: "\e4f6";
+}
+.ph-fill.ph-x-circle:before {
+  content: "\e4f8";
+}
+

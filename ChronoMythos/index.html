@@ -1,0 +1,2105 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ChronoMythos, the temporal registry: twenty thousand years of history, myth and the tales set in them. A companion to The Magic Registry.">
+    <meta name="theme-color" content="#0f1630">
+    <title>ChronoMythos | The Temporal Registry</title>
+    <link rel="preload" href="./fonts/eb-garamond-regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./fonts/cormorant-garamond-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="./chronomythos.css">
+    <link rel="stylesheet" href="./icons/phosphor.css">
+</head>
+<body class="min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+
+    <div class="bg-obsidian-950 border-b border-slate-800/90 text-[11px] font-mono py-1.5 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-3 text-slate-400 tracking-widest">
+                <span>The Temporal Registry</span>
+                <span class="hidden sm:inline text-amber-400" aria-hidden="true">&#9670;</span>
+                <span class="hidden sm:inline">20,000 BCE to 1600 CE</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="../magic-registry/" class="text-slate-300 hover:text-amber-400 flex items-center gap-1.5 transition">
+                    <i class="ph-bold ph-sparkle text-amber-400" aria-hidden="true"></i>
+                    <span>A companion to The Magic Registry</span>
+                </a>
+                <button id="exportRegistryBtn" class="text-slate-300 hover:text-amber-400 flex items-center gap-1 transition" title="Download the whole chronicle as a JSON file">
+                    <i class="ph-bold ph-download-simple text-amber-400" aria-hidden="true"></i>
+                    <span class="hidden sm:inline">Download the ledger</span>
+                    <span class="sm:hidden">Ledger</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Header & Search -->
+    <header class="lg:sticky lg:top-0 z-40 glass-panel border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 border border-amber-500/60 flex items-center justify-center text-amber-400 registry-stamp" aria-hidden="true">
+                    <i class="ph ph-hourglass-medium text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-seal text-lg sm:text-xl font-semibold tracking-[0.18em] text-white">
+                        ChronoMythos
+                    </h1>
+                    <p class="text-xs text-slate-400 italic hidden sm:block">A ledger of world history, mythic transitions and the tales set in them</p>
+                </div>
+            </div>
+
+            <!-- Global Search & Controls -->
+            <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto justify-end">
+                <div class="relative w-full sm:w-64">
+                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true"></i>
+                    <input 
+                        id="globalSearchInput" 
+                        type="search" 
+                        aria-label="Search the chronicle"
+                        placeholder="Search eras, myths and tales" 
+                        class="w-full pl-9 pr-8 py-2 bg-obsidian-950/90 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors italic"
+                    >
+                    <button id="clearSearchBtn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white" aria-label="Clear the search">
+                        <i class="ph-fill ph-x-circle" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <button id="themeToggleBtn" aria-pressed="false" class="px-3 py-2 rounded-xl bg-obsidian-950 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-mono flex items-center gap-1.5 transition" title="Turn the page between night and parchment">
+                    <i id="themeToggleIcon" class="ph-fill ph-scroll text-amber-400 text-base" aria-hidden="true"></i>
+                    <span id="themeToggleLabel" class="sr-only md:not-sr-only">Parchment</span>
+                </button>
+
+                <button id="openCompareModalBtn" class="px-3 py-2 rounded-xl bg-obsidian-950 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-mono flex items-center gap-1.5 transition" title="How the chronicle is arranged">
+                    <i class="ph ph-book-open text-amber-400 text-base" aria-hidden="true"></i>
+                    <span class="sr-only lg:not-sr-only">How to read</span>
+                </button>
+
+                <button id="openAddMediaBtn" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs font-mono tracking-wider flex items-center gap-1.5 transition">
+                    <i class="ph-bold ph-plus" aria-hidden="true"></i>
+                    <span>Add a tale</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Layer 1: Macro-Era Timeline Ribbon -->
+        <div class="border-t border-slate-800/60 bg-obsidian-950/70">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span id="eraRibbonLabel" class="text-xs font-mono tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <span class="text-amber-400" aria-hidden="true">&#9670;</span>
+                        The six volumes of the ages
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <button id="prevEraBtn" aria-label="Previous volume" class="p-1 rounded-lg bg-obsidian-900 hover:bg-slate-700 border border-slate-700/80 text-slate-300 text-xs font-mono flex items-center gap-1 px-2.5 transition">
+                            <i class="ph-bold ph-caret-left" aria-hidden="true"></i> <span class="hidden sm:inline">Previous</span>
+                        </button>
+                        <button id="nextEraBtn" aria-label="Next volume" class="p-1 rounded-lg bg-obsidian-900 hover:bg-slate-700 border border-slate-700/80 text-slate-300 text-xs font-mono flex items-center gap-1 px-2.5 transition">
+                            <span class="hidden sm:inline">Next</span> <i class="ph-bold ph-caret-right" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="eraRibbonContainer" role="group" aria-labelledby="eraRibbonLabel" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Global Search Results Drawer (Hidden unless searching) -->
+    <div id="searchResultsBanner" class="hidden bg-amber-500/10 border-b border-amber-500/30 py-4 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-sm font-semibold text-amber-300 flex items-center gap-2" aria-live="polite">
+                    <i class="ph-fill ph-sparkle" aria-hidden="true"></i>
+                    <span id="searchCountText">Found across all the ages</span>
+                </h2>
+                <button id="closeSearchBannerBtn" class="text-xs font-mono text-amber-300 hover:underline">Close the search</button>
+            </div>
+            <div id="globalSearchGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+        <!-- Era Hero Banner -->
+        <section id="eraHeroBanner" class="relative rounded-2xl overflow-hidden border border-amber-500/30 p-6 sm:p-8 era-glow shadow-xl">
+            <div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                <div class="space-y-3 max-w-3xl flex-1 min-w-0">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span id="eraRegistryCode" class="px-2.5 py-1 rounded text-xs font-mono bg-amber-500 text-slate-950 tracking-widest">
+                            Volume I
+                        </span>
+                        <span id="eraDateBadge" class="px-3 py-1 rounded text-xs font-mono bg-obsidian-950/80 text-white border border-slate-700">
+                            20,000 BCE – 10,000 BCE
+                        </span>
+                        <span id="eraArchetypeBadge" class="px-3 py-1 rounded text-xs font-mono bg-amber-500/15 text-amber-300 registry-stamp">
+                            Animism, Megafauna & Primordial Spirits
+                        </span>
+                    </div>
+                    <h2 id="eraTitle" class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+                        The Upper Paleolithic & Ice Age
+                    </h2>
+                    <p id="eraTagline" class="font-editorial text-slate-200 text-lg sm:text-xl italic leading-relaxed">
+                        Humanity's earliest struggle for survival amidst colossal glaciers, painted caves, and the birth of shamanic storytelling.
+                    </p>
+                </div>
+
+                <!-- Quick Stats Pill Box -->
+                <div class="grid grid-cols-3 gap-2 sm:gap-3 bg-obsidian-950/90 backdrop-blur-md p-3.5 rounded-xl border border-slate-700/80 shrink-0 lg:w-[26rem]">
+                    <div class="text-center px-2">
+                        <div class="text-[11px] font-mono text-slate-400">Dominant mythos</div>
+                        <div id="statMythos" class="text-xs sm:text-sm font-semibold text-white mt-0.5">Shamanic Animism</div>
+                    </div>
+                    <div class="text-center px-2 border-x border-slate-800">
+                        <div class="text-[11px] font-mono text-slate-400">Craft and magic</div>
+                        <div id="statTech" class="text-xs sm:text-sm font-semibold text-amber-400 mt-0.5">Flint, Ochre & Bone</div>
+                    </div>
+                    <div class="text-center px-2">
+                        <div class="text-[11px] font-mono text-slate-400">Tales kept</div>
+                        <div id="statMediaCount" class="text-xs sm:text-sm font-semibold text-emerald-400 mt-0.5">6 tales</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Layer 2: Temporal Drill-Down (Centuries, Decades, & Milestone Years) -->
+        <section class="glass-panel rounded-2xl p-5 sm:p-6 border border-slate-800/90 space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
+                <div>
+                    <span class="text-xs font-mono tracking-wider text-amber-400 flex items-center gap-1.5">
+                        <i class="ph-fill ph-clock-counter-clockwise" aria-hidden="true"></i>
+                        The second layer: centuries, decades and turning-point years
+                    </span>
+                    <h2 class="text-2xl font-serif font-bold text-white mt-0.5">The Turning Points of the Age</h2>
+                </div>
+                <span class="text-xs text-slate-400 italic">Each division of time opens on its events and the shift they made in myth.</span>
+            </div>
+
+            <!-- Sub-period / Century Tabs -->
+            <div>
+                <div class="text-xs font-mono text-slate-400 mb-2 flex items-center gap-1.5">
+                    <i class="ph ph-calendar-blank text-amber-400" aria-hidden="true"></i> Divisions of the age
+                </div>
+                <div id="centuryTabsContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- Decades & Specific Years Inspector -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-2">
+                <!-- Left: Decades & Milestone Years Selector -->
+                <div class="lg:col-span-5 bg-obsidian-950/90 rounded-xl p-4 border border-slate-800/80 space-y-3">
+                    <div class="text-xs font-mono text-slate-400 flex items-center justify-between">
+                        <span><i class="ph ph-hourglass-simple text-amber-400 mr-1" aria-hidden="true"></i> Decades and milestone years</span>
+                        <span id="activeCenturyLabel" class="text-amber-400 font-semibold"></span>
+                    </div>
+                    <div id="yearNodesList" class="space-y-2">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+
+                <!-- Right: Detailed Year / Decade Inspector Card -->
+                <div id="yearDetailInspector" aria-live="polite" class="lg:col-span-7 bg-gradient-to-br from-obsidian-900 to-obsidian-950 rounded-xl p-5 border border-slate-700/70 flex flex-col justify-between">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Layer 3: Historical & Mythic Context (The 3 Core Pillars) -->
+        <section class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <span class="text-xs font-mono tracking-wider text-amber-400 flex items-center gap-1.5">
+                        <i class="ph-fill ph-columns" aria-hidden="true"></i>
+                        The third layer: the anatomy of the age
+                    </span>
+                    <h2 class="text-2xl font-serif font-bold text-white">The Period, the Great Transition and the Beliefs</h2>
+                </div>
+                <p class="text-xs text-slate-400 italic">Kept for worldbuilders, writers and students of history</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <!-- Pillar 1: What This Period Was -->
+                <div class="glass-panel rounded-2xl p-6 border border-slate-800/90 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono tracking-widest px-2.5 py-1 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                                I &middot; The Period
+                            </span>
+                            <i class="ph ph-globe-hemisphere-west text-2xl text-sky-400" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-white">What This Age Was</h3>
+                        <p id="pillarPeriodSummary" class="text-sm text-slate-300 leading-relaxed"></p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-800/80">
+                        <div class="text-xs font-mono text-slate-400 mb-2">Defining realities</div>
+                        <ul id="pillarPeriodBullets" class="space-y-1.5 text-xs text-slate-300"></ul>
+                    </div>
+                </div>
+
+                <!-- Pillar 2: What The Transition Was -->
+                <div class="glass-panel rounded-2xl p-6 border border-slate-800/90 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono tracking-widest px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                II &middot; The Transition
+                            </span>
+                            <i class="ph ph-arrows-left-right text-2xl text-amber-400" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-white">How the World Shifted</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="p-3 rounded-xl bg-obsidian-950/80 border border-slate-800">
+                                <div class="text-xs font-mono text-emerald-400 mb-1 flex items-center gap-1">
+                                    <i class="ph-bold ph-arrow-elbow-down-right" aria-hidden="true"></i> Arrival, from the age before
+                                </div>
+                                <p id="pillarTransitionIn" class="text-xs text-slate-300 leading-relaxed"></p>
+                            </div>
+                            <div class="p-3 rounded-xl bg-obsidian-950/80 border border-slate-800">
+                                <div class="text-xs font-mono text-rose-400 mb-1 flex items-center gap-1">
+                                    <i class="ph-bold ph-arrow-right" aria-hidden="true"></i> Departure, into the age after
+                                </div>
+                                <p id="pillarTransitionOut" class="text-xs text-slate-300 leading-relaxed"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-800/80">
+                        <div class="text-xs font-mono text-slate-400 mb-1">Catalyst of change</div>
+                        <p id="pillarTransitionCatalyst" class="text-xs font-medium text-amber-300"></p>
+                    </div>
+                </div>
+
+                <!-- Pillar 3: Beliefs, Cultures & Practices -->
+                <div class="glass-panel rounded-2xl p-6 border border-slate-800/90 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono tracking-widest px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                III &middot; Beliefs and Culture
+                            </span>
+                            <i class="ph ph-fire text-2xl text-purple-400" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-white">Mythos, Culture and Practice</h3>
+
+                        <!-- Interactive Sub-Tabs for Beliefs / Cultures / Practices -->
+                        <div class="grid grid-cols-3 gap-1 bg-obsidian-950 p-1 rounded-xl border border-slate-800" role="group" aria-label="Beliefs, cultures or practices">
+                            <button data-culture-tab="beliefs" aria-pressed="true" class="culture-tab-btn py-1.5 px-2 rounded-lg text-xs font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30 transition">
+                                Beliefs
+                            </button>
+                            <button data-culture-tab="cultures" class="culture-tab-btn py-1.5 px-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">
+                                Cultures
+                            </button>
+                            <button data-culture-tab="practices" class="culture-tab-btn py-1.5 px-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">
+                                Practices
+                            </button>
+                        </div>
+
+                        <div id="cultureTabContent" class="space-y-2.5 pt-1">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-800/80">
+                        <div class="text-xs font-mono text-slate-400 mb-1">Signature mythic archetype</div>
+                        <p id="pillarMythicArchetype" class="text-xs text-purple-300 font-medium"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Layer 4: Period-Relevant Fantasy, Mythological & Historical Media -->
+        <section class="glass-panel rounded-2xl p-5 sm:p-7 border border-slate-800/90 space-y-6">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                <div>
+                    <span class="text-xs font-mono tracking-wider text-amber-400 flex items-center gap-1.5">
+                        <i class="ph-fill ph-books" aria-hidden="true"></i>
+                        The fourth layer: the vault of tales
+                    </span>
+                    <h2 class="text-2xl font-serif font-bold text-white mt-0.5">
+                        Fantasy, Myth and History Set in the Age
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1 italic">
+                        Books, films, games and ancient epics set in, or drawn directly from, <span id="mediaSectionEraName" class="text-amber-400 not-italic">this age</span>.
+                    </p>
+                </div>
+
+                <!-- Media Filter Controls -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Format Filter -->
+                    <div class="flex flex-wrap items-center bg-obsidian-950 p-1 rounded-xl border border-slate-800 text-xs" role="group" aria-label="Kind of work">
+                        <button data-media-type="ALL" class="media-type-btn px-2.5 py-1.5 rounded-lg font-medium bg-amber-500 text-slate-950 transition">All</button>
+                        <button data-media-type="Myth / Epic" class="media-type-btn px-2.5 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition">Sacred / Epics</button>
+                        <button data-media-type="Book" class="media-type-btn px-2.5 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition">Books</button>
+                        <button data-media-type="Film / Series" class="media-type-btn px-2.5 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition">Film & TV</button>
+                        <button data-media-type="Game" class="media-type-btn px-2.5 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition">Games</button>
+                    </div>
+
+                    <!-- Tone / Lens Filter (Mythological, Fantasy, Historical) -->
+                    <select id="mediaLensFilter" aria-label="Lens" class="bg-obsidian-950 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500">
+                        <option value="ALL">All Lenses (Myth, Fantasy & History)</option>
+                        <option value="Mythological">Mythological (Gods & Folklore)</option>
+                        <option value="High / Dark Fantasy">Fantasy (Secondary Worlds & Magic)</option>
+                        <option value="Historical Fiction">Historical (Grounded Period Drama)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Media Cards Grid -->
+            <div id="mediaVaultGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Populated via JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal 1: Media Detail Inspector Modal -->
+    <div id="mediaDetailModal" role="dialog" aria-modal="true" aria-labelledby="modalMediaTitle" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="glass-panel bg-obsidian-900 border border-slate-700 rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl relative">
+            <button id="closeMediaModalBtn" aria-label="Close" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+                <i class="ph-bold ph-x" aria-hidden="true"></i>
+            </button>
+            <div class="flex flex-wrap items-center gap-2 pr-10" id="modalMediaBadges"></div>
+            <div>
+                <h2 id="modalMediaTitle" class="font-serif text-3xl font-bold text-white"></h2>
+                <p id="modalMediaCreator" class="text-xs font-mono text-slate-400 mt-1"></p>
+            </div>
+            <div class="p-4 rounded-xl bg-obsidian-950 border border-slate-800 space-y-2">
+                <div class="text-xs font-mono text-amber-400">The tale and its world</div>
+                <p id="modalMediaSynopsis" class="text-sm text-slate-200 leading-relaxed"></p>
+            </div>
+            <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 space-y-1.5">
+                <div class="text-xs font-mono text-amber-300 flex items-center gap-1.5">
+                    <i class="ph-fill ph-link" aria-hidden="true"></i> Its tie to the age
+                </div>
+                <p id="modalMediaHistoricalTie" class="text-xs text-slate-200 leading-relaxed"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Layer Architecture Guide Modal -->
+    <div id="layerGuideModal" role="dialog" aria-modal="true" aria-labelledby="layerGuideTitle" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="glass-panel bg-obsidian-900 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl relative">
+            <button id="closeLayerGuideBtn" aria-label="Close" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+                <i class="ph-bold ph-x" aria-hidden="true"></i>
+            </button>
+            <div>
+                <span class="text-xs font-mono text-amber-400">How to read the chronicle</span>
+                <h2 id="layerGuideTitle" class="font-serif text-3xl font-bold text-white mt-0.5">Four Layers, from the Age to the Tale</h2>
+                <p class="text-sm text-slate-400 mt-1 italic">A companion to <a href="../magic-registry/" class="text-amber-400 underline not-italic">The Magic Registry</a>.</p>
+            </div>
+            <div class="space-y-3 text-xs sm:text-sm">
+                <div class="p-3.5 rounded-xl bg-obsidian-950 border border-slate-800 flex gap-3">
+                    <span class="font-seal text-amber-400 w-6 shrink-0">I</span>
+                    <div>
+                        <div class="font-semibold text-white">The six volumes</div>
+                        <p class="text-slate-400 text-xs mt-0.5">Human and mythic history in six volumes, from the Ice Age (20,000 BCE) to the Renaissance (1600 CE). The arrow keys turn from one volume to the next.</p>
+                    </div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-obsidian-950 border border-slate-800 flex gap-3">
+                    <span class="font-seal text-amber-400 w-6 shrink-0">II</span>
+                    <div>
+                        <div class="font-semibold text-white">Centuries, decades and turning-point years</div>
+                        <p class="text-slate-400 text-xs mt-0.5">Each age narrows from its broad divisions to the decades and the exact years on which it turned.</p>
+                    </div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-obsidian-950 border border-slate-800 flex gap-3">
+                    <span class="font-seal text-amber-400 w-6 shrink-0">III</span>
+                    <div>
+                        <div class="font-semibold text-white">The three pillars</div>
+                        <p class="text-slate-400 text-xs mt-0.5">The period itself, the transition into and out of it, and its beliefs, cultures and practices.</p>
+                    </div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-obsidian-950 border border-slate-800 flex gap-3">
+                    <span class="font-seal text-amber-400 w-6 shrink-0">IV</span>
+                    <div>
+                        <div class="font-semibold text-white">The vault of tales</div>
+                        <p class="text-slate-400 text-xs mt-0.5">Books, films, games and sacred epics set in the age, sorted by kind and by lens: myth, fantasy or history.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Add Custom Media Entry -->
+    <div id="addMediaModal" role="dialog" aria-modal="true" aria-labelledby="addMediaTitle" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="glass-panel bg-obsidian-900 border border-slate-700 rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 shadow-2xl relative">
+            <button id="closeAddMediaBtn" aria-label="Close" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+                <i class="ph-bold ph-x" aria-hidden="true"></i>
+            </button>
+            <div>
+                <span class="text-xs font-mono text-amber-400">A shelf of your own</span>
+                <h2 id="addMediaTitle" class="font-serif text-2xl font-bold text-white">Add a Tale to an Age</h2>
+                <p class="text-xs text-slate-400 italic mt-1">Kept only in this browser, beside the chronicle's own entries.</p>
+            </div>
+            <form id="addMediaForm" class="space-y-3 text-xs sm:text-sm">
+                <div>
+                    <label for="formEraSelect" class="block text-xs text-slate-400 mb-1">The age</label>
+                    <select id="formEraSelect" class="w-full bg-obsidian-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500"></select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="formTitle" class="block text-xs text-slate-400 mb-1">Title</label>
+                        <input id="formTitle" required type="text" placeholder="e.g., The Northman" class="w-full bg-obsidian-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label for="formCreator" class="block text-xs text-slate-400 mb-1">Maker and year</label>
+                        <input id="formCreator" required type="text" placeholder="e.g., Robert Eggers (2022)" class="w-full bg-obsidian-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label for="formType" class="block text-xs text-slate-400 mb-1">Medium</label>
+                        <select id="formType" class="w-full bg-obsidian-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+                            <option value="Book">Book</option>
+                            <option value="Film / Series">Film / Series</option>
+                            <option value="Game">Game</option>
+                            <option value="Myth / Epic">Myth / Epic</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="formLens" class="block text-xs text-slate-400 mb-1">Lens</label>
+                        <select id="formLens" class="w-full bg-obsidian-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+                            <option value="High / Dark Fantasy">High / Dark Fantasy</option>
+                            <option value="Mythological">Mythological</option>
+                            <option value="Historical Fiction">Historical Fiction</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="formSettingYear" class="block text-xs text-slate-400 mb-1">Set in</label>
+                        <input id="formSettingYear" required type="text" placeholder="e.g., 895 CE" class="w-full bg-obsidian-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+                    </div>
+                </div>
+                <div>
+                    <label for="formSynopsis" class="block text-xs text-slate-400 mb-1">The tale and its world</label>
+                    <textarea id="formSynopsis" required rows="2" placeholder="How does this work portray the period or its myths?" class="w-full bg-obsidian-950 border border-slate-700 rounded-xl px-3 py-2 text-white"></textarea>
+                </div>
+                <div>
+                    <label for="formTie" class="block text-xs text-slate-400 mb-1">Its tie to the age</label>
+                    <input id="formTie" required type="text" placeholder="e.g., Draws directly from Norse Berserker rituals and Icelandic sagas" class="w-full bg-obsidian-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+                </div>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" id="cancelAddMediaBtn" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-medium">Cancel</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-semibold">Save to Timeline</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="py-8 mt-12 text-center text-xs text-slate-400">
+        <div class="max-w-3xl mx-auto px-4 space-y-3">
+            <div class="house-rule" aria-hidden="true"><span class="text-[11px]">&#9670;</span></div>
+            <p class="italic">ChronoMythos, the temporal registry: twenty thousand years of history, myth and the tales set in them. Set in EB Garamond, Cormorant, IM Fell and Cinzel, as a companion to <a href="../magic-registry/" class="text-amber-400 underline not-italic">The Magic Registry</a>.</p>
+            <p class="font-mono">The <kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded">&larr;</kbd> and <kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded">&rarr;</kbd> keys turn the volumes</p>
+        </div>
+    </footer>
+
+    <script>
+        const TIMELINE_DATA = [
+            {
+                id: "ice-age",
+                shortName: "I. Ice Age",
+                name: "The Upper Paleolithic & Ice Age",
+                dateRange: "20,000 BCE – 10,000 BCE",
+                archetype: "Animism, Megafauna & Primordial Spirits",
+                accentHex: "#8ea2d6",
+                bgGradient: "linear-gradient(135deg, rgba(70, 92, 150, 0.42) 0%, rgba(15, 22, 48, 0.95) 100%)",
+                tagline: "Humanity's earliest struggle for survival amidst colossal continental glaciers, painted subterranean caves, and the birth of shamanic storytelling.",
+                stats: {
+                    mythos: "Shamanic Animism",
+                    tech: "Flint, Ochre & Bone"
+                },
+                period: {
+                    summary: "During the Last Glacial Maximum and its slow thaw, nomadic bands of Homo sapiens shared a frozen, untamed world with woolly mammoths, cave lions, and saber-toothed cats. There were no cities, written laws, or metal tools—survival hinged on kinship, seasonal migration, and oral memory.",
+                    bullets: [
+                        "Small egalitarian hunter-gatherer bands of 25–50 kin members.",
+                        "Deep limestone cave complexes (Lascaux, Chauvet, Altamira) used as sacred acoustic chambers.",
+                        "Coexistence and eventual disappearance of archaic hominins (Neanderthals & Denisovans) echoing into folklore as 'trolls' or 'wild men'."
+                    ]
+                },
+                transition: {
+                    in: "Emerged from the Middle Paleolithic through the 'Cognitive Revolution'—an explosion of symbolic art, complex spoken grammar, tailored furs, and ritual burial.",
+                    out: "The Younger Dryas freeze and subsequent Holocene warming melted the great ice sheets, drowning coastal lands (like Doggerland), driving megafauna extinct, and forcing humans toward wild grain harvesting.",
+                    catalyst: "Rapid glacial meltwater pulses, megafauna extinction, and the warming of the Fertile Crescent."
+                },
+                cultureData: {
+                    beliefs: [
+                        { title: "Universal Animism", desc: "Every glacier, river, mammoth, and wind possessed a conscious spirit that had to be bargained with or appeased." },
+                        { title: "The Three-Tiered Cosmos", desc: "Early shamanic worldview dividing reality into the Upper World (sky spirits), Middle Earth (mortal hunting grounds), and Underworld (caves & ancestors)." },
+                        { title: "The Great Mother & Animal Master", desc: "Veneration of fertility ('Venus' figurines) alongside the Lord/Lady of the Beasts who granted hunting success." }
+                    ],
+                    cultures: [
+                        { title: "Magdalenian Culture (Western Europe)", desc: "Master reindeer hunters and creators of polychrome cave murals and intricately carved bone harpoons." },
+                        { title: "Gravettian Mammoth Hunters (Eurasian Steppe)", desc: "Built circular dwellings out of interlocking mammoth jaws and tusks across the frozen tundra." },
+                        { title: "Beringian Pathfinders", desc: "Nomadic bands crossing the exposed land bridge from Siberia into the Americas." }
+                    ],
+                    practices: [
+                        { title: "Subterranean Cave Trances", desc: "Using flickering animal-fat lamps, bone flutes, and acoustic echoes deep inside caves to make painted beasts appear to breathe and move." },
+                        { title: "Red Ochre Burials", desc: "Coating the deceased in blood-red iron oxide powder with shell beads and ivory spears for the spirit journey." },
+                        { title: "Therithropic Transformation", desc: "Shamans donning antler headdresses and wolf pelts (like the 'Sorcerer' of Trois-Frères) to channel animal spirits." }
+                    ],
+                    archetypeSummary: "The Antlered Shaman, The Primordial Hunter, and The Spirit Beast."
+                },
+                centuries: [
+                    {
+                        label: "20th–16th Millennia BCE",
+                        subtitle: "Last Glacial Maximum & Solutrean Survival",
+                        nodes: [
+                            {
+                                scale: "Millennium / Century",
+                                year: "c. 19,500 BCE",
+                                title: "Peak of the Last Glacial Maximum",
+                                event: "Ice sheets two miles thick cover Northern Europe and North America; sea levels are 400 feet lower than today.",
+                                mythicShift: "Birth of 'Endless Winter' myths (precursors to Fimbulwinter) and ancestral memories of exposed sunken lands."
+                            },
+                            {
+                                scale: "Turning Point",
+                                year: "c. 15,000 BCE",
+                                title: "Consecration of the Sanctuary of Lascaux",
+                                event: "Generations of Magdalenian artists paint the 'Hall of the Bulls' and the mysterious 'Shaft of the Dead Man' using mineral pigments.",
+                                mythicShift: "Star maps (such as the Pleiades above the Bull) are encoded directly into animal mythologies."
+                            }
+                        ]
+                    },
+                    {
+                        label: "15th–12th Millennia BCE",
+                        subtitle: "The Great Thaw & Magdalenian Golden Age",
+                        nodes: [
+                            {
+                                scale: "Century / Phase",
+                                year: "c. 13,500 BCE",
+                                title: "Carving of the Swimming Reindeer & Lion-Man Tradition",
+                                event: "Portable ivory masterpieces and bone flutes proliferate across Europe as summer hunting grounds expand northward.",
+                                mythicShift: "Standardization of shared totemic clans across hundreds of miles of steppe."
+                            },
+                            {
+                                scale: "Decade / Milestone",
+                                year: "c. 12,000 BCE",
+                                title: "Domestication of the Wolf",
+                                event: "Paleolithic camps form permanent symbiotic bonds with ice-age wolves, breeding the first hunting and guardian dogs.",
+                                mythicShift: "The Hound becomes the universal mythic guardian of the threshold between life and death."
+                            }
+                        ]
+                    },
+                    {
+                        label: "11th Millennium BCE",
+                        subtitle: "Younger Dryas Shock & End of the Ice Age",
+                        nodes: [
+                            {
+                                scale: "Decade / Cataclysm",
+                                year: "c. 10,900 BCE",
+                                title: "Onset of the Younger Dryas Freeze",
+                                event: "Within a few decades, global temperatures plummet back into near-glacial conditions, stressing megafauna and human populations.",
+                                mythicShift: "Cataclysmic climate memory solidifies stories of sudden divine wrath and world-cleansing floods/frosts."
+                            },
+                            {
+                                scale: "Milestone Year",
+                                year: "c. 9,600 BCE",
+                                title: "First Pillars Raised at Göbekli Tepe",
+                                event: "Hunter-gatherers gather in Anatolia to carve massive T-shaped limestone pillars adorned with vultures, scorpions, and foxes.",
+                                mythicShift: "Religion and monumental sanctuary-building precede settled farming—the bridge to the Neolithic."
+                            }
+                        ]
+                    }
+                ],
+                media: [
+                    {
+                        title: "The Cave of Bones (Ice Age Spiritual Origins)",
+                        creator: "Oral & Archaeological Tradition (Upper Paleolithic)",
+                        settingYear: "c. 17,000 BCE",
+                        type: "Myth / Epic",
+                        lens: "Mythological",
+                        synopsis: "The primordial Cosmic Hunt myth—found across Eurasia and the Americas—where a great bear or elk is pursued into the night sky, becoming the stars of Ursa Major.",
+                        historicalTie: "Comparative mythologists trace the Cosmic Hunt directly back to Upper Paleolithic Beringian and Eurasian mammoth-hunting bands."
+                    },
+                    {
+                        title: "The Clan of the Cave Bear",
+                        creator: "Jean M. Auel (1980)",
+                        settingYear: "c. 28,000 – 20,000 BCE",
+                        type: "Book",
+                        lens: "Historical Fiction",
+                        synopsis: "Orphaned Cro-Magnon girl Ayla is adopted by a conservative clan of Neanderthals led by their medicine woman Iza and totem shaman Creb.",
+                        historicalTie: "Explores the clash between instinctive/ritual memory and the innovative toolmaking of Upper Paleolithic Homo sapiens."
+                    },
+                    {
+                        title: "Far Cry Primal",
+                        creator: "Ubisoft (2016)",
+                        settingYear: "10,000 BCE",
+                        type: "Game",
+                        lens: "High / Dark Fantasy",
+                        synopsis: "Set in the lush Carpathian basin of Oros at the end of the Ice Age, hunter Takkar masters the shamanic Beast Master gift to unite the scattered Wenja tribe.",
+                        historicalTie: "Features reconstructed proto-languages, flint knapping, mammoth hunts, and shamanic vision quests."
+                    },
+                    {
+                        title: "Primal",
+                        creator: "Genndy Tartakovsky (2019–2022)",
+                        settingYear: "Mythic Prehistory",
+                        type: "Film / Series",
+                        lens: "High / Dark Fantasy",
+                        synopsis: "A wordless, visceral animated epic following Spear, a prehistoric hunter, and Fang, across a brutal primordial world of witches, ape-men, and ancient gods.",
+                        historicalTie: "Captures the raw pulp-fantasy terror of prehistoric survival before spoken civilization."
+                    },
+                    {
+                        title: "Shaman",
+                        creator: "Kim Stanley Robinson (2013)",
+                        settingYear: "c. 30,000 – 15,000 BCE",
+                        type: "Book",
+                        lens: "Historical Fiction",
+                        synopsis: "Loon, a young apprentice shaman in Ice Age France, learns the art of survival, herbalism, and painting the sacred subterranean murals of Chauvet.",
+                        historicalTie: "Directly reconstructs the social and spiritual purpose of paleolithic cave art."
+                    },
+                    {
+                        title: "Alpha",
+                        creator: "Albert Hughes (2018)",
+                        settingYear: "20,000 BCE",
+                        type: "Film / Series",
+                        lens: "Historical Fiction",
+                        synopsis: "Separated from his tribe during an autumn steppe bison hunt, a young Cro-Magnon forms an unlikely alliance with an injured lone wolf to survive the oncoming winter.",
+                        historicalTie: "Dramatizes the Paleolithic domestication of wolves into humanity's earliest companions."
+                    }
+                ]
+            },
+            {
+                id: "neolithic",
+                shortName: "II. Neolithic",
+                name: "The Neolithic & Megalithic Dawn",
+                dateRange: "10,000 BCE – 3,300 BCE",
+                archetype: "Sacred Stones, Ancestor Skulls & The Harvest Goddess",
+                accentHex: "#5f9a86",
+                bgGradient: "linear-gradient(135deg, rgba(58, 98, 84, 0.45) 0%, rgba(15, 22, 48, 0.95) 100%)",
+                tagline: "The taming of wild grain and beasts transforms nomads into builders of stone circles, subterranean barrows, and astronomical calendars.",
+                stats: {
+                    mythos: "Earth & Solar Cycles",
+                    tech: "Megaliths, Pottery & Loom"
+                },
+                period: {
+                    summary: "As the ice vanished, humans made the most radical bargain in history: trading the freedom of the hunt for the security of the seed. Permanent mud-brick villages (like Çatalhöyük and Jericho) arose alongside towering megalithic stone circles aligned with the solstices.",
+                    bullets: [
+                        "Domestication of wheat, barley, sheep, cattle, and goats in the Fertile Crescent.",
+                        "Construction of colossal stone monuments (Stonehenge, Newgrange, Carnac) requiring thousands of coordinated laborers.",
+                        "Emergence of personal property, ancestral land claims, ceramic pottery, and fermented beer/wine."
+                    ]
+                },
+                transition: {
+                    in: "Warming Holocene climates created dense stands of wild cereals, allowing semi-sedentary Natufian and Anatolian tribes to settle permanently.",
+                    out: "Discovery of smelting copper with tin in high-temperature kilns—combined with the invention of the wheel and proto-writing—sparked urban statehood.",
+                    catalyst: "Copper-tin metallurgy, irrigation surpluses, and the rise of hereditary priest-kings."
+                },
+                cultureData: {
+                    beliefs: [
+                        { title: "The Dying & Rising Harvest God", desc: "Because seed must be buried in the dark earth to sprout anew, religion pivoted to cycles of death, underworld descent, and seasonal rebirth." },
+                        { title: "Solar & Lunar Alignment", desc: "Passage tombs (like Newgrange) were engineered so the winter solstice sunrise pierced the inner burial chamber, impregnating the earth with light." },
+                        { title: "The Cult of the Ancestors", desc: "Ancestors owned the farmland; keeping their plastered skulls in the home legitimized a family's right to the soil." }
+                    ],
+                    cultures: [
+                        { title: "Çatalhöyük Proto-City (Anatolia)", desc: "Honeycomb mud-brick town with no streets; citizens walked across rooftops and entered homes via ladders, burying kin beneath their beds." },
+                        { title: "Atlantic Megalith Builders (Britain, Brittany, Ireland)", desc: "Raised thousands of menhirs, dolmens, and henges along the misty western coast of Europe." },
+                        { title: "Cucuteni-Trypillia Culture (Eastern Europe)", desc: "Built massive concentric mega-settlements that they ritually burned down every 60–80 years." }
+                    ],
+                    practices: [
+                        { title: "Plastered Ancestor Skulls", desc: "Exhuming the craniums of revered elders, sculpting lifelike faces over the bone with clay, and setting cowrie shells into the eye sockets." },
+                        { title: "Trepanation (Spirit Hole Surgery)", desc: "Drilling circular holes into living human skulls with flint blades to release evil spirits or cure head trauma." },
+                        { title: "Solstice Feasts & Sacred Brewing", desc: "Mass winter and mid-summer gatherings at stone circles featuring roasted cattle and ritual psychoactive brews." }
+                    ],
+                    archetypeSummary: "The Stone-Circle Druid/Astronomer, The Earth Mother, and The Barrow-Wight."
+                },
+                centuries: [
+                    {
+                        label: "9th–7th Millennia BCE",
+                        subtitle: "Walls of Jericho & Rooftops of Çatalhöyük",
+                        nodes: [
+                            {
+                                scale: "Century / Milestone",
+                                year: "c. 8,000 BCE",
+                                title: "The Stone Tower of Jericho",
+                                event: "Settlers build a 28-foot-tall stone tower and defensive wall in the Jordan Valley—the world's first monumental fortification.",
+                                mythicShift: "The division between 'The Walled Town' (order) and 'The Wilds' (chaos/monsters) enters human consciousness."
+                            },
+                            {
+                                scale: "Century / Phase",
+                                year: "c. 7,100 BCE",
+                                title: "Flourishing of Çatalhöyük Bull Shrines",
+                                event: "Domestic shrines are lined with wild bull horns (bucrania) and murals of headless men surrounded by vultures.",
+                                mythicShift: "The Bull becomes the supreme symbol of virile storm-power alongside the Seated Mother Goddess."
+                            }
+                        ]
+                    },
+                    {
+                        label: "5th Millennium BCE",
+                        subtitle: "Old Europe, Gold of Varna & Carnac Stones",
+                        nodes: [
+                            {
+                                scale: "Century",
+                                year: "c. 4,500 BCE",
+                                title: "Raising of the Carnac Alignments",
+                                event: "Over 3,000 granite standing stones are erected in long ritual avenues across Brittany, France.",
+                                mythicShift: "Folk legends later claim these stones are petrified armies or giants frozen by enchantment."
+                            },
+                            {
+                                scale: "Decade / Milestone",
+                                year: "c. 4,400 BCE",
+                                title: "The Golden Necropolis of Varna",
+                                event: "On the Black Sea coast, a chieftain is buried with the world's oldest worked gold treasure and a golden scepter.",
+                                mythicShift: "Egalitarian village life gives way to sacred kingship and the mythic allure of incorruptible gold."
+                            }
+                        ]
+                    },
+                    {
+                        label: "4th Millennium BCE",
+                        subtitle: "Newgrange, Stonehenge I & The Copper Age",
+                        nodes: [
+                            {
+                                scale: "Decade / Milestone",
+                                year: "c. 3,300 BCE",
+                                title: "Death of Ötzi the Iceman in the Alps",
+                                event: "A copper-axe-carrying traveler with 61 therapeutic tattoos is ambushed with an arrow high in the Ötztal Alps.",
+                                mythicShift: "Reveals a world of long-distance mountain trade, blood feuds, and copper-axe prestige."
+                            },
+                            {
+                                scale: "Decade / Monument",
+                                year: "c. 3,200 BCE",
+                                title: "Construction of Newgrange (Brú na Bóinne)",
+                                event: "Irish builders construct a quartz-faced passage tomb older than the Egyptian Pyramids, aligned with the winter solstice dawn.",
+                                mythicShift: "Becomes the legendary 'Sídhe' mound—the dwelling place of the Tuatha Dé Danann in Irish myth."
+                            }
+                        ]
+                    }
+                ],
+                media: [
+                    {
+                        title: "Myth of the Tuatha Dé Danann & The Sídhe Mounds",
+                        creator: "Irish Mythological Cycle (Rooted in Neolithic Boyne Valley)",
+                        settingYear: "c. 3,200 BCE (Mythic Time)",
+                        type: "Myth / Epic",
+                        lens: "Mythological",
+                        synopsis: "Godlike beings of art, magic, and light inhabit the great Neolithic passage tombs of Ireland (Newgrange, Knowth, Dowth) as portals to the Otherworld (Tír na nÓg).",
+                        historicalTie: "Directly inspired by the awe-inspiring quartz-and-kerbstone megalithic mounds built along the River Boyne."
+                    },
+                    {
+                        title: "Stonehenge",
+                        creator: "Bernard Cornwell (1999)",
+                        settingYear: "c. 2,000 BCE (Late Neolithic/Early Bronze)",
+                        type: "Book",
+                        lens: "Historical Fiction",
+                        synopsis: "Three brothers of the tribe of Ratharryn—Lengar the warrior, Camaban the crippled visionary sorcerer, and Saban the builder—rival to raise a grand temple to the Sun.",
+                        historicalTie: "Reconstructs the engineering, solar priesthoods, and human sacrifice debates surrounding Britain's most famous henge."
+                    },
+                    {
+                        title: "Dawn of Man",
+                        creator: "Madruga Works (2019)",
+                        settingYear: "10,000 BCE – 3,000 BCE",
+                        type: "Game",
+                        lens: "Historical Fiction",
+                        synopsis: "A survival city-builder guiding a settlement from Paleolithic tents through the Neolithic agricultural revolution and megalithic stone hauling.",
+                        historicalTie: "Clearly illustrates the technological transition from flint hunting to grain storage, dolmen raising, and smelting."
+                    },
+                    {
+                        title: "FarSeer / Wurm: Tales of the Neolithic",
+                        creator: "Prehistoric Fantasy Tradition / Robert Holdstock's Mythago Wood",
+                        settingYear: "c. 4,000 BCE",
+                        type: "Book",
+                        lens: "High / Dark Fantasy",
+                        synopsis: "Deep inside primeval post-glacial forests, ancient earth-memories ('mythagos') manifest as barrow guardians, horned forest gods, and megalithic shamans.",
+                        historicalTie: "Explores the psychological transition of early farmers clearing haunted primeval woodlands."
+                    }
+                ]
+            },
+            {
+                id: "bronze-age",
+                shortName: "III. Bronze Age",
+                name: "The Bronze Age & Heroic Pantheons",
+                dateRange: "3,300 BCE – 1,200 BCE",
+                archetype: "God-Kings, Ziggurats, Chariots & The Heroic Quest",
+                accentHex: "#c9a24a",
+                bgGradient: "linear-gradient(135deg, rgba(122, 91, 26, 0.48) 0%, rgba(15, 22, 48, 0.95) 100%)",
+                tagline: "The age of Gilgamesh, the Pharaohs, Babylon, and Mycenaean Troy—where gods walked openly beside bronze-armored heroes.",
+                stats: {
+                    mythos: "State Pantheons & Demigods",
+                    tech: "Bronze, Cuneiform & Chariots"
+                },
+                period: {
+                    summary: "Civilization explodes across river valleys and seas: Sumerian city-states, Old & New Kingdom Egypt, Minoan Crete, Mycenaean Greece, and Shang China. Because tin and copper rarely occur together, an interconnected diplomatic trade network bound empires together—until everything shattered in 1177 BCE.",
+                    bullets: [
+                        "Invention of writing (Sumerian Cuneiform, Egyptian Hieroglyphs, Linear B) to record temple tribute and royal epics.",
+                        "Monumental state architecture: The Great Pyramids of Giza, Ziggurat of Ur, and the Labyrinthine Palace of Knossos.",
+                        "Chariot-riding warrior aristocracies fighting beneath the banners of patron deities."
+                    ]
+                },
+                transition: {
+                    in: "Irrigation in Mesopotamia and the Nile Valley generated massive grain surpluses, funding full-time bronze smiths, scribes, and standing armies.",
+                    out: "The Late Bronze Age Collapse (c. 1200–1150 BCE): A perfect storm of mega-drought, earthquakes, internal rebellions, and invasions by the mysterious 'Sea Peoples' burned nearly every palace city from Mycenae to Ugarit.",
+                    catalyst: "The Late Bronze Age Collapse & disruption of international tin trade routes."
+                },
+                cultureData: {
+                    beliefs: [
+                        { title: "Theocracy & Divine Kingship", desc: "Pharaohs were living Horus/Osiris on Earth; Mesopotamian kings were mortal stewards chosen to feed and house the city's patron god." },
+                        { title: "The Quest for Immortality", desc: "From Gilgamesh seeking the plant of youth to Egyptian Book of the Dead spells, mortality was the central spiritual obsession." },
+                        { title: "Cosmic Order vs. Primordial Chaos", desc: "Ma'at vs. Isfet (Egypt) or Marduk slaying Tiamat (Babylon): state rituals were required daily to stop the cosmos from collapsing." }
+                    ],
+                    cultures: [
+                        { title: "Sumerian & Babylonian City-States", desc: "Astronomer-priests, clay-tablet libraries, mud-brick ziggurats, and Hammurabi's carved legal stele." },
+                        { title: "Minoan & Mycenaean Aegean", desc: "Bull-leaping island thalassocracies and cyclopean-walled fortress citadels (Mycenae, Tiryns, Troy)." },
+                        { title: "New Kingdom Egypt", desc: "Chariot empires stretching from Nubia to Syria, excavating the Valley of the Kings." }
+                    ],
+                    practices: [
+                        { title: "Mummification & Weighing of the Heart", desc: "Preserving the physical vessel so the Ka and Ba souls could navigate the Duat underworld and face Anubis's scales." },
+                        { title: "Hepatoscopy (Liver Divination)", desc: "Babylonian and Hittite priests inspecting the sheep livers of sacrificed animals using bronze anatomical models to predict war outcomes." },
+                        { title: "Sacred Bull-Leaping (Taurokathapsia)", desc: "Minoan acrobats somersaulting over charging bulls in the central courtyard of Knossos." }
+                    ],
+                    archetypeSummary: "The Demigod Hero (Gilgamesh/Achilles), The God-King Pharaoh, and The Labyrinth Monster."
+                },
+                centuries: [
+                    {
+                        label: "31st–25th Centuries BCE",
+                        subtitle: "Uruk, Gilgamesh & The Great Pyramids",
+                        nodes: [
+                            {
+                                scale: "Century / Milestone",
+                                year: "c. 2,750 BCE",
+                                title: "Historical Reign of King Gilgamesh of Uruk",
+                                event: "The fifth king of Uruk builds the city's monumental walls; his exploits with Enkidu are immortalized in clay tablets.",
+                                mythicShift: "Establishes the foundational template for all heroic fantasy: the wild companion, the forest monster (Humbaba), and the tragic quest."
+                            },
+                            {
+                                scale: "Decade / Monument",
+                                year: "c. 2,560 BCE",
+                                title: "Completion of the Great Pyramid of Khufu at Giza",
+                                event: "2.3 million limestone and granite blocks are raised to lift the Pharaoh's soul toward the imperishable circumpolar stars.",
+                                mythicShift: "Cements Egypt in the mythic imagination as the land of eternal monuments and stellar magic."
+                            }
+                        ]
+                    },
+                    {
+                        label: "18th–14th Centuries BCE",
+                        subtitle: "Babylon, Thera Eruption & Akhenaten's Heresy",
+                        nodes: [
+                            {
+                                scale: "Decade / Cataclysm",
+                                year: "c. 1,620 BCE",
+                                title: "Volcanic Apocalypse of Minoan Thera (Santorini)",
+                                event: "One of the largest volcanic eruptions in human history obliterates Akrotiri and sends tsunamis crashing into Minoan Crete.",
+                                mythicShift: "Inspires Plato's legend of the sunken empire of Atlantis and the Titanomachy."
+                            },
+                            {
+                                scale: "Milestone Year",
+                                year: "1353 BCE",
+                                title: "Pharaoh Akhenaten Declares the Cult of the Aten",
+                                event: "Amenhotep IV bans the traditional polytheistic priesthood of Amun, builds a new capital at Amarna, and elevates the Sun Disk.",
+                                mythicShift: "The world's first dramatic royal experiment in monotheism and iconoclasm."
+                            }
+                        ]
+                    },
+                    {
+                        label: "13th–12th Centuries BCE",
+                        subtitle: "Battle of Kadesh, Trojan War & The Collapse",
+                        nodes: [
+                            {
+                                scale: "Milestone Year",
+                                year: "1274 BCE",
+                                title: "Battle of Kadesh (Ramesses II vs. The Hittites)",
+                                event: "Over 5,000 chariots clash in Syria in the largest chariot battle in history, followed by the world's first surviving peace treaty.",
+                                mythicShift: "Ramesses claims the god Amun personallyinfused him with superhuman strength when surrounded."
+                            },
+                            {
+                                scale: "Decade / Cataclysm",
+                                year: "c. 1184 – 1177 BCE",
+                                title: "Fall of Troy VIIa & The Sea Peoples Invasion",
+                                event: "Mycenaean coalitions sack Wilusa (Troy) just before their own palaces at Mycenae, Pylos, and Hattusa burn to ash.",
+                                mythicShift: "Marks the mythic end of the 'Age of Heroes'—the gods withdraw from direct mortal battle."
+                            }
+                        ]
+                    }
+                ],
+                media: [
+                    {
+                        title: "The Epic of Gilgamesh",
+                        creator: "Sin-liqe-unninni / Sumerian-Babylonian Tradition",
+                        settingYear: "c. 2,750 BCE",
+                        type: "Myth / Epic",
+                        lens: "Mythological",
+                        synopsis: "Two-thirds god and one-third man, King Gilgamesh of Uruk befriends the wild man Enkidu, slays the Cedar Forest guardian Humbaba, defies Ishtar, and seeks Utnapishtim, survivor of the Great Flood.",
+                        historicalTie: "The oldest surviving great work of world literature, pressed into cuneiform clay tablets."
+                    },
+                    {
+                        title: "The Song of Achilles / Circe",
+                        creator: "Madeline Miller (2011 / 2018)",
+                        settingYear: "c. 1,250 – 1,180 BCE",
+                        type: "Book",
+                        lens: "Mythological",
+                        synopsis: "Lush, emotionally grounded retellings of the Mycenaean Bronze Age, following Patroclus and Achilles to the walls of Troy, and the exiledwitch-goddess Circe on Aiaia.",
+                        historicalTie: "Captures the palace culture, bronze panoply, and divine fatalism of Late Bronze Age Greece."
+                    },
+                    {
+                        title: "Total War: PHARAOH",
+                        creator: "Creative Assembly (2023)",
+                        settingYear: "c. 1205 – 1150 BCE",
+                        type: "Game",
+                        lens: "Historical Fiction",
+                        synopsis: "Grand strategy set on the precipice of the Bronze Age Collapse across Egypt, Canaan, and Hittite Anatolia as skies darken and the Sea Peoples invade.",
+                        historicalTie: "Simulates the shift from shining bronze prosperity to systemic civilizational collapse."
+                    },
+                    {
+                        title: "The Prince of Egypt / The Mummy",
+                        creator: "DreamWorks (1998) / Stephen Sommers (1999)",
+                        settingYear: "c. 13th Century BCE",
+                        type: "Film / Series",
+                        lens: "Mythological",
+                        synopsis: "Iconic cinematic depictions of New Kingdom Ramesside Egypt, featuring colossal temple magic, plagues, curses, and the Book of the Dead.",
+                        historicalTie: "Showcases the visual splendor of Seti I and Ramesses II's monumental building programs at Karnak and Abu Simbel."
+                    },
+                    {
+                        title: "Conan the Barbarian (The Hyborian Age)",
+                        creator: "Robert E. Howard (1932)",
+                        settingYear: "Mythic Post-Atlantean Bronze/Iron Transition",
+                        type: "Book",
+                        lens: "High / Dark Fantasy",
+                        synopsis: "Sword-and-sorcery tales set in a decadent age of Stygian sorcerer-priests, ziggurat temples, serpent cults, and bronze-clad mercenaries.",
+                        historicalTie: "Howard modeled Stygia, Zamora, and Koth directly on Bronze Age Egypt, Babylon, and the Hittite Empire."
+                    }
+                ]
+            },
+            {
+                id: "classical",
+                shortName: "IV. Iron & Classical",
+                name: "Iron Age & Classical Antiquity",
+                dateRange: "1,200 BCE – 476 CE",
+                archetype: "Olympians, Druids, Empires & Mystery Cults",
+                accentHex: "#d85a40",
+                bgGradient: "linear-gradient(135deg, rgba(142, 42, 30, 0.45) 0%, rgba(15, 22, 48, 0.95) 100%)",
+                tagline: "Out of the ashes of the Bronze Age rise iron-forging empires, Greek tragedians, Celtic druids, Persian immortals, and the Pax Romana.",
+                stats: {
+                    mythos: "Olympian, Celtic & Imperial",
+                    tech: "Forged Iron, Coinage & Aqueducts"
+                },
+                period: {
+                    summary: "Iron ore is abundant across the earth, breaking the royal monopoly on bronze weapons and democratizing warfare. Across the Mediterranean and Eurasia, the 'Axial Age' gives birth to philosophy, theatre, democracy, and sprawling empires (Assyria, Persia, Alexander's Macedon, Han China, and Rome).",
+                    bullets: [
+                        "Phonetic alphabets replace complex scribal syllabaries, spreading literacy and epic poetry (Homer's Iliad and Odyssey).",
+                        "Clash between urbanized Mediterranean republics/empires and tribal Iron Age cultures (La Tène Celts, Scythians, Germanic tribes).",
+                        "Syncretism of gods across empires (e.g., Isis, Mithras, and Cybele worshiped along Hadrian's Wall in Britain)."
+                    ]
+                },
+                transition: {
+                    in: "During the 'Greek Dark Ages' following the Bronze collapse, smiths mastered carburizing iron into steel while oral bards preserved memories of the lost Mycenaean age.",
+                    out: "Imperial overextension, plagues, climate cooling driving Hunnish and Germanic migrations, and the rise of Nicene Christianity fractured the Western Roman Empire.",
+                    catalyst: "The Christianization of Rome (312–380 CE) and the Great Migration Period (Völkerwanderung)."
+                },
+                cultureData: {
+                    beliefs: [
+                        { title: "The Axial Age Dualism", desc: "Zoroastrianism introduces cosmic battle between Light (Ahura Mazda) and Darkness (Angra Mainyu), influencing apocalyptic theology forever." },
+                        { title: "Initiatory Mystery Cults", desc: "Eleusinian, Dionysian, and Mithraic mysteries offered secret personal salvation and ecstatic union with the divine." },
+                        { title: "Fate (Moira) & Hubris", desc: "Even the Olympian gods were bound by the three Fates; mortals who displayed hubris invited Nemesis." }
+                    ],
+                    cultures: [
+                        { title: "Hellenic & Hellenistic World", desc: "Polis city-states (Athens, Sparta) evolving into Alexander's cosmopolitan kingdoms from Egypt to India." },
+                        { title: "Iron Age Celts (Hallstatt & La Tène)", desc: "Druidic sacred groves, horned god Cernunnos, head-hunting warrior elites, and intricate swirling gold torcs." },
+                        { title: "Imperial Rome", desc: "Legions, gladiatorial amphitheaters, household gods (Lares and Penates), and deified Emperors." }
+                    ],
+                    practices: [
+                        { title: "Consulting the Oracle of Delphi", desc: "The Pythia priestess inhaling chasm vapors on Apollo's tripod to deliver cryptic hexameter prophecies to kings." },
+                        { title: "Celtic Bog Offerings & Sacred Cauldrons", desc: "Depositing ritually bent iron swords, golden cauldrons (Gundestrup), and threefold sacrifices into liminal peat bogs." },
+                        { title: "Augury & Triumphs", desc: "Roman magistrates reading the flight of birds before battle and parading conquered kings through the Forum." }
+                    ],
+                    archetypeSummary: "The Tragic Spartan/Legionary, The Sacred Grove Druid, and The Delphic Oracle."
+                },
+                centuries: [
+                    {
+                        label: "8th–5th Centuries BCE",
+                        subtitle: "Homer, Rise of Polis, Buddha & Persian Wars",
+                        nodes: [
+                            {
+                                scale: "Century / Milestone",
+                                year: "c. 753 – 700 BCE",
+                                title: "Founding of Rome & Homer's Iliad Composed",
+                                event: "The alphabet arrives in Greece to record Homer's epics just as Latin shepherds fortify the Palatine Hill.",
+                                mythicShift: "Myth transitions from rigid temple liturgy into dramatic narrative poetry and character psychology."
+                            },
+                            {
+                                scale: "Milestone Year",
+                                year: "480 BCE",
+                                title: "Thermopylae & Salamis (Greco-Persian Wars)",
+                                event: "Xerxes the Great bridges the Hellespont; Leonidas's 300 Spartans fall at the Hot Gates before Athens triumphs at sea.",
+                                mythicShift: "Cements the East-vs-West heroic martyrdom trope in Western storytelling."
+                            }
+                        ]
+                    },
+                    {
+                        label: "4th–1st Centuries BCE",
+                        subtitle: "Alexander the Great, Celtic Peak & Fall of the Republic",
+                        nodes: [
+                            {
+                                scale: "Decade / Milestone",
+                                year: "334 – 323 BCE",
+                                title: "Campaigns of Alexander the Great",
+                                event: "By age 32, Alexander conquers Persia, is crowned son of Ammon-Zeus at Siwa Oasis, and reaches the Indus River.",
+                                mythicShift: "Spawns the 'Alexander Romance'—legends of Alexander battling dragons, griffins, and seeking the Water of Life."
+                            },
+                            {
+                                scale: "Decade / Milestone",
+                                year: "52 – 44 BCE",
+                                title: "Siege of Alesia & Assassination of Julius Caesar",
+                                event: "Vercingetorix surrenders the Gallic tribes to Caesar; eight years later, Caesar falls on the Ides of March before a comet appears in the sky.",
+                                mythicShift: "The twilight of independent Celtic druidism in Gaul and the birth of the Roman God-Emperor."
+                            }
+                        ]
+                    },
+                    {
+                        label: "1st–5th Centuries CE",
+                        subtitle: "Pax Romana, Mystery Cults & Fall of Western Rome",
+                        nodes: [
+                            {
+                                scale: "Milestone Year",
+                                year: "60 – 61 CE",
+                                title: "Destruction of Mona (Anglesey) & Boudica's Revolt",
+                                event: "Roman legions storm the sacred island citadel of the British Druids as Queen Boudica burns Londinium.",
+                                mythicShift: "Pushes Celtic myth underground into oral Welsh and Irish bardic traditions."
+                            },
+                            {
+                                scale: "Milestone Year",
+                                year: "391 – 476 CE",
+                                title: "Closing of Pagan Temples & Deposition of Romulus Augustulus",
+                                event: "Emperor Theodosius extinguishes the Eternal Flame of Vesta and closes the Oracle of Delphi; in 476, the last Western Emperor is deposed.",
+                                mythicShift: "The classic polytheistic gods of Greece and Rome pass from state religion into allegory, astrology, and folklore."
+                            }
+                        ]
+                    }
+                ],
+                media: [
+                    {
+                        title: "The Odyssey & The Aeneid",
+                        creator: "Homer (c. 700 BCE) & Virgil (19 BCE)",
+                        settingYear: "Mythic Heroic / Classical Foundation",
+                        type: "Myth / Epic",
+                        lens: "Mythological",
+                        synopsis: "Odysseus's ten-year voyage past Cyclopes, Sirens, and Scylla, paired with Aeneas's fateful flight from burning Troy to found the bloodline of Rome.",
+                        historicalTie: "Served as the moral, educational, and religious bible of the entire Greco-Roman world."
+                    },
+                    {
+                        title: "Hades / Assassin's Creed Odyssey",
+                        creator: "Supergiant Games (2020) / Ubisoft (2018)",
+                        settingYear: "5th Century BCE / Mythic Underworld",
+                        type: "Game",
+                        lens: "Mythological",
+                        synopsis: "Zagreus battles out of the Greek Underworld aided by Olympian boons, while Odyssey recreates the Peloponnesian War alongside living monsters of myth.",
+                        historicalTie: "Draws deeply on Orphic mystery religion, chthonic vs. Olympian theology, and 5th-century Athenian life."
+                    },
+                    {
+                        title: "Gladiator / Rome (HBO)",
+                        creator: "Ridley Scott (2000) / Bruno Heller (2005)",
+                        settingYear: "49 BCE – 180 CE",
+                        type: "Film / Series",
+                        lens: "Historical Fiction",
+                        synopsis: "Visceral portrayals of the late Roman Republic and high Empire—from legionary eagle standards and plebeian curse tablets to Elysium visions.",
+                        historicalTie: "Highlights authentic everyday Roman superstition, household ancestor shrines, and imperial spectacle."
+                    },
+                    {
+                        title: "300 / Alexander",
+                        creator: "Frank Miller & Zack Snyder (2006) / Oliver Stone (2004)",
+                        settingYear: "480 BCE / 331 BCE",
+                        type: "Film / Series",
+                        lens: "High / Dark Fantasy",
+                        synopsis: "Heightened, mythic retellings of the Spartan stand at Thermopylae (told as a campfire tall tale) and Alexander's obsession with Achilles and Heracles.",
+                        historicalTie: "Demonstrates how ancient historians like Herodotus blended battlefield fact with monstrous legend."
+                    },
+                    {
+                        title: "Lavondyss / The Mabinogion (Celtic Roots)",
+                        creator: "Welsh Bardic Tradition / Juliet Marillier",
+                        settingYear: "Iron Age Britain",
+                        type: "Book",
+                        lens: "Mythological",
+                        synopsis: "Tales of cauldron-born warriors, shapeshifting druids, sacred oak groves, and Sovereign Goddesses of the land.",
+                        historicalTie: "Preserves pre-Roman Iron Age Celtic beliefs regarding head-veneration, geasa (taboos), and Annwn (the Otherworld)."
+                    }
+                ]
+            },
+            {
+                id: "medieval",
+                shortName: "V. Middle Ages",
+                name: "The Middle Ages (Dark & High Medieval)",
+                dateRange: "476 CE – 1,350 CE",
+                archetype: "Wyrms, Vikings, Arthurian Grail & Gothic Cathedrals",
+                accentHex: "#9b6fc4",
+                bgGradient: "linear-gradient(135deg, rgba(92, 65, 122, 0.48) 0%, rgba(15, 22, 48, 0.95) 100%)",
+                tagline: "The ultimate crucible of modern fantasy: Norse longships, Anglo-Saxon mead halls, Arthurian chivalry, Islamic Golden Age alchemy, and soaring cathedrals.",
+                stats: {
+                    mythos: "Norse, Arthurian & Scholastic",
+                    tech: "Crucible Steel, Castles & Grimoires"
+                },
+                period: {
+                    summary: "Built atop the ruins of Rome—whose aqueducts and amphitheaters Anglo-Saxons called 'the work of giants'—medieval society organized into feudal kingdoms, monastic scriptoriums, and walled guild towns. While Northern Europe experienced the Viking Age, the Islamic Caliphates and Tang/Song China spearheaded global science and magic lore.",
+                    bullets: [
+                        "Feudalism, stone concentric castles, heavy couched-lance cavalry, and monastic preservation of manuscripts.",
+                        "Coexistence of official monotheism with vibrant folk beliefs in elves, fairies, changelings, werewolves, and revenants.",
+                        "The Golden Age of Baghdad, Cordoba, and Cairo preserving Greek philosophy and pioneering alchemy, optics, and astrolabes."
+                    ]
+                },
+                transition: {
+                    in: "Germanic and Slavic kingdoms carved up Western Roman provinces, fusing tribal warrior codes (comitatus) with Christian monasticism.",
+                    out: "The catastrophic 14th century—the Great Famine, the Black Death (1347–1351) killing up to 50% of Europe, and gunpowder cannons shattering castle walls—ended feudal certainty.",
+                    catalyst: "The Black Death (1347), gunpowder siege warfare, and the Fall of Constantinople (1453)."
+                },
+                cultureData: {
+                    beliefs: [
+                        { title: "The Great Chain of Being & Relic Power", desc: "A hierarchical cosmos from God and the nine choirs of angels down to kings, peasants, beasts, and demons; saintly bones radiated physical healing miracles." },
+                        { title: "Wyrd, Ragnarok & Valhalla", desc: "In the pagan North, even Odin could not escape Wyrd (fate) and the twilight of the gods; only a glorious death earned a seat in Valhalla." },
+                        { title: "The Fair Folk & Liminal Borders", desc: "Pagan gods shrank into the 'Good Neighbors' (Fae, Elves, Huldufólk) dwelling beneath hawthorn trees and ancient barrows." }
+                    ],
+                    cultures: [
+                        { title: "Viking Age Norsemen (793–1066 CE)", desc: "Runestones, skaldic poetry, shieldmaidens, varangian mercenaries in Constantinople, and Atlantic voyages to Vinland." },
+                        { title: "High Medieval Chivalric Europe", desc: "Troubadours, courtly love, crusader military orders, heraldry, and cathedral universities." },
+                        { title: "Abbasid & Andalusian Golden Age", desc: "The House of Wisdom in Baghdad, tales of Djinn, Solomon's brass vessels, and enchanted mechanical automata." }
+                    ],
+                    practices: [
+                        { title: "Trial by Ordeal & Judicial Combat", desc: "Determining guilt by carrying red-hot ironthree paces or fighting a judicial duel so God would defend the righteous." },
+                        { title: "Seiðr Magic & Blót Sacrifices", desc: "Norse völva prophetesses chanting on high staffs to weave fate, alongside nine-year sacrifices at the Temple of Uppsala." },
+                        { title: "Alchemy & Illuminated Bestiaries", desc: "Monks and alchemists cataloging dragons, basilisks, and manticores while seeking the Philosopher's Stone." }
+                    ],
+                    archetypeSummary: "The Questing Grail Knight, The Norse Berserker/Völva, and The Hoard-Guarding Dragon."
+                },
+                centuries: [
+                    {
+                        label: "6th–8th Centuries CE",
+                        subtitle: "Age of Migration, King Arthur, Sutton Hoo & Beowulf",
+                        nodes: [
+                            {
+                                scale: "Decade / Milestone",
+                                year: "c. 516 – 537 CE",
+                                title: "Battles of Mount Badon & Camlann (Sub-Roman Britain)",
+                                event: "Romano-British warlords hold back Anglo-Saxon advances; 536 CE brings a volcanic dust veil that blocks the sun for 18 months.",
+                                mythicShift: "Gives birth to the legend of King Arthur, Merlin, and the Once and Future King."
+                            },
+                            {
+                                scale: "Milestone Year",
+                                year: "c. 625 CE",
+                                title: "The Ship Burial of Sutton Hoo",
+                                event: "An East Anglian king (likely Raedwald) is buried inside a 90-foot warship with an iconic crested helmet and pattern-welded sword.",
+                                mythicShift: "The historical world of Beowulf, Heorot mead-halls, and swamp-dwelling monsters."
+                            }
+                        ]
+                    },
+                    {
+                        label: "9th–11th Centuries CE",
+                        subtitle: "The Viking Age, Baghdad's House of Wisdom & 1066",
+                        nodes: [
+                            {
+                                scale: "Milestone Year",
+                                year: "793 CE",
+                                title: "Viking Raid on Lindisfarne Priory",
+                                event: "Dragon-prowed longships strike the holy island of Lindisfarne amidst reports of 'fiery dragons flying in the air'.",
+                                mythicShift: "Opens the Viking Age, spreading the mythology of Odin, Thor, and Loki across Europe."
+                            },
+                            {
+                                scale: "Milestone Year",
+                                year: "1066 CE",
+                                title: "Stamford Bridge & Battle of Hastings",
+                                event: "Harald Hardrada falls in England days before William the Conqueror's Norman knights defeat King Harold under Halley's Comet.",
+                                mythicShift: "Ends the Viking Age and fuses Celtic, Saxon, and Norman lore into High Chivalric romance."
+                            }
+                        ]
+                    },
+                    {
+                        label: "12th–14th Centuries CE",
+                        subtitle: "High Chivalry, Crusades, Eddas & The Black Death",
+                        nodes: [
+                            {
+                                scale: "Decade / Literary Peak",
+                                year: "c. 1180 – 1220 CE",
+                                title: "Chrétien de Troyes's Grail Romances & Snorri's Prose Edda",
+                                event: "Lancelot, Perceval, and the Holy Grail captivate European courts while Snorri Sturluson records Norse mythology in Iceland.",
+                                mythicShift: "Codifies the exact visual and narrative rules of High Fantasy quests."
+                            },
+                            {
+                                scale: "Milestone Year",
+                                year: "1347 – 1351 CE",
+                                title: "Arrival of the Black Death (Bubonic Plague)",
+                                event: "Genoese galleys fleeing Caffa bring Yersinia pestis to Europe; flagellant processions and Danse Macabre murals sweep the continent.",
+                                mythicShift: "Birth of grimdark medieval apocalyptic imagery and the Grim Reaper."
+                            }
+                        ]
+                    }
+                ],
+                media: [
+                    {
+                        title: "Beowulf / The Poetic Edda / Le Morte d'Arthur",
+                        creator: "Anglo-Saxon, Norse & Arthurian Traditions",
+                        settingYear: "6th – 12th Centuries CE",
+                        type: "Myth / Epic",
+                        lens: "Mythological",
+                        synopsis: "The foundational triad of Western fantasy: Beowulf slaying Grendel and the Dragon, the Norse myths of Yggdrasil and Ragnarok, and the rise and fall of Camelot.",
+                        historicalTie: "Directly inspired J.R.R. Tolkien and every subsequent medieval fantasy world."
+                    },
+                    {
+                        title: "The Lord of the Rings / The Silmarillion",
+                        creator: "J.R.R. Tolkien (1954 / 1977)",
+                        settingYear: "Mythic Anglo-Saxon & Northern Medieval",
+                        type: "Book",
+                        lens: "High / Dark Fantasy",
+                        synopsis: "A philologist's masterwork weaving Rohirrim Anglo-Saxon horse-lords, Norse dwarven rings, cursed barrow-blades, and lost Numenorean empires.",
+                        historicalTie: "Tolkien explicitly designed Middle-earth as a mythological prehistory steeped in early medieval Northern European ethos."
+                    },
+                    {
+                        title: "The Witcher 3: Wild Hunt / Elden Ring",
+                        creator: "CD Projekt Red (2015) / FromSoftware (2022)",
+                        settingYear: "High & Late Medieval Fantasy",
+                        type: "Game",
+                        lens: "High / Dark Fantasy",
+                        synopsis: "Monster-slayer Geralt of Rivia navigates Slavic and Celtic folk monsters (leshens, noonwraiths, strigas) across war-torn feudal kingdoms.",
+                        historicalTie: "Draws directly from medieval Eastern and Northern European village superstition, alchemical herbals, and feudal warfare."
+                    },
+                    {
+                        title: "The Northman / The Green Knight",
+                        creator: "Robert Eggers (2022) / David Lowery (2021)",
+                        settingYear: "895 CE / 14th Century Arthurian",
+                        type: "Film / Series",
+                        lens: "Mythological",
+                        synopsis: "The Northman adapts the Viking legend of Amleth with uncompromising ritual accuracy; The Green Knight brings the 14th-century Middle English poem to surreal life.",
+                        historicalTie: "Shows the medieval mind from the inside—where valkyries, draugr, and pagan forest spirits are tangible realities."
+                    },
+                    {
+                        title: "One Thousand and One Nights (Arabian Nights)",
+                        creator: "Islamic Golden Age Folk & Court Tradition (8th–13th C.)",
+                        settingYear: "c. 800 CE (Harun al-Rashid's Baghdad)",
+                        type: "Myth / Epic",
+                        lens: "Mythological",
+                        synopsis: "Scheherazade spins tales of Sinbad the Sailor, Aladdin, brass lamps housing ancient Djinn, and Rocs across the seas of the Abbasid Caliphate.",
+                        historicalTie: "Reflects the cosmopolitan maritime trade networks stretching from medieval Baghdad to India and China."
+                    },
+                    {
+                        title: "Between Two Fires",
+                        creator: "Christopher Buehlman (2012)",
+                        settingYear: "1348 CE (The Black Death)",
+                        type: "Book",
+                        lens: "High / Dark Fantasy",
+                        synopsis: "A disgraced Norman knight escorts a mysterious young girl across plague-ravaged France as fallen angels and Boschian demons wage war on Earth.",
+                        historicalTie: "Captures the apocalyptic terror and religious mysticism of the 1348 Bubonic Plague."
+                    }
+                ]
+            },
+            {
+                id: "renaissance",
+                shortName: "VI. Renaissance",
+                name: "The Renaissance & Age of Alchemy",
+                dateRange: "1,350 CE – 1,600 CE",
+                archetype: "Hermetic Magi, Clockwork, Gunpowder & Witch Trials",
+                accentHex: "#e0c27a",
+                bgGradient: "linear-gradient(135deg, rgba(154, 116, 32, 0.42) 0%, rgba(15, 22, 48, 0.95) 100%)",
+                tagline: "Where medieval mysticism collides with printing presses, pike-and-shot mercenaries, Hermetic grimoires, and transoceanic voyages.",
+                stats: {
+                    mythos: "Hermeticism, Faust & Occult",
+                    tech: "Printing Press, Astrolabe & Arquebus"
+                },
+                period: {
+                    summary: "Far from being purely secular, the Renaissance was the Golden Age of the Occult. Rediscovery of classical Greek, Roman, and Hermetic texts convinced scholars like Marsilio Ficino, John Dee, and Paracelsus that humanity could unlock the divine mathematical code of the universe. Simultaneously, gunpowder, printing presses, and ocean caravels redrew the globe.",
+                    bullets: [
+                        "Merchant republics and banking dynasties (the Medici in Florence, Fuggers in Augsburg) funding artists, engineers, and alchemists.",
+                        "The Gutenberg Printing Press (1440) spreads both scientific treatises and demonological manuals (Malleus Maleficarum).",
+                        "Collision of Old World empires with the Aztec (Mexica) and Inca civilizations in the Americas."
+                    ]
+                },
+                transition: {
+                    in: "Byzantine scholars fleeing the fall of Constantinople brought ancient Greek manuscripts to wealthy Italian city-states hungry for classical rebirth.",
+                    out: "The Scientific Revolution (Galileo, Newton) and the devastation of the Thirty Years' War separated chemistry from alchemy and astronomy from astrology.",
+                    catalyst: "The Printing Press, Copernican Heliocentricity, and the Scientific Revolution."
+                },
+                cultureData: {
+                    beliefs: [
+                        { title: "Hermeticism & The Renaissance Magus", desc: "'As above, so below': belief in Hermes Trismegistus, planetary talismans, angelic Enochian magic, and the Dignity of Man." },
+                        { title: "The Faustian Bargain & Demonology", desc: "Obsession with forbidden knowledge, goetic grimoires (Lemegeton), and fear of diabolical witches' sabbaths." },
+                        { title: "The Fifth Sun (Mesoamerican Contact)", desc: "Across the Atlantic, Aztec priests performed sacrifices to Huitzilopochtli and Quetzalcoatl to prevent the Fifth Sun from dying." }
+                    ],
+                    cultures: [
+                        { title: "Italian City-States (Florence, Venice, Rome)", desc: "Condottieri mercenary captains, Venetian carnivals, Borgia intrigue, and Leonardo's workshops." },
+                        { title: "Holy Roman Empire & Tudor England", desc: "Landsknecht Zweihänder swordsmen, Paracelsian alchemists, and Queen Elizabeth's astrologer John Dee." },
+                        { title: "Tenochtitlan & The Aztec Triple Alliance", desc: "Floating chinampa gardens, obsidian macuahuitl blades, jaguar knights, and towering twin pyramid temples." }
+                    ],
+                    practices: [
+                        { title: "Scrying with Obsidian Mirrors", desc: "Dr. John Dee and Edward Kelley using an imported Aztec obsidian mirror to converse with angels in Enochian." },
+                        { title: "Creating the Homunculus & Magnum Opus", desc: "Alchemists distilling vitriol and mercury in glass alembics to create artificial life or transmute lead into philosophical gold." },
+                        { title: "Anatomical Theaters & Clockwork Automata", desc: "Public dissections by candlelight alongside royal cabinets of curiosities (Wunderkammern) filled with 'unicorn horns' (narwhal tusks)." }
+                    ],
+                    archetypeSummary: "The Faustian Alchemist, The Clockwork Inventor, and The Witch-Hunter."
+                },
+                centuries: [
+                    {
+                        label: "14th–15th Centuries CE (1350–1499)",
+                        subtitle: "Florence, Gutenberg, Fall of Constantinople & 1492",
+                        nodes: [
+                            {
+                                scale: "Decade / Milestone",
+                                year: "1453 – 1460 CE",
+                                title: "Fall of Constantinople & Translation of the Corpus Hermeticum",
+                                event: "Ottoman cannons breach Constantinople; Cosimo de' Medici orders Marsilio Ficino to translate Hermes Trismegistus before Plato.",
+                                mythicShift: "Ignites Renaissance high magic—magic becomes an intellectual science of stars, music, and symbols."
+                            },
+                            {
+                                scale: "Milestone Year",
+                                year: "1486 – 1492 CE",
+                                title: "Publication of the Malleus Maleficarum & Columbus's Voyage",
+                                event: "The 'Hammer of Witches' is printed in Germany just six years before Spanish caravels reach the Caribbean.",
+                                mythicShift: "Triggers the Early Modern European Witch Trials alongside myths of El Dorado and the Fountain of Youth."
+                            }
+                        ]
+                    },
+                    {
+                        label: "Early 16th Century (1500–1550)",
+                        subtitle: "Da Vinci, Cortes at Tenochtitlan, Paracelsus & Faust",
+                        nodes: [
+                            {
+                                scale: "Milestone Year",
+                                year: "1519 – 1521 CE",
+                                title: "Meeting of Moctezuma II and Hernán Cortés at Tenochtitlan",
+                                event: "Spanish conquistadors enter the island metropolis of 200,000 citizens; two years later, the Aztec Empire falls amidst smallpox and siege.",
+                                mythicShift: "Two completely separate streams of human mythology—European and Mesoamerican—collide violently."
+                            },
+                            {
+                                scale: "Decade / Milestone",
+                                year: "1530 – 1543 CE",
+                                title: "Paracelsus Codifies Elemental Spirits & Copernicus's Revolution",
+                                event: "The alchemist Paracelsus defines the four Elementals (Gnomes, Undines, Sylphs, Salamanders) while Copernicus places the Sun at the center.",
+                                mythicShift: "Creates the four-elemental magic system used in nearly every modern fantasy RPG."
+                            }
+                        ]
+                    },
+                    {
+                        label: "Late 16th Century (1550–1600)",
+                        subtitle: "Nostradamus, Rabbi Loew's Golem, John Dee & Shakespeare",
+                        nodes: [
+                            {
+                                scale: "Decade / Milestone",
+                                year: "c. 1580 – 1584 CE",
+                                title: "The Golem of Prague & John Dee in Emperor Rudolf II's Court",
+                                event: "In mystical Prague, Emperor Rudolf II hosts alchemists across the Golden Lane while legend tells of Rabbi Loew animating a clay Golem.",
+                                mythicShift: "The birth of the artificial construct/automaton myth bridging magic and early science."
+                            },
+                            {
+                                scale: "Milestone Year",
+                                year: "1600 – 1611 CE",
+                                title: "Giordano Bruno Burned at the Stake & Shakespeare's The Tempest",
+                                event: "Bruno is executed in Rome for preaching infinite worlds; Shakespeare writes Prospero—modeled on Renaissance magi—breaking his staff.",
+                                mythicShift: "Prospero drowning his book of magic symbolizes the twilight of the Renaissance Magus and the dawn of the Modern Age."
+                            }
+                        ]
+                    }
+                ],
+                media: [
+                    {
+                        title: "Doctor Faustus & The Tempest",
+                        creator: "Christopher Marlowe (1592) & William Shakespeare (1611)",
+                        settingYear: "16th Century Europe",
+                        type: "Myth / Epic",
+                        lens: "Mythological",
+                        synopsis: "The twin poles of Renaissance magic: Faustus trading his soul to Mephistopheles for infernal knowledge, and Prospero commanding airy spirits on an enchanted island.",
+                        historicalTie: "Directly reflects 16th-century debates between black necromancy (Goetia) and high Hermetic theurgy."
+                    },
+                    {
+                        title: "The Lies of Locke Lamora / The Golden City",
+                        creator: "Scott Lynch (2006)",
+                        settingYear: "Renaissance Venice Inspired Fantasy",
+                        type: "Book",
+                        lens: "High / Dark Fantasy",
+                        synopsis: "Set in Camorr—a canal-laced merchant city built around towering alien Elderglass spires—master thief Locke Lamora navigates alchemical poisons, dueling salons, and criminal syndicates.",
+                        historicalTie: "Captures the shift from feudal castles to Renaissance Italian merchant oligarchies, banking houses, and alchemy."
+                    },
+                    {
+                        title: "Assassin's Creed II / Pentiment",
+                        creator: "Ubisoft (2009) / Obsidian Entertainment (2022)",
+                        settingYear: "1476 – 1545 CE",
+                        type: "Game",
+                        lens: "Historical Fiction",
+                        synopsis: "Ezio Auditore uncovers ancient artifacts with Leonardo da Vinci in Medici Florence, while Pentiment explores a 16th-century Bavarian abbey haunted by pagan Roman remnants and occult mysteries.",
+                        historicalTie: "Masterfully illustrates how Renaissance humanism, printing presses, and persistent folk paganism coexisted."
+                    },
+                    {
+                        title: "Warhammer Fantasy (The Empire)",
+                        creator: "Games Workshop / Rick Priestley (1983)",
+                        settingYear: "16th Century Holy Roman Empire Fantasy",
+                        type: "Game",
+                        lens: "High / Dark Fantasy",
+                        synopsis: "In a dark mirror of the 1500s Holy Roman Empire, Landsknecht halberdiers, flintlock pistoliers, witch-hunters, and Imperial Colleges of Magic battle Chaos and Skaven.",
+                        historicalTie: "Directly lifted from 16th-century German pike-and-shot warfare, printing-press pamphlets, and early modern witch hysteria."
+                    },
+                    {
+                        title: "Obsidian and Blood (Servant of the Underworld)",
+                        creator: "Aliette de Bodard (2010)",
+                        settingYear: "1480 CE (Tenochtitlan)",
+                        type: "Book",
+                        lens: "Mythological",
+                        synopsis: "Acamapichtli, High Priest of the Dead in the Aztec capital of Tenochtitlan, investigates magical murders and blood rituals where the Mesoamerican gods are terribly real.",
+                        historicalTie: "Brings pre-Columbian 15th-century Aztec cosmology, calendar magic, and imperial politics to vivid life."
+                    }
+                ]
+            }
+        ];
+
+        // Application State
+        let currentEraIndex = 0;
+        let currentCenturyIndex = 0;
+        let currentNodeIndex = 0;
+        let currentCultureTab = "beliefs";
+        let currentMediaTypeFilter = "ALL";
+        let currentMediaLensFilter = "ALL";
+        let isParchmentMode = false;
+
+        const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const scrollBehavior = () => (prefersReducedMotion.matches ? "auto" : "smooth");
+
+        function esc(value) {
+            return String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+        }
+
+        function initApp() {
+            // Load any custom user-added entries from localStorage
+            try {
+                const savedCustom = localStorage.getItem("chronomythos_custom_media");
+                if (savedCustom) {
+                    const parsed = JSON.parse(savedCustom);
+                    parsed.forEach(entry => {
+                        if (TIMELINE_DATA[entry.eraIdx]) {
+                            TIMELINE_DATA[entry.eraIdx].media.unshift(entry.item);
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn("Could not restore custom registry entries:", e);
+            }
+
+            renderEraRibbon();
+            populateAddMediaSelect();
+            renderAllForCurrentEra();
+            attachEventListeners();
+        }
+
+        function renderEraRibbon() {
+            const container = document.getElementById("eraRibbonContainer");
+            container.innerHTML = TIMELINE_DATA.map((era, idx) => {
+                const isActive = idx === currentEraIndex;
+                const volCode = `Vol. ${ROMAN[idx]}`;
+                return `
+                    <button 
+                        onclick="selectEra(${idx})"
+                        aria-pressed="${isActive}"
+                        class="text-left p-2.5 rounded-xl border transition-all relative overflow-hidden group ${
+                            isActive 
+                            ? 'bg-slate-800/95 border-amber-400 shadow-lg shadow-amber-500/10' 
+                            : 'bg-obsidian-900/70 border-slate-800/90 hover:border-slate-600 hover:bg-slate-800/40'
+                        }"
+                    >
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-[11px] font-mono tracking-wider ${isActive ? 'text-amber-400' : 'text-slate-400'}">
+                                ${volCode}
+                            </span>
+                            <span class="w-2 h-2 rotate-45 shrink-0" style="background-color: ${era.accentHex}" aria-hidden="true"></span>
+                        </div>
+                        <div class="text-base leading-tight font-serif font-bold ${isActive ? 'text-white' : 'text-slate-200 group-hover:text-white'} truncate mt-0.5">
+                            ${esc(era.shortName.replace(/^[IVX]+\.\s*/, ""))}
+                        </div>
+                        <div class="text-[11px] text-slate-400 truncate">${era.dateRange}</div>
+                    </button>
+                `;
+            }).join("");
+        }
+
+        function selectEra(index) {
+            currentEraIndex = index;
+            currentCenturyIndex = 0;
+            currentNodeIndex = 0;
+            renderEraRibbon();
+            renderAllForCurrentEra();
+        }
+
+        function renderAllForCurrentEra() {
+            const era = TIMELINE_DATA[currentEraIndex];
+
+            // 1. Update Era Hero Banner
+            const hero = document.getElementById("eraHeroBanner");
+            if (!isParchmentMode) {
+                hero.style.background = era.bgGradient;
+            }
+            const regCodeEl = document.getElementById("eraRegistryCode");
+            if (regCodeEl) {
+                regCodeEl.textContent = `Volume ${ROMAN[currentEraIndex]}`;
+            }
+            document.getElementById("eraDateBadge").textContent = era.dateRange;
+            document.getElementById("eraArchetypeBadge").textContent = era.archetype;
+            document.getElementById("eraTitle").textContent = era.name;
+            document.getElementById("eraTagline").textContent = era.tagline;
+            document.getElementById("statMythos").textContent = era.stats.mythos;
+            document.getElementById("statTech").textContent = era.stats.tech;
+            document.getElementById("statMediaCount").textContent = `${era.media.length} ${era.media.length === 1 ? "tale" : "tales"}`;
+
+            // 2. Render Layer 2: Century / Sub-epoch Tabs & Year Drill-down
+            renderTemporalDrillDown();
+
+            // 3. Render Layer 3: The 3 Historical & Cultural Pillars
+            document.getElementById("pillarPeriodSummary").textContent = era.period.summary;
+            document.getElementById("pillarPeriodBullets").innerHTML = era.period.bullets.map(b => `
+                <li class="flex items-start gap-2">
+                    <i class="ph-fill ph-caret-right text-sky-400 mt-0.5 shrink-0"></i>
+                    <span>${b}</span>
+                </li>
+            `).join("");
+
+            document.getElementById("pillarTransitionIn").textContent = era.transition.in;
+            document.getElementById("pillarTransitionOut").textContent = era.transition.out;
+            document.getElementById("pillarTransitionCatalyst").textContent = era.transition.catalyst;
+
+            renderCultureSubTab();
+            document.getElementById("pillarMythicArchetype").textContent = era.cultureData.archetypeSummary;
+
+            // 4. Render Layer 4: Media Vault
+            document.getElementById("mediaSectionEraName").textContent = era.name;
+            renderMediaVault();
+        }
+
+        function renderTemporalDrillDown() {
+            const era = TIMELINE_DATA[currentEraIndex];
+            const centuryTabs = document.getElementById("centuryTabsContainer");
+
+            centuryTabs.innerHTML = era.centuries.map((cent, idx) => {
+                const active = idx === currentCenturyIndex;
+                return `
+                    <button 
+                        onclick="selectCentury(${idx})"
+                        aria-pressed="${active}"
+                        class="text-left p-3.5 rounded-xl border transition-all ${
+                            active 
+                            ? 'bg-amber-500/15 border-amber-400 text-white shadow-md' 
+                            : 'bg-obsidian-950/70 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                        }"
+                    >
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono ${active ? 'text-amber-400' : 'text-slate-300'}">${cent.label}</span>
+                            <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">${cent.nodes.length} milestones</span>
+                        </div>
+                        <div class="text-sm font-medium mt-1 text-slate-200 truncate">${cent.subtitle}</div>
+                    </button>
+                `;
+            }).join("");
+
+            const activeCentury = era.centuries[currentCenturyIndex];
+            document.getElementById("activeCenturyLabel").textContent = activeCentury.label;
+
+            const nodesContainer = document.getElementById("yearNodesList");
+            nodesContainer.innerHTML = activeCentury.nodes.map((node, nIdx) => {
+                const isSelected = nIdx === currentNodeIndex;
+                return `
+                    <button 
+                        onclick="selectYearNode(${nIdx})"
+                        aria-pressed="${isSelected}"
+                        class="w-full text-left p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${
+                            isSelected 
+                            ? 'bg-slate-800 border-amber-400/80 text-white' 
+                            : 'bg-obsidian-900/60 border-slate-800/80 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200'
+                        }"
+                    >
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-mono ${isSelected ? 'text-amber-400' : 'text-slate-300'}">${node.year}</span>
+                                <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-slate-950 text-slate-400 border border-slate-800">${node.scale}</span>
+                            </div>
+                            <div class="text-sm font-medium text-slate-200 mt-1">${node.title}</div>
+                        </div>
+                        <i class="ph-bold ph-arrow-right ${isSelected ? 'text-amber-400' : 'text-slate-600'}" aria-hidden="true"></i>
+                    </button>
+                `;
+            }).join("");
+
+            const selectedNode = activeCentury.nodes[currentNodeIndex];
+            const inspector = document.getElementById("yearDetailInspector");
+            inspector.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="px-2.5 py-1 rounded-md text-xs font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            ${selectedNode.year}
+                        </span>
+                        <span class="text-xs font-mono text-slate-400">${selectedNode.scale}</span>
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold text-white">${selectedNode.title}</h3>
+                    <div class="p-3.5 rounded-xl bg-obsidian-950/90 border border-slate-800 space-y-1">
+                        <div class="text-xs font-mono text-sky-400 flex items-center gap-1">
+                            <i class="ph-fill ph-scroll" aria-hidden="true"></i> The turning point
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">${selectedNode.event}</p>
+                    </div>
+                </div>
+                <div class="mt-4 p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/25 space-y-1">
+                    <div class="text-xs font-mono text-purple-300 flex items-center gap-1">
+                        <i class="ph-fill ph-sparkle" aria-hidden="true"></i> Its mark on myth, folklore and worldbuilding
+                    </div>
+                    <p class="text-xs sm:text-sm text-purple-100 leading-relaxed">${selectedNode.mythicShift}</p>
+                </div>
+            `;
+        }
+
+        function selectCentury(idx) {
+            currentCenturyIndex = idx;
+            currentNodeIndex = 0;
+            renderTemporalDrillDown();
+        }
+
+        function selectYearNode(idx) {
+            currentNodeIndex = idx;
+            renderTemporalDrillDown();
+        }
+
+        function renderCultureSubTab() {
+            const era = TIMELINE_DATA[currentEraIndex];
+            const items = era.cultureData[currentCultureTab] || [];
+            const container = document.getElementById("cultureTabContent");
+
+            container.innerHTML = items.map(item => `
+                <div class="p-3 rounded-xl bg-obsidian-950/85 border border-slate-800/90">
+                    <div class="text-sm font-semibold text-purple-300">${item.title}</div>
+                    <p class="text-xs text-slate-300 mt-1 leading-relaxed">${item.desc}</p>
+                </div>
+            `).join("");
+        }
+
+        function getMediaBadgeStyle(type) {
+            switch (type) {
+                case "Book":
+                    return { icon: "ph-book-open-text", cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" };
+                case "Film / Series":
+                    return { icon: "ph-film-strip", cls: "bg-rose-500/15 text-rose-300 border-rose-500/30" };
+                case "Game":
+                    return { icon: "ph-game-controller", cls: "bg-sky-500/15 text-sky-300 border-sky-500/30" };
+                default:
+                    return { icon: "ph-scroll", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" };
+            }
+        }
+
+        function renderMediaVault() {
+            const era = TIMELINE_DATA[currentEraIndex];
+            const grid = document.getElementById("mediaVaultGrid");
+
+            const filtered = era.media.filter(item => {
+                const matchType = currentMediaTypeFilter === "ALL" || item.type === currentMediaTypeFilter;
+                const matchLens = currentMediaLensFilter === "ALL" || item.lens === currentMediaLensFilter;
+                return matchType && matchLens;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-obsidian-950/60 rounded-2xl border border-slate-800/80">
+                        <i class="ph ph-books text-4xl text-slate-500" aria-hidden="true"></i>
+                        <p class="text-sm text-slate-300 mt-2 italic">No tale of that kind and lens is kept for ${esc(era.name)}.</p>
+                        <button onclick="resetMediaFilters()" class="mt-3 px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 text-xs font-mono hover:bg-amber-500/30 transition">
+                            Show every tale
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map((item, idx) => {
+                const badge = getMediaBadgeStyle(item.type);
+                const catNumber = `No. ${ROMAN[currentEraIndex]}.${idx + 1}`;
+                return `
+                    <div 
+                        role="button"
+                        tabindex="0"
+                        data-open-media="${era.media.indexOf(item)}"
+                        aria-label="${esc(item.title)}, ${esc(item.type)}"
+                        class="cursor-pointer bg-obsidian-950/90 hover:bg-obsidian-900 border border-slate-800/90 hover:border-amber-500/50 rounded-2xl p-5 flex flex-col justify-between space-y-4 card-hover group"
+                    >
+                        <div class="space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                                        ${catNumber}
+                                    </span>
+                                    <span class="px-2.5 py-0.5 rounded text-[11px] font-medium border flex items-center gap-1.5 ${badge.cls}">
+                                        <i class="ph-fill ${badge.icon}" aria-hidden="true"></i> ${esc(item.type)}
+                                    </span>
+                                </div>
+                                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-obsidian-900 text-slate-400 border border-slate-800">
+                                    ${esc(item.lens)}
+                                </span>
+                            </div>
+
+                            <div>
+                                <h3 class="font-serif text-xl font-bold text-white group-hover:text-amber-400 transition-colors">
+                                    ${esc(item.title)}
+                                </h3>
+                                <p class="text-xs italic text-slate-400 mt-0.5">${esc(item.creator)}, set in ${esc(item.settingYear)}</p>
+                            </div>
+
+                            <p class="text-sm text-slate-300 leading-relaxed line-clamp-3">
+                                ${esc(item.synopsis)}
+                            </p>
+                        </div>
+
+                        <div class="pt-3 border-t border-slate-800/80 space-y-1.5">
+                            <div class="text-xs font-mono tracking-wider text-amber-400 flex items-center gap-1">
+                                <i class="ph-fill ph-link-simple" aria-hidden="true"></i> Its tie to the age
+                            </div>
+                            <p class="text-xs text-slate-400 line-clamp-2">${esc(item.historicalTie)}</p>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function resetMediaFilters() {
+            currentMediaTypeFilter = "ALL";
+            currentMediaLensFilter = "ALL";
+            document.getElementById("mediaLensFilter").value = "ALL";
+            document.querySelectorAll(".media-type-btn").forEach(btn => {
+                if (btn.dataset.mediaType === "ALL") {
+                    btn.className = "media-type-btn px-2.5 py-1.5 rounded-lg font-medium bg-amber-500 text-slate-950 transition";
+                } else {
+                    btn.className = "media-type-btn px-2.5 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition";
+                }
+            });
+            markPressed(".media-type-btn", b => b.dataset.mediaType === "ALL");
+            renderMediaVault();
+        }
+
+        function openMediaDetail(eraIdx, mediaIdx) {
+            const era = TIMELINE_DATA[eraIdx];
+            const item = era.media[mediaIdx];
+            if (!item) return;
+
+            const badge = getMediaBadgeStyle(item.type);
+            document.getElementById("modalMediaBadges").innerHTML = `
+                <span class="px-2.5 py-1 rounded-md text-xs font-medium border flex items-center gap-1.5 ${badge.cls}">
+                    <i class="ph-fill ${badge.icon}" aria-hidden="true"></i> ${esc(item.type)}
+                </span>
+                <span class="px-2.5 py-1 rounded-md text-xs font-mono bg-slate-800 text-slate-300">${esc(item.lens)}</span>
+                <span class="px-2.5 py-1 rounded-md text-xs font-mono bg-amber-500/15 text-amber-300">${esc(era.shortName)}</span>
+            `;
+            document.getElementById("modalMediaTitle").textContent = item.title;
+            document.getElementById("modalMediaCreator").textContent = `${item.creator}, set in ${item.settingYear}`;
+            document.getElementById("modalMediaSynopsis").textContent = item.synopsis;
+            document.getElementById("modalMediaHistoricalTie").textContent = item.historicalTie;
+
+            openModal("mediaDetailModal");
+        }
+
+        let modalReturnFocus = null;
+
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modalReturnFocus = document.activeElement;
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+            const first = modal.querySelector("input, select, textarea, button");
+            if (first) first.focus();
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal.classList.contains("hidden")) return;
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+            if (modalReturnFocus && document.contains(modalReturnFocus)) modalReturnFocus.focus();
+            modalReturnFocus = null;
+        }
+
+        function openModalId() {
+            const open = document.querySelector('[role="dialog"].flex');
+            return open ? open.id : null;
+        }
+
+        function populateAddMediaSelect() {
+            const select = document.getElementById("formEraSelect");
+            select.innerHTML = TIMELINE_DATA.map((era, idx) => `
+                <option value="${idx}">${esc(era.name)} (${esc(era.dateRange)})</option>
+            `).join("");
+        }
+
+        function handleGlobalSearch(query) {
+            const banner = document.getElementById("searchResultsBanner");
+            const clearBtn = document.getElementById("clearSearchBtn");
+            const grid = document.getElementById("globalSearchGrid");
+            const q = query.trim().toLowerCase();
+
+            if (!q) {
+                banner.classList.add("hidden");
+                clearBtn.classList.add("hidden");
+                return;
+            }
+
+            clearBtn.classList.remove("hidden");
+            banner.classList.remove("hidden");
+
+            const matches = [];
+            TIMELINE_DATA.forEach((era, eIdx) => {
+                // Check media matches
+                era.media.forEach(m => {
+                    if (
+                        m.title.toLowerCase().includes(q) ||
+                        m.synopsis.toLowerCase().includes(q) ||
+                        m.creator.toLowerCase().includes(q) ||
+                        m.historicalTie.toLowerCase().includes(q)
+                    ) {
+                        matches.push({
+                            kind: "Media",
+                            eraIdx: eIdx,
+                            mIdx: era.media.indexOf(m),
+                            eraName: era.shortName,
+                            title: m.title,
+                            subtitle: m.type,
+                            desc: m.synopsis
+                        });
+                    }
+                });
+
+                // Check milestone year matches
+                era.centuries.forEach((c, cIdx) => {
+                    c.nodes.forEach((n, nIdx) => {
+                        if (
+                            n.title.toLowerCase().includes(q) ||
+                            n.event.toLowerCase().includes(q) ||
+                            n.mythicShift.toLowerCase().includes(q) ||
+                            n.year.toLowerCase().includes(q)
+                        ) {
+                            matches.push({
+                                kind: "Milestone",
+                                eraIdx: eIdx,
+                                cIdx,
+                                nIdx,
+                                eraName: era.shortName,
+                                title: `${n.year}: ${n.title}`,
+                                subtitle: "Milestone",
+                                desc: n.event
+                            });
+                        }
+                    });
+                });
+            });
+
+            const shown = Math.min(matches.length, 9);
+            document.getElementById("searchCountText").textContent = matches.length === 0
+                ? `Nothing found for "${query}"`
+                : `${matches.length} found for "${query}" across twenty thousand years${matches.length > shown ? `, the first ${shown} shown` : ""}`;
+
+            if (matches.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-sm italic text-slate-400">No age, milestone or tale answers to that.</div>`;
+                return;
+            }
+
+            grid.innerHTML = matches.slice(0, shown).map(item => `
+                <div 
+                    role="button"
+                    tabindex="0"
+                    data-jump="${item.eraIdx},${item.cIdx || 0},${item.nIdx || 0},${item.mIdx ?? -1}"
+                    data-kind="${item.kind}"
+                    class="cursor-pointer p-3.5 rounded-xl bg-obsidian-950/90 border border-slate-800 hover:border-amber-400 transition"
+                >
+                    <div class="flex items-center justify-between text-[11px] font-mono">
+                        <span class="text-amber-400">${esc(item.eraName)}</span>
+                        <span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">${esc(item.subtitle)}</span>
+                    </div>
+                    <div class="font-serif font-bold text-base text-white mt-1">${esc(item.title)}</div>
+                    <p class="text-xs text-slate-400 mt-1 line-clamp-2">${esc(item.desc)}</p>
+                </div>
+            `).join("");
+        }
+
+        function jumpToSearchResult(eraIdx, cIdx, nIdx, kind, mIdx) {
+            selectEra(eraIdx);
+            if (kind === "Milestone") {
+                selectCentury(cIdx);
+                selectYearNode(nIdx);
+                document.getElementById("yearDetailInspector").scrollIntoView({ behavior: scrollBehavior(), block: "center" });
+            } else {
+                resetMediaFilters();
+                document.getElementById("mediaVaultGrid").scrollIntoView({ behavior: scrollBehavior(), block: "start" });
+                if (mIdx >= 0) openMediaDetail(eraIdx, mIdx);
+            }
+        }
+
+        function delegateActivation(container, selector, handler) {
+            container.addEventListener("click", (e) => {
+                const target = e.target.closest(selector);
+                if (target && container.contains(target)) handler(target);
+            });
+            container.addEventListener("keydown", (e) => {
+                if (e.key !== "Enter" && e.key !== " ") return;
+                const target = e.target.closest(selector);
+                if (!target || !container.contains(target)) return;
+                e.preventDefault();
+                handler(target);
+            });
+        }
+
+        function setTheme(parchment) {
+            isParchmentMode = parchment;
+            document.body.classList.toggle("registry-parchment", parchment);
+            document.querySelector('meta[name="theme-color"]').setAttribute("content", parchment ? "#f4eedc" : "#0f1630");
+            const btn = document.getElementById("themeToggleBtn");
+            const label = document.getElementById("themeToggleLabel");
+            const icon = document.getElementById("themeToggleIcon");
+            btn.setAttribute("aria-pressed", String(parchment));
+            label.textContent = parchment ? "Night" : "Parchment";
+            icon.className = parchment ? "ph-fill ph-moon-stars text-amber-600 text-base" : "ph-fill ph-scroll text-amber-400 text-base";
+            try {
+                localStorage.setItem("chronomythos_theme", parchment ? "parchment" : "night");
+            } catch (err) {}
+        }
+
+        function markPressed(selector, isPressed) {
+            document.querySelectorAll(selector).forEach(b => b.setAttribute("aria-pressed", String(isPressed(b))));
+        }
+
+        function attachEventListeners() {
+            // Era Prev / Next buttons
+            document.getElementById("prevEraBtn").addEventListener("click", () => {
+                const nextIdx = (currentEraIndex - 1 + TIMELINE_DATA.length) % TIMELINE_DATA.length;
+                selectEra(nextIdx);
+            });
+            document.getElementById("nextEraBtn").addEventListener("click", () => {
+                const nextIdx = (currentEraIndex + 1) % TIMELINE_DATA.length;
+                selectEra(nextIdx);
+            });
+
+            // Keyboard left/right navigation
+            window.addEventListener("keydown", (e) => {
+                const openId = openModalId();
+                if (e.key === "Escape" && openId) {
+                    closeModal(openId);
+                    return;
+                }
+                if (openId || e.altKey || e.ctrlKey || e.metaKey) return;
+                if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
+                if (e.key === "ArrowRight") {
+                    selectEra((currentEraIndex + 1) % TIMELINE_DATA.length);
+                } else if (e.key === "ArrowLeft") {
+                    selectEra((currentEraIndex - 1 + TIMELINE_DATA.length) % TIMELINE_DATA.length);
+                }
+            });
+
+            // Culture Sub-tabs (Beliefs / Cultures / Practices)
+            document.querySelectorAll(".culture-tab-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    currentCultureTab = btn.dataset.cultureTab;
+                    document.querySelectorAll(".culture-tab-btn").forEach(b => {
+                        if (b.dataset.cultureTab === currentCultureTab) {
+                            b.className = "culture-tab-btn py-1.5 px-2 rounded-lg text-xs font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30 transition";
+                        } else {
+                            b.className = "culture-tab-btn py-1.5 px-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition";
+                        }
+                    });
+                    markPressed(".culture-tab-btn", b => b.dataset.cultureTab === currentCultureTab);
+                    renderCultureSubTab();
+                });
+            });
+
+            // Media Type Filter Buttons
+            document.querySelectorAll(".media-type-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    currentMediaTypeFilter = btn.dataset.mediaType;
+                    document.querySelectorAll(".media-type-btn").forEach(b => {
+                        if (b.dataset.mediaType === currentMediaTypeFilter) {
+                            b.className = "media-type-btn px-2.5 py-1.5 rounded-lg font-medium bg-amber-500 text-slate-950 transition";
+                        } else {
+                            b.className = "media-type-btn px-2.5 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition";
+                        }
+                    });
+                    markPressed(".media-type-btn", b => b.dataset.mediaType === currentMediaTypeFilter);
+                    renderMediaVault();
+                });
+            });
+            markPressed(".media-type-btn", b => b.dataset.mediaType === currentMediaTypeFilter);
+            markPressed(".culture-tab-btn", b => b.dataset.cultureTab === currentCultureTab);
+
+            delegateActivation(document.getElementById("mediaVaultGrid"), "[data-open-media]", (card) => {
+                openMediaDetail(currentEraIndex, parseInt(card.dataset.openMedia, 10));
+            });
+            delegateActivation(document.getElementById("globalSearchGrid"), "[data-jump]", (result) => {
+                const [eraIdx, cIdx, nIdx, mIdx] = result.dataset.jump.split(",").map(Number);
+                jumpToSearchResult(eraIdx, cIdx, nIdx, result.dataset.kind, mIdx);
+            });
+
+            // Media Lens Select
+            document.getElementById("mediaLensFilter").addEventListener("change", (e) => {
+                currentMediaLensFilter = e.target.value;
+                renderMediaVault();
+            });
+
+            // Search Input
+            const searchInput = document.getElementById("globalSearchInput");
+            searchInput.addEventListener("input", (e) => handleGlobalSearch(e.target.value));
+            document.getElementById("clearSearchBtn").addEventListener("click", () => {
+                searchInput.value = "";
+                handleGlobalSearch("");
+            });
+            document.getElementById("closeSearchBannerBtn").addEventListener("click", () => {
+                searchInput.value = "";
+                handleGlobalSearch("");
+            });
+
+            // Modals
+            document.getElementById("closeMediaModalBtn").addEventListener("click", () => closeModal("mediaDetailModal"));
+            document.getElementById("openCompareModalBtn").addEventListener("click", () => openModal("layerGuideModal"));
+            document.getElementById("closeLayerGuideBtn").addEventListener("click", () => closeModal("layerGuideModal"));
+            document.querySelectorAll('[role="dialog"]').forEach(modal => {
+                modal.addEventListener("click", (e) => {
+                    if (e.target === modal) closeModal(modal.id);
+                });
+            });
+
+            // Theme Toggle (night vs parchment)
+            document.getElementById("themeToggleBtn").addEventListener("click", () => {
+                setTheme(!isParchmentMode);
+                renderAllForCurrentEra();
+            });
+
+            // Export Registry JSON
+            document.getElementById("exportRegistryBtn").addEventListener("click", () => {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(TIMELINE_DATA, null, 2));
+                const dlAnchor = document.createElement("a");
+                dlAnchor.setAttribute("href", dataStr);
+                dlAnchor.setAttribute("download", "chronomythos-registry.json");
+                document.body.appendChild(dlAnchor);
+                dlAnchor.click();
+                dlAnchor.remove();
+            });
+
+            // Add Media Modal
+            document.getElementById("openAddMediaBtn").addEventListener("click", () => {
+                document.getElementById("formEraSelect").value = currentEraIndex;
+                openModal("addMediaModal");
+            });
+            const closeAdd = () => closeModal("addMediaModal");
+            document.getElementById("closeAddMediaBtn").addEventListener("click", closeAdd);
+            document.getElementById("cancelAddMediaBtn").addEventListener("click", closeAdd);
+
+            document.getElementById("addMediaForm").addEventListener("submit", (e) => {
+                e.preventDefault();
+                const targetEraIdx = parseInt(document.getElementById("formEraSelect").value, 10);
+                const newEntry = {
+                    title: document.getElementById("formTitle").value.trim(),
+                    creator: document.getElementById("formCreator").value.trim(),
+                    settingYear: document.getElementById("formSettingYear").value.trim(),
+                    type: document.getElementById("formType").value,
+                    lens: document.getElementById("formLens").value,
+                    synopsis: document.getElementById("formSynopsis").value.trim(),
+                    historicalTie: document.getElementById("formTie").value.trim()
+                };
+
+                TIMELINE_DATA[targetEraIdx].media.unshift(newEntry);
+
+                // Persist to localStorage
+                try {
+                    const existing = JSON.parse(localStorage.getItem("chronomythos_custom_media") || "[]");
+                    existing.push({ eraIdx: targetEraIdx, item: newEntry });
+                    localStorage.setItem("chronomythos_custom_media", JSON.stringify(existing));
+                } catch (err) {
+                    console.warn("LocalStorage unavailable:", err);
+                }
+
+                document.getElementById("addMediaForm").reset();
+                closeAdd();
+                selectEra(targetEraIdx);
+                document.getElementById("mediaVaultGrid").scrollIntoView({ behavior: scrollBehavior() });
+            });
+        }
+
+        try {
+            if (localStorage.getItem("chronomythos_theme") === "parchment") setTheme(true);
+        } catch (err) {}
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
