@@ -10,10 +10,72 @@
     <link rel="preload" href="./fonts/cormorant-garamond-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="./chronomythos.css">
     <link rel="stylesheet" href="./icons/phosphor.css">
+    <script>
+        // Every visit writes the page in; the first of a session turns the glass first.
+        (() => {
+            if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+            const root = document.documentElement;
+            root.classList.add("waking");
+            try {
+                if (localStorage.getItem("chronomythos_theme") === "parchment") root.classList.add("veil-parchment");
+                if (sessionStorage.getItem("cm-opened")) return;
+                sessionStorage.setItem("cm-opened", "1");
+                root.classList.add("opening");
+                root.dataset.openedAt = String(performance.now());
+            } catch (err) {
+                // Storage refused: no glass, rather than one on every visit.
+            }
+        })();
+    </script>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
 
-    <div class="bg-obsidian-950 border-b border-slate-800/90 text-[11px] font-mono py-1.5 px-4 sm:px-6 lg:px-8">
+    <div class="glass-opening" aria-hidden="true">
+        <svg viewBox="-60 -60 120 120" focusable="false">
+            <circle class="dial" r="52"></circle>
+            <circle class="dial dial-inner" r="47"></circle>
+            <line class="tick" style="--i: 0" x1="0" y1="-47" x2="0" y2="-52"></line>
+            <line class="tick" style="--i: 1" x1="40.70" y1="-23.50" x2="45.03" y2="-26.00"></line>
+            <line class="tick" style="--i: 2" x1="40.70" y1="23.50" x2="45.03" y2="26.00"></line>
+            <line class="tick" style="--i: 3" x1="0" y1="47" x2="0" y2="52"></line>
+            <line class="tick" style="--i: 4" x1="-40.70" y1="23.50" x2="-45.03" y2="26.00"></line>
+            <line class="tick" style="--i: 5" x1="-40.70" y1="-23.50" x2="-45.03" y2="-26.00"></line>
+            <g class="glass">
+                <path class="sand sand-top" d="M-13 -31H13C11 -19 4 -10 0 -5C-4 -10 -11 -19 -13 -31Z"></path>
+                <path class="sand sand-bottom" d="M0 17C6 21 12 26 14 33H-14C-12 26 -6 21 0 17Z"></path>
+                <path class="stream" d="M0 -5V31"></path>
+                <path class="frame" d="M-21 -37H21M-21 37H21M-16 -37C-16 -15 -3 -6 -3 0C-3 6 -16 15 -16 37M16 -37C16 -15 3 -6 3 0C3 6 16 15 16 37"></path>
+            </g>
+        </svg>
+    </div>
+    <script>
+        (() => {
+            const root = document.documentElement;
+            if (!root.classList.contains("opening")) return;
+            const opts = { capture: true, passive: true };
+            const begun = Number(root.dataset.openedAt) || performance.now();
+            delete root.dataset.openedAt;
+            window.__cmWakeAt = begun + 1350;
+            let done = false;
+            const open = () => {
+                if (done) return;
+                done = true;
+                clearTimeout(timer);
+                root.classList.remove("opening");
+                removeEventListener("pointerdown", open, opts);
+                removeEventListener("keydown", open, opts);
+                dispatchEvent(new Event("cm:opened"));
+            };
+            const timer = setTimeout(open, Math.max(0, 2250 - (performance.now() - begun)));
+            addEventListener("pointerdown", open, opts);
+            addEventListener("keydown", open, opts);
+            document.querySelector(".glass-opening").addEventListener("animationend", (e) => {
+                if (e.animationName === "cm-sweep") open();
+            });
+        })();
+    </script>
+
+    <div data-rise="now" class="bg-obsidian-950 border-b border-slate-800/90 text-[11px] font-mono py-1.5 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
             <div class="flex items-center gap-3 text-slate-400 tracking-widest">
                 <span>The Temporal Registry</span>
@@ -37,7 +99,7 @@
     <!-- Top Header & Search -->
     <header class="lg:sticky lg:top-0 z-40 glass-panel border-b border-slate-800/80">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
+            <div data-rise="now" class="flex items-center gap-3">
                 <div class="w-10 h-10 border border-amber-500/60 flex items-center justify-center text-amber-400 registry-stamp" aria-hidden="true">
                     <i class="ph ph-hourglass-medium text-2xl"></i>
                 </div>
@@ -50,7 +112,7 @@
             </div>
 
             <!-- Global Search & Controls -->
-            <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto justify-end">
+            <div data-rise="now" class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto justify-end">
                 <div class="relative w-full sm:w-64">
                     <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true"></i>
                     <input 
@@ -85,7 +147,7 @@
         <!-- Layer 1: Macro-Era Timeline Ribbon -->
         <div class="border-t border-slate-800/60 bg-obsidian-950/70">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
-                <div class="flex items-center justify-between mb-1.5">
+                <div data-rise="now" class="flex items-center justify-between mb-1.5">
                     <span id="eraRibbonLabel" class="text-xs font-mono tracking-wider text-slate-400 flex items-center gap-1.5">
                         <span class="text-amber-400" aria-hidden="true">&#9670;</span>
                         The six volumes of the ages
@@ -127,7 +189,7 @@
         <section id="eraHeroBanner" class="relative rounded-2xl overflow-hidden border border-amber-500/30 p-6 sm:p-8 era-glow shadow-xl">
             <div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
                 <div class="space-y-3 max-w-3xl flex-1 min-w-0">
-                    <div class="flex flex-wrap items-center gap-2">
+                    <div id="heroBadges" data-rise="now" class="flex flex-wrap items-center gap-2">
                         <span id="eraRegistryCode" class="px-2.5 py-1 rounded text-xs font-mono bg-amber-500 text-slate-950 tracking-widest">
                             Volume I
                         </span>
@@ -138,16 +200,16 @@
                             Animism, Megafauna & Primordial Spirits
                         </span>
                     </div>
-                    <h2 id="eraTitle" class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+                    <h2 id="eraTitle" data-rise="now" class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
                         The Upper Paleolithic & Ice Age
                     </h2>
-                    <p id="eraTagline" class="font-editorial text-slate-200 text-lg sm:text-xl italic leading-relaxed">
+                    <p id="eraTagline" data-rise="now" class="font-editorial text-slate-200 text-lg sm:text-xl italic leading-relaxed">
                         Humanity's earliest struggle for survival amidst colossal glaciers, painted caves, and the birth of shamanic storytelling.
                     </p>
                 </div>
 
                 <!-- Quick Stats Pill Box -->
-                <div class="grid grid-cols-3 gap-2 sm:gap-3 bg-obsidian-950/90 backdrop-blur-md p-3.5 rounded-xl border border-slate-700/80 shrink-0 lg:w-[26rem]">
+                <div id="heroStats" data-rise="now" class="grid grid-cols-3 gap-2 sm:gap-3 bg-obsidian-950/90 backdrop-blur-md p-3.5 rounded-xl border border-slate-700/80 shrink-0 lg:w-[26rem]">
                     <div class="text-center px-2">
                         <div class="text-[11px] font-mono text-slate-400">Dominant mythos</div>
                         <div id="statMythos" class="text-xs sm:text-sm font-semibold text-white mt-0.5">Shamanic Animism</div>
@@ -165,7 +227,7 @@
         </section>
 
         <!-- Layer 2: Temporal Drill-Down (Centuries, Decades, & Milestone Years) -->
-        <section class="glass-panel rounded-2xl p-5 sm:p-6 border border-slate-800/90 space-y-5">
+        <section data-rise="view" class="glass-panel rounded-2xl p-5 sm:p-6 border border-slate-800/90 space-y-5">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
                 <div>
                     <span class="text-xs font-mono tracking-wider text-amber-400 flex items-center gap-1.5">
@@ -209,7 +271,7 @@
 
         <!-- Layer 3: Historical & Mythic Context (The 3 Core Pillars) -->
         <section class="space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div data-rise="view" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                     <span class="text-xs font-mono tracking-wider text-amber-400 flex items-center gap-1.5">
                         <i class="ph-fill ph-columns" aria-hidden="true"></i>
@@ -220,9 +282,9 @@
                 <p class="text-xs text-slate-400 italic">Kept for worldbuilders, writers and students of history</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div id="pillarGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 <!-- Pillar 1: What This Period Was -->
-                <div class="glass-panel rounded-2xl p-6 border border-slate-800/90 flex flex-col justify-between space-y-4">
+                <div data-rise="view" class="glass-panel rounded-2xl p-6 border border-slate-800/90 flex flex-col justify-between space-y-4">
                     <div class="space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-mono tracking-widest px-2.5 py-1 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20">
@@ -240,7 +302,7 @@
                 </div>
 
                 <!-- Pillar 2: What The Transition Was -->
-                <div class="glass-panel rounded-2xl p-6 border border-slate-800/90 flex flex-col justify-between space-y-4">
+                <div data-rise="view" class="glass-panel rounded-2xl p-6 border border-slate-800/90 flex flex-col justify-between space-y-4">
                     <div class="space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-mono tracking-widest px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">
@@ -271,7 +333,7 @@
                 </div>
 
                 <!-- Pillar 3: Beliefs, Cultures & Practices -->
-                <div class="glass-panel rounded-2xl p-6 border border-slate-800/90 flex flex-col justify-between space-y-4">
+                <div data-rise="view" class="glass-panel rounded-2xl p-6 border border-slate-800/90 flex flex-col justify-between space-y-4">
                     <div class="space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-mono tracking-widest px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20">
@@ -308,7 +370,7 @@
 
         <!-- Layer 4: Period-Relevant Fantasy, Mythological & Historical Media -->
         <section class="glass-panel rounded-2xl p-5 sm:p-7 border border-slate-800/90 space-y-6">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+            <div data-rise="view" class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5">
                 <div>
                     <span class="text-xs font-mono tracking-wider text-amber-400 flex items-center gap-1.5">
                         <i class="ph-fill ph-books" aria-hidden="true"></i>
@@ -344,7 +406,7 @@
             </div>
 
             <!-- Media Cards Grid -->
-            <div id="mediaVaultGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div id="mediaVaultGrid" data-rise="view" data-rise-children class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 <!-- Populated via JS -->
             </div>
         </section>
@@ -483,7 +545,7 @@
         </div>
     </div>
 
-    <footer class="py-8 mt-12 text-center text-xs text-slate-400">
+    <footer data-rise="view" class="py-8 mt-12 text-center text-xs text-slate-400">
         <div class="max-w-3xl mx-auto px-4 space-y-3">
             <div class="house-rule" aria-hidden="true"><span class="text-[11px]">&#9670;</span></div>
             <p class="italic">ChronoMythos, the temporal registry: twenty thousand years of history, myth and the tales set in them. Set in EB Garamond, Cormorant, IM Fell and Cinzel, as a companion to <a href="../magic-registry/" class="text-amber-400 underline not-italic">The Magic Registry</a>.</p>
@@ -1441,6 +1503,68 @@
         const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
         const scrollBehavior = () => (prefersReducedMotion.matches ? "auto" : "smooth");
 
+        let awake = false;
+        const stillness = () => prefersReducedMotion.matches;
+
+        function animateOnce(el, cls, delay) {
+            if (!el) return;
+            el.classList.remove("inking", "turn-forward", "turn-back");
+            void el.offsetWidth;
+            el.style.setProperty("--delay", `${delay}s`);
+            el.classList.add(cls);
+            el.addEventListener("animationend", function done(e) {
+                if (e.target !== el) return;
+                el.classList.remove(cls);
+                el.removeAttribute("data-rise");
+                el.style.removeProperty("--delay");
+                el.removeEventListener("animationend", done);
+            });
+        }
+
+        function ink(el, delay) {
+            if (el.hasAttribute("data-rise-children")) {
+                el.removeAttribute("data-rise");
+                [...el.children].forEach((child, i) => animateOnce(child, "inking", delay + Math.min(i, 8) * 0.09));
+                return;
+            }
+            animateOnce(el, "inking", delay);
+        }
+
+        function turn(els, direction = 1, base = 0, step = 0.06) {
+            if (!awake || stillness()) return;
+            [...els].filter(el => el && !el.hasAttribute("data-rise")).forEach((el, i) => animateOnce(el, direction < 0 ? "turn-back" : "turn-forward", base + Math.min(i, 8) * step));
+        }
+
+        function wake() {
+            if (awake) return;
+            awake = true;
+            const root = document.documentElement;
+            if (!root.classList.contains("waking")) return;
+            document.querySelectorAll('[data-rise="now"]').forEach((el, i) => ink(el, i * 0.07));
+            const waiting = document.querySelectorAll('[data-rise="view"]');
+            if (!("IntersectionObserver" in window)) {
+                waiting.forEach((el, i) => ink(el, 0.6 + i * 0.1));
+                return;
+            }
+            let first = true;
+            const watcher = new IntersectionObserver((entries) => {
+                const seen = entries.filter(e => e.isIntersecting).map(e => e.target);
+                seen.forEach((el, i) => {
+                    watcher.unobserve(el);
+                    ink(el, (first ? 0.7 : 0) + i * 0.12);
+                });
+                first = false;
+            }, { rootMargin: "0px 0px -8% 0px" });
+            waiting.forEach(el => watcher.observe(el));
+        }
+
+        function wakeWhenOpen() {
+            const root = document.documentElement;
+            if (!root.classList.contains("opening")) return wake();
+            addEventListener("cm:opened", wake, { once: true });
+            setTimeout(wake, Math.max(0, (window.__cmWakeAt || 0) - performance.now()));
+        }
+
         function esc(value) {
             return String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
         }
@@ -1465,6 +1589,7 @@
             populateAddMediaSelect();
             renderAllForCurrentEra();
             attachEventListeners();
+            wakeWhenOpen();
         }
 
         function renderEraRibbon() {
@@ -1476,6 +1601,7 @@
                     <button 
                         onclick="selectEra(${idx})"
                         aria-pressed="${isActive}"
+                        ${awake ? "" : 'data-rise="now"'}
                         class="text-left p-2.5 rounded-xl border transition-all relative overflow-hidden group ${
                             isActive 
                             ? 'bg-slate-800/95 border-amber-400 shadow-lg shadow-amber-500/10' 
@@ -1498,14 +1624,21 @@
         }
 
         function selectEra(index) {
+            const direction = Math.sign(index - currentEraIndex);
             currentEraIndex = index;
             currentCenturyIndex = 0;
             currentNodeIndex = 0;
             renderEraRibbon();
-            renderAllForCurrentEra();
+            renderAllForCurrentEra(direction);
+            if (direction === 0) return;
+            const $ = (id) => document.getElementById(id);
+            turn([$("heroBadges"), $("eraTitle"), $("eraTagline"), $("heroStats")], direction, 0, 0.07);
+            turn($("centuryTabsContainer").children, direction, 0.1, 0.05);
+            turn([$("yearNodesList"), $("yearDetailInspector")], direction, 0.15, 0.08);
+            turn($("pillarGrid").children, direction, 0.2, 0.08);
         }
 
-        function renderAllForCurrentEra() {
+        function renderAllForCurrentEra(direction = 0) {
             const era = TIMELINE_DATA[currentEraIndex];
 
             // 1. Update Era Hero Banner
@@ -1546,7 +1679,7 @@
 
             // 4. Render Layer 4: Media Vault
             document.getElementById("mediaSectionEraName").textContent = era.name;
-            renderMediaVault();
+            renderMediaVault(direction);
         }
 
         function renderTemporalDrillDown() {
@@ -1630,14 +1763,19 @@
         }
 
         function selectCentury(idx) {
+            const direction = Math.sign(idx - currentCenturyIndex) || 1;
             currentCenturyIndex = idx;
             currentNodeIndex = 0;
             renderTemporalDrillDown();
+            turn(document.getElementById("yearNodesList").children, direction, 0, 0.05);
+            turn([document.getElementById("yearDetailInspector")], direction, 0.1);
         }
 
         function selectYearNode(idx) {
+            const direction = Math.sign(idx - currentNodeIndex) || 1;
             currentNodeIndex = idx;
             renderTemporalDrillDown();
+            turn([document.getElementById("yearDetailInspector")], direction);
         }
 
         function renderCultureSubTab() {
@@ -1651,6 +1789,7 @@
                     <p class="text-xs text-slate-300 mt-1 leading-relaxed">${item.desc}</p>
                 </div>
             `).join("");
+            turn(container.children, 1, 0, 0.06);
         }
 
         function getMediaBadgeStyle(type) {
@@ -1666,7 +1805,7 @@
             }
         }
 
-        function renderMediaVault() {
+        function renderMediaVault(direction = 1) {
             const era = TIMELINE_DATA[currentEraIndex];
             const grid = document.getElementById("mediaVaultGrid");
 
@@ -1736,6 +1875,7 @@
                     </div>
                 `;
             }).join("");
+            if (direction !== 0) turn(grid.children, direction, 0.1, 0.06);
         }
 
         function resetMediaFilters() {
