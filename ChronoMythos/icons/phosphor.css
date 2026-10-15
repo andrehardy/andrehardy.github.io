@@ -31,8 +31,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ph.ph-arrow-elbow-down-right:before {
-  content: "\e046";
+.ph.ph-arrow-elbow-right:before {
+  content: "\e04e";
 }
 .ph.ph-arrow-right:before {
   content: "\e06c";
@@ -64,8 +64,17 @@
 .ph.ph-columns:before {
   content: "\e546";
 }
+.ph.ph-compass:before {
+  content: "\e1c8";
+}
+.ph.ph-compass-tool:before {
+  content: "\ea0e";
+}
 .ph.ph-download-simple:before {
   content: "\e20c";
+}
+.ph.ph-eye:before {
+  content: "\e220";
 }
 .ph.ph-film-strip:before {
   content: "\e792";
@@ -73,17 +82,20 @@
 .ph.ph-fire:before {
   content: "\e242";
 }
+.ph.ph-flame:before {
+  content: "\e624";
+}
 .ph.ph-game-controller:before {
   content: "\e26e";
 }
+.ph.ph-git-commit:before {
+  content: "\e27a";
+}
+.ph.ph-github-logo:before {
+  content: "\e576";
+}
 .ph.ph-globe-hemisphere-west:before {
   content: "\e28c";
-}
-.ph.ph-hourglass-medium:before {
-  content: "\e2b8";
-}
-.ph.ph-hourglass-simple:before {
-  content: "\e2ba";
 }
 .ph.ph-link:before {
   content: "\e2e2";
@@ -97,14 +109,32 @@
 .ph.ph-moon-stars:before {
   content: "\e58e";
 }
+.ph.ph-planet:before {
+  content: "\e652";
+}
 .ph.ph-plus:before {
   content: "\e3d4";
 }
 .ph.ph-scroll:before {
   content: "\eb7a";
 }
+.ph.ph-shield-chevron:before {
+  content: "\e40e";
+}
+.ph.ph-snowflake:before {
+  content: "\e5aa";
+}
 .ph.ph-sparkle:before {
   content: "\e6a2";
+}
+.ph.ph-spiral:before {
+  content: "\e9fa";
+}
+.ph.ph-sun-dim:before {
+  content: "\e474";
+}
+.ph.ph-wave-sine:before {
+  content: "\ea9a";
 }
 .ph.ph-x:before {
   content: "\e4f6";
@@ -146,8 +176,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ph-bold.ph-arrow-elbow-down-right:before {
-  content: "\e046";
+.ph-bold.ph-arrow-elbow-right:before {
+  content: "\e04e";
 }
 .ph-bold.ph-arrow-right:before {
   content: "\e06c";
@@ -179,8 +209,17 @@
 .ph-bold.ph-columns:before {
   content: "\e546";
 }
+.ph-bold.ph-compass:before {
+  content: "\e1c8";
+}
+.ph-bold.ph-compass-tool:before {
+  content: "\ea0e";
+}
 .ph-bold.ph-download-simple:before {
   content: "\e20c";
+}
+.ph-bold.ph-eye:before {
+  content: "\e220";
 }
 .ph-bold.ph-film-strip:before {
   content: "\e792";
@@ -188,17 +227,20 @@
 .ph-bold.ph-fire:before {
   content: "\e242";
 }
+.ph-bold.ph-flame:before {
+  content: "\e624";
+}
 .ph-bold.ph-game-controller:before {
   content: "\e26e";
 }
+.ph-bold.ph-git-commit:before {
+  content: "\e27a";
+}
+.ph-bold.ph-github-logo:before {
+  content: "\e576";
+}
 .ph-bold.ph-globe-hemisphere-west:before {
   content: "\e28c";
-}
-.ph-bold.ph-hourglass-medium:before {
-  content: "\e2b8";
-}
-.ph-bold.ph-hourglass-simple:before {
-  content: "\e2ba";
 }
 .ph-bold.ph-link:before {
   content: "\e2e2";
@@ -212,14 +254,32 @@
 .ph-bold.ph-moon-stars:before {
   content: "\e58e";
 }
+.ph-bold.ph-planet:before {
+  content: "\e652";
+}
 .ph-bold.ph-plus:before {
   content: "\e3d4";
 }
 .ph-bold.ph-scroll:before {
   content: "\eb7a";
 }
+.ph-bold.ph-shield-chevron:before {
+  content: "\e40e";
+}
+.ph-bold.ph-snowflake:before {
+  content: "\e5aa";
+}
 .ph-bold.ph-sparkle:before {
   content: "\e6a2";
+}
+.ph-bold.ph-spiral:before {
+  content: "\e9fa";
+}
+.ph-bold.ph-sun-dim:before {
+  content: "\e474";
+}
+.ph-bold.ph-wave-sine:before {
+  content: "\ea9a";
 }
 .ph-bold.ph-x:before {
   content: "\e4f6";
@@ -261,8 +321,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ph-fill.ph-arrow-elbow-down-right:before {
-  content: "\e046";
+.ph-fill.ph-arrow-elbow-right:before {
+  content: "\e04e";
 }
 .ph-fill.ph-arrow-right:before {
   content: "\e06c";
@@ -294,8 +354,17 @@
 .ph-fill.ph-columns:before {
   content: "\e546";
 }
+.ph-fill.ph-compass:before {
+  content: "\e1c8";
+}
+.ph-fill.ph-compass-tool:before {
+  content: "\ea0e";
+}
 .ph-fill.ph-download-simple:before {
   content: "\e20c";
+}
+.ph-fill.ph-eye:before {
+  content: "\e220";
 }
 .ph-fill.ph-film-strip:before {
   content: "\e792";
@@ -303,17 +372,20 @@
 .ph-fill.ph-fire:before {
   content: "\e242";
 }
+.ph-fill.ph-flame:before {
+  content: "\e624";
+}
 .ph-fill.ph-game-controller:before {
   content: "\e26e";
 }
+.ph-fill.ph-git-commit:before {
+  content: "\e27a";
+}
+.ph-fill.ph-github-logo:before {
+  content: "\e576";
+}
 .ph-fill.ph-globe-hemisphere-west:before {
   content: "\e28c";
-}
-.ph-fill.ph-hourglass-medium:before {
-  content: "\e2b8";
-}
-.ph-fill.ph-hourglass-simple:before {
-  content: "\e2ba";
 }
 .ph-fill.ph-link:before {
   content: "\e2e2";
@@ -327,14 +399,32 @@
 .ph-fill.ph-moon-stars:before {
   content: "\e58e";
 }
+.ph-fill.ph-planet:before {
+  content: "\e652";
+}
 .ph-fill.ph-plus:before {
   content: "\e3d4";
 }
 .ph-fill.ph-scroll:before {
   content: "\eb7a";
 }
+.ph-fill.ph-shield-chevron:before {
+  content: "\e40e";
+}
+.ph-fill.ph-snowflake:before {
+  content: "\e5aa";
+}
 .ph-fill.ph-sparkle:before {
   content: "\e6a2";
+}
+.ph-fill.ph-spiral:before {
+  content: "\e9fa";
+}
+.ph-fill.ph-sun-dim:before {
+  content: "\e474";
+}
+.ph-fill.ph-wave-sine:before {
+  content: "\ea9a";
 }
 .ph-fill.ph-x:before {
   content: "\e4f6";
