@@ -423,49 +423,10 @@
             border-color: #b45309 !important;
         }
 
-        /* The clasp is the way in for a keyboard, and a still reader never waits on the void. */
-        #openingStatusBanner {
-            position: absolute;
-            z-index: 6;
-            top: 8vh;
-            left: 50%;
-            transform: translateX(-50%);
-            max-width: 90vw;
-            padding: 0.45rem 0.9rem;
-            border: 1px solid rgba(212, 175, 55, 0.45);
-            background: rgba(8, 6, 4, 0.82);
-            color: #f3e6c4;
-            font-family: "IM Fell English SC", serif;
-            letter-spacing: 0.04em;
-            text-align: center;
-        }
-        #openTomeBtn {
-            position: absolute;
-            z-index: 6;
-            left: 50%;
-            bottom: 8vh;
-            transform: translateX(-50%);
-            padding: 0.9rem 1.8rem;
-            font-family: Cinzel, serif;
-            font-size: 0.95rem;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: #1c1408;
-            cursor: pointer;
-        }
-        #openTomeBtn.forged-clasp-btn:hover:not(:disabled) {
-            transform: translateX(-50%) translateY(-2px);
-        }
-        #openTomeBtn:focus-visible,
-        .forged-clasp-btn:focus-visible,
         button:focus-visible,
         a:focus-visible {
             outline: 2px solid #f8f1de;
             outline-offset: 3px;
-        }
-        #frontCoverStage.stage-hidden #openTomeBtn,
-        #frontCoverStage.stage-hidden #openingStatusBanner {
-            display: none;
         }
         html.tome-still body {
             overflow-x: hidden;
@@ -552,12 +513,6 @@
         <!-- ========================================================================= -->
         <section id="frontCoverStage">
             <div id="book3DViewport"></div>
-            <div id="openingStatusBanner" class="hidden" role="status">
-                <span id="openingStatusText">The clasps are set.</span>
-            </div>
-            <button id="openTomeBtn" type="button" class="forged-clasp-btn">
-                <span id="openTomeBtnText">Open the tome</span>
-            </button>
         </section>
 
         <!-- ========================================================================= -->
@@ -1487,7 +1442,7 @@
         let targetBookRotZ = 0.03;
         let targetCameraX = 0;
         let targetCameraY = 0.05;
-        let targetCameraZ = 7.5;
+        let targetCameraZ = 13;
 
         // Mechanical Opening Animation State
         let isBookOpening = false;
@@ -1507,7 +1462,7 @@
             const height = window.innerHeight || container.clientHeight || 768;
 
             coverScene = new THREE.Scene();
-            coverScene.fog = new THREE.FogExp2(0x040406, 0.042);
+            coverScene.fog = new THREE.FogExp2(0x040406, 0.02);
 
             coverCamera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
             coverCamera.position.set(0, targetCameraY, targetCameraZ);
@@ -2302,8 +2257,16 @@
             container.addEventListener("wheel", (e) => {
                 if (isBookOpening || isBookOpened) return;
                 e.preventDefault();
-                targetCameraZ = Math.max(5.0, Math.min(11.5, targetCameraZ + e.deltaY * 0.004));
+                targetCameraZ = Math.max(10, Math.min(16, targetCameraZ + e.deltaY * 0.004));
             }, { passive: false });
+
+            window.addEventListener("keydown", (e) => {
+                if (isBookOpening || isBookOpened) return;
+                if (e.key !== "Enter" && e.key !== " ") return;
+                const tag = document.activeElement && document.activeElement.tagName;
+                if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON" || tag === "A") return;
+                triggerMechanicalBookOpening();
+            });
         }
 
         function setBookViewPreset(preset) {
@@ -2312,28 +2275,28 @@
                 targetBookRotX = 0.08;
                 targetBookRotY = 0.0;
                 targetBookRotZ = 0.0;
-                targetCameraZ = 7.8;
+                targetCameraZ = 13;
             } else if (preset === "clasps") {
                 targetBookRotX = 0.12;
                 targetBookRotY = -1.25;
                 targetBookRotZ = 0.0;
-                targetCameraZ = 7.2;
+                targetCameraZ = 12.4;
             } else if (preset === "spine") {
                 targetBookRotX = 0.1;
                 targetBookRotY = 1.45;
                 targetBookRotZ = 0.0;
-                targetCameraZ = 7.4;
+                targetCameraZ = 12.6;
             } else if (preset === "back") {
                 targetBookRotX = 0.1;
                 targetBookRotY = Math.PI;
                 targetBookRotZ = 0.0;
-                targetCameraZ = 7.8;
+                targetCameraZ = 13;
             } else {
                 // Isometric lectern tilt
                 targetBookRotX = 0.45;
                 targetBookRotY = -0.52;
                 targetBookRotZ = 0.08;
-                targetCameraZ = 8.0;
+                targetCameraZ = 13.4;
             }
         }
 
@@ -2344,16 +2307,6 @@
             if (isBookOpening || isBookOpened) return;
             isBookOpening = true;
             openAnimStartTime = performance.now();
-
-            const btn = document.getElementById("openTomeBtn");
-            const btnText = document.getElementById("openTomeBtnText");
-            const banner = document.getElementById("openingStatusBanner");
-            if (btn) btn.disabled = true;
-            if (btnText) btnText.textContent = "Unlatching Clasps & Manifesting Folios...";
-            if (banner) {
-                banner.classList.remove("hidden");
-                banner.classList.add("flex");
-            }
 
             // Prepare hinged and flying pages
             hingedPages.forEach(p => {
@@ -2369,11 +2322,10 @@
         function updateBookOpeningTimeline(now) {
             const elapsed = (now - openAnimStartTime) / 1000;
             const progress = Math.min(1, elapsed / OPEN_DURATION);
-            const statusText = document.getElementById("openingStatusText");
 
-            // Smoothly orient book to an open lectern presentation angle
-            targetBookRotX = -0.38;
-            targetBookRotY = 0.18;
+            // The book opens where it stands, held in the void.
+            targetBookRotX = 0.12;
+            targetBookRotY = -0.18;
             targetBookRotZ = 0;
 
             // STAGE A (0.0s - 0.7s): Unlatch Iron/Bronze Fore-Edge Clasps
@@ -2383,9 +2335,6 @@
                 topClaspPivot.rotation.y = easeClasp * 2.4;
                 bottomClaspPivot.rotation.y = easeClasp * 2.4;
             }
-            if (elapsed < 0.7 && statusText) {
-                statusText.textContent = "Stage I // Unlatching Forged Iron & Bronze Clasps...";
-            }
 
             // STAGE B (0.55s - 1.85s): Heavy Front Cover Swings Open on Left Hinge
             if (elapsed >= 0.55) {
@@ -2393,17 +2342,10 @@
                 const easeCover = coverT < 0.5 ? 2 * coverT * coverT : 1 - Math.pow(-2 * coverT + 2, 2) / 2;
                 frontCoverPivot.rotation.y = -easeCover * 2.75; // Opens ~158 degrees
                 innerBookGlowLight.intensity = 0.3 + easeCover * 3.8;
-                if (elapsed < 1.7 && statusText) {
-                    statusText.textContent = "Stage II // Swinging Heavy Leather & Cedar Board Open...";
-                }
             }
 
             // STAGE C (1.05s - 3.6s): 28 Hinged Vellum Pages Riffle + 24 Flying Pages Manifest
             if (elapsed >= 1.05) {
-                if (elapsed < 3.0 && statusText) {
-                    statusText.textContent = "Stage III // Manifesting Living Vellum Folios Across 20,000 Years...";
-                }
-
                 // Riffle each of the 28 hinged spine pages with real vertex arch curvature
                 hingedPages.forEach((pageMesh, idx) => {
                     const pageStart = 1.05 + idx * 0.062;
@@ -2452,7 +2394,7 @@
                             fp.position.set(
                                 Math.sin(heroT * Math.PI) * 0.22,
                                 -0.15 + easeHero * 0.32,
-                                0.6 + easeHero * 5.6
+                                0.6 + easeHero * 2.2
                             );
                             // Smoothly align rotation to square with camera lens
                             fp.rotation.set(
@@ -2477,12 +2419,12 @@
                             // swooping past the viewer's head, left, right, and behind!
                             // cameraWrap / surroundViewer depth: Z travels past camera (vortexDepth goes past camera Z: 7.8)
                             const swirlAngle = d.spiralAngle + localT * d.spiralSpeed;
-                            const currentRadius = d.spiralRadius * (0.35 + localT * 2.2);
-                            const zTravel = 0.5 + localT * 10.2; // pastCamera depth
+                            const currentRadius = d.spiralRadius * (0.45 + localT * 0.55);
+                            const zTravel = 0.35 + localT * 2.4; // pastCamera depth stays inside the void, short of the lens
                             
                             fp.position.set(
                                 Math.cos(swirlAngle) * currentRadius,
-                                -0.3 + Math.sin(d.elevationAngle) * currentRadius * 0.75 + localT * d.riseSpeed * 2.2,
+                                -0.15 + Math.sin(d.elevationAngle) * currentRadius * 0.28 + localT * d.riseSpeed * 0.45,
                                 zTravel
                             );
 
@@ -2522,16 +2464,7 @@
                 }
             }
 
-            // STAGE D (2.85s - 4.2s): Camera Portal Dive into the Open Codex
-            if (elapsed >= 2.85) {
-                if (statusText) {
-                    statusText.textContent = "Stage IV // Stepping Through the Codex Threshold...";
-                }
-                const diveT = Math.min(1, (elapsed - 2.85) / 1.35);
-                const easeDive = diveT * diveT * diveT;
-                targetCameraZ = 7.8 - easeDive * 6.4;
-                targetCameraY = 0.2 - easeDive * 0.15;
-            }
+            // The opening stays in the void. The camera does not dive into the book.
 
             // Complete Transition -> Reveal Inner Sanctum & 3D Orbital Armillary
             if (progress >= 1) {
@@ -2572,7 +2505,7 @@
             targetBookRotX = 0.24;
             targetBookRotY = -0.44;
             targetBookRotZ = 0.03;
-            targetCameraZ = 7.5;
+            targetCameraZ = 13;
             targetCameraY = 0.05;
 
             window.scrollTo({ top: 0, behavior: "instant" });
@@ -3221,11 +3154,6 @@
         }
 
         function attachUIListeners() {
-            const openBtn = document.getElementById("openTomeBtn");
-            if (openBtn) {
-                openBtn.addEventListener("click", triggerMechanicalBookOpening);
-            }
-
             const closeBtn = document.getElementById("closeBookBtn");
             if (closeBtn) {
                 closeBtn.addEventListener("click", resetBookToClosed3DStage);
@@ -3319,7 +3247,7 @@
             } catch (err) {}
 
             const start = () => {
-                targetCameraZ = 7.6;
+                targetCameraZ = 13;
                 targetCameraY = 0.0;
                 const stillPage = document.documentElement.classList.contains("tome-still");
                 if (!stillPage && window.THREE) {
