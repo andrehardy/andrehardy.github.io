@@ -4,13 +4,92 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ChronoMythos — The Lineage</title>
+  <script>
+    (() => {
+      const root = document.documentElement;
+      try {
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      } catch (err) {
+        return;
+      }
+      root.classList.add("opening");
+    })();
+  </script>
     <style>
       @font-face { font-family: "Cinzel"; font-weight: 400; font-style: normal; src: url("../fonts/cinzel-latin-400-normal.woff2") format("woff2"); font-display: swap; }
       @font-face { font-family: "Cinzel"; font-weight: 600 800; font-style: normal; src: url("../fonts/cinzel-latin-600-normal.woff2") format("woff2"); font-display: swap; }
       @font-face { font-family: "Cormorant Garamond"; font-weight: 400 700; font-style: normal; src: url("../fonts/cormorant-garamond-latin-600-normal.woff2") format("woff2"); font-display: swap; }
       @font-face { font-family: "Cormorant Garamond"; font-weight: 400; font-style: italic; src: url("../fonts/cormorant-garamond-latin-400-italic.woff2") format("woff2"); font-display: swap; }
-      @media (prefers-reduced-motion: reduce) { #codexPanel { transition: none; } }
+      @media (prefers-reduced-motion: reduce) {
+        #codexPanel { transition: none; }
+        html.opening #codexHeader,
+        html.opening #statusRibbon,
+        html.opening .tree-node,
+        html.opening .edge-line,
+        html.opening #layerStrata,
+        html.opening #layerColumns {
+          opacity: 1 !important;
+          transform: none !important;
+          animation: none !important;
+          stroke-dashoffset: 0 !important;
+        }
+      }
       a.btn-action { text-decoration: none; display: inline-block; }
+
+      html.opening #codexHeader,
+      html.opening #statusRibbon,
+      html.opening #treeCanvasContainer {
+        pointer-events: none;
+      }
+      html.opening #codexHeader {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      html.opening.waking #codexHeader {
+        animation: lineage-bar-in 0.7s cubic-bezier(0.3, 0.7, 0.2, 1) 0.85s forwards;
+      }
+      html.opening #statusRibbon {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+      html.opening.waking #statusRibbon {
+        animation: lineage-bar-in 0.7s cubic-bezier(0.3, 0.7, 0.2, 1) 1s forwards;
+      }
+      html.opening #layerStrata,
+      html.opening #layerColumns {
+        opacity: 0;
+      }
+      html.opening.waking #layerStrata,
+      html.opening.waking #layerColumns {
+        animation: lineage-ink 0.9s cubic-bezier(0.3, 0.7, 0.2, 1) 0.08s forwards;
+      }
+      html.opening .tree-node {
+        opacity: 0;
+      }
+      html.opening.waking .tree-node {
+        animation: lineage-ink 0.75s cubic-bezier(0.3, 0.7, 0.2, 1) forwards;
+      }
+      html.opening.waking .tree-node[data-act="1"] { animation-delay: 0.18s; }
+      html.opening.waking .tree-node[data-act="2"] { animation-delay: 0.38s; }
+      html.opening.waking .tree-node[data-act="3"] { animation-delay: 0.58s; }
+      html.opening.waking .tree-node[data-act="4"] { animation-delay: 0.78s; }
+      html.opening .edge-line {
+        stroke-dasharray: var(--draw, 400);
+        stroke-dashoffset: var(--draw, 400);
+      }
+      html.opening.waking .edge-line {
+        animation: lineage-draw 1.2s ease forwards;
+      }
+      @keyframes lineage-bar-in {
+        to { transform: none; opacity: 1; }
+      }
+      @keyframes lineage-ink {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: none; }
+      }
+      @keyframes lineage-draw {
+        to { stroke-dashoffset: 0; }
+      }
     </style>
   <style>
     :root {
@@ -3300,7 +3379,36 @@
     window.addEventListener('DOMContentLoaded', () => {
       setupInteractions();
       fitToScreen(false);
+      openTheLineage();
     });
+
+    function openTheLineage() {
+      const root = document.documentElement;
+      const finish = () => {
+        if (!root.classList.contains("opening")) return;
+        root.classList.remove("opening", "waking");
+        document.querySelectorAll(".edge-line").forEach((el) => {
+          el.style.removeProperty("--draw");
+          el.style.removeProperty("stroke-dasharray");
+          el.style.removeProperty("stroke-dashoffset");
+        });
+      };
+      if (!root.classList.contains("opening")) return;
+      document.querySelectorAll(".edge-line").forEach((el) => {
+        const len = typeof el.getTotalLength === "function" ? Math.ceil(el.getTotalLength()) : 400;
+        el.style.setProperty("--draw", String(Math.max(len, 1)));
+      });
+      requestAnimationFrame(() => root.classList.add("waking"));
+      const timer = setTimeout(finish, 1800);
+      const skip = () => {
+        clearTimeout(timer);
+        finish();
+        window.removeEventListener("pointerdown", skip);
+        window.removeEventListener("keydown", skip);
+      };
+      window.addEventListener("pointerdown", skip, { once: true, capture: true });
+      window.addEventListener("keydown", skip, { once: true, capture: true });
+    }
   </script>
 </body>
 </html>
