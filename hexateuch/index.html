@@ -88,26 +88,165 @@
             display: none;
         }
 
-        .close-rail {
-            display: flex;
-            justify-content: center;
-            padding: 0.85rem 1rem 0.2rem;
+        .tome-volume {
+            position: relative;
+            margin: 1.1rem auto 2.8rem;
+            max-width: 78rem;
+            padding: 1.4rem 4.8rem 2.6rem 2.6rem;
+            perspective: 2200px;
         }
-        #closeBookBtn {
-            font-family: Cinzel, serif;
-            letter-spacing: 0.14em;
-            font-size: 11px;
-            text-transform: uppercase;
-            color: #f6edd4;
-            background: linear-gradient(180deg, #7a2c22 0%, #4a1510 100%);
-            border: 1px solid #d4af37;
-            border-radius: 999px;
-            padding: 0.5rem 1.05rem;
-            box-shadow: 0 8px 18px rgba(40, 12, 8, 0.28), inset 0 1px 0 rgba(254, 240, 138, 0.35);
+        .tome-clasp {
+            position: absolute;
+            left: 10px;
+            top: 20%;
+            width: 38px;
+            height: 176px;
+            z-index: 40;
+            background: transparent;
+            border: none;
+            padding: 0;
             cursor: pointer;
         }
-        #closeBookBtn:hover {
-            background: linear-gradient(180deg, #8d3428 0%, #5c1c14 100%);
+        .clasp-bar {
+            position: absolute;
+            left: 5px;
+            width: 28px;
+            height: 54px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #8a6a3a 0%, #3a2412 42%, #c4a574 68%, #2a1608 100%);
+            box-shadow: inset 0 1px 0 rgba(254, 240, 138, 0.35), 2px 5px 10px rgba(0, 0, 0, 0.45);
+        }
+        .clasp-bar-top { top: 0; }
+        .clasp-bar-bot { bottom: 0; }
+        .clasp-hasp {
+            position: absolute;
+            left: 8px;
+            top: 62px;
+            width: 22px;
+            height: 50px;
+            border-radius: 11px;
+            background: radial-gradient(circle at 38% 28%, #f3d27a, #b45309 55%, #3b1806);
+            border: 1px solid #fef08a;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(254, 240, 138, 0.55);
+        }
+        .tome-clasp:hover .clasp-hasp {
+            filter: brightness(1.08);
+        }
+        .leaf-stack {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .leaf-stack-foot {
+            left: 28px;
+            right: 52px;
+            bottom: 18px;
+            height: 22px;
+            background: repeating-linear-gradient(
+                to bottom,
+                #f3e6c8 0px, #f3e6c8 2px,
+                #c4a574 2px, #d6bf96 3px
+            );
+            border-radius: 0 0 7px 7px;
+            box-shadow: 0 12px 22px rgba(32, 14, 6, 0.38);
+        }
+        .leaf-stack-head {
+            left: 32px;
+            right: 56px;
+            top: 18px;
+            height: 10px;
+            background: repeating-linear-gradient(
+                to top,
+                #ead9b6 0px, #ead9b6 2px,
+                #c4a574 2px, #d8c09a 3px
+            );
+            border-radius: 6px 6px 0 0;
+            opacity: 0.85;
+        }
+        .leaf-stack-fore {
+            right: 36px;
+            top: 42px;
+            bottom: 42px;
+            width: 18px;
+            background: repeating-linear-gradient(
+                to right,
+                #efe0c0 0px, #efe0c0 2px,
+                #c4a574 2px, #d8c09a 3px
+            );
+            border-radius: 0 5px 5px 0;
+            box-shadow: 6px 8px 16px rgba(32, 14, 6, 0.28);
+        }
+        .fore-index {
+            position: absolute;
+            right: 4px;
+            top: 86px;
+            bottom: 86px;
+            width: 58px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 8;
+        }
+        .fore-tab {
+            flex: 1;
+            margin: 3px 0 3px 10px;
+            min-height: 42px;
+            border: 1px solid rgba(80, 48, 18, 0.45);
+            border-left: none;
+            border-radius: 0 9px 9px 0;
+            background:
+                linear-gradient(90deg, rgba(255, 248, 230, 0.2), transparent 40%),
+                linear-gradient(180deg, color-mix(in srgb, var(--tab) 55%, #f3e6c8), color-mix(in srgb, var(--tab) 70%, #6b3416));
+            color: #2a1608;
+            font-family: Cinzel, serif;
+            text-align: left;
+            padding: 0.25rem 0.4rem 0.25rem 0.55rem;
+            cursor: pointer;
+            box-shadow: 3px 3px 8px rgba(40, 16, 6, 0.28);
+            writing-mode: horizontal-tb;
+        }
+        .fore-tab.active {
+            margin-left: 0;
+            box-shadow: 4px 4px 10px rgba(40, 16, 6, 0.38);
+            filter: brightness(1.06);
+        }
+        .fore-tab-roman {
+            display: block;
+            font-size: 9px;
+            letter-spacing: 0.14em;
+        }
+        .fore-tab-name {
+            display: block;
+            font-size: 10px;
+            line-height: 1.15;
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+        }
+        @media (max-width: 900px) {
+            .tome-volume {
+                padding: 0.8rem 1rem 1.4rem;
+            }
+            .fore-index {
+                position: relative;
+                right: auto;
+                top: auto;
+                bottom: auto;
+                width: 100%;
+                flex-direction: row;
+                height: auto;
+                margin-top: 0.55rem;
+            }
+            .fore-tab {
+                margin: 0 2px;
+                border-left: 1px solid rgba(80, 48, 18, 0.45);
+                border-radius: 0 0 8px 8px;
+                min-height: 44px;
+            }
+            .tome-clasp {
+                left: 4px;
+                top: 12%;
+                height: 140px;
+            }
         }
 
         /* STAGE LAYERING: Fixed 100vw x 100vh Void for Stage 1, Full Flow for Stage 2 */
@@ -253,7 +392,9 @@
 
         #astrolabe3DViewport {
             width: 100%;
-            height: 460px;
+            height: auto;
+            aspect-ratio: 1 / 1.14;
+            min-height: 400px;
             position: relative;
             cursor: grab;
             touch-action: none;
@@ -265,15 +406,16 @@
             position: relative;
             width: 100%;
             overflow: visible;
+            padding: 0.15rem 0 2.6rem;
         }
         .astrolabe-hanger::after {
             content: "";
             position: absolute;
-            left: 14%;
-            right: 14%;
-            bottom: 7%;
-            height: 46px;
-            background: radial-gradient(ellipse at center, rgba(42, 24, 10, 0.30), transparent 72%);
+            left: 16%;
+            right: 16%;
+            bottom: 6%;
+            height: 58px;
+            background: radial-gradient(ellipse at center, rgba(42, 24, 10, 0.32), transparent 74%);
             pointer-events: none;
             z-index: 0;
         }
@@ -320,13 +462,24 @@
                     #f4e6c8 62%,
                     #ead9b6 84%,
                     #f5ebd6 100%);
+            overflow: visible;
+            transform: rotateX(6deg);
+            transform-origin: 50% 100%;
             border: 2px solid #d4af37;
             outline: 1px solid #fef08a;
             outline-offset: 0;
+            border-radius: 3px 10px 10px 3px;
             box-shadow:
-                0 0 0 8px #6e241c,
-                0 0 0 9px #d4af37,
-                0 32px 70px -18px rgba(48, 22, 8, 0.45),
+                0 0 0 14px #4a1c14,
+                0 0 0 16px #d4af37,
+                0 5px 0 13px #ead9b6,
+                0 8px 0 12px #d6bf96,
+                0 11px 0 11px #c4a574,
+                0 14px 0 10px #b08958,
+                8px 0 0 12px #ead9b6,
+                11px 0 0 11px #d6bf96,
+                14px 0 0 10px #c4a574,
+                0 36px 70px -16px rgba(48, 22, 8, 0.48),
                 inset 0 0 48px rgba(120, 78, 28, 0.14);
         }
 
@@ -346,11 +499,19 @@
                     #faf5e8 60%, 
                     #f0e7d3 84%, 
                     #e6dac2 100%);
+            overflow: visible;
             border: 2px solid #d4af37;
             box-shadow:
-                0 0 0 8px #6e241c,
-                0 0 0 9px #d4af37,
-                0 32px 70px -18px rgba(48, 22, 8, 0.38),
+                0 0 0 14px #4a1c14,
+                0 0 0 16px #d4af37,
+                0 5px 0 13px #ead9b6,
+                0 8px 0 12px #d6bf96,
+                0 11px 0 11px #c4a574,
+                0 14px 0 10px #b08958,
+                8px 0 0 12px #ead9b6,
+                11px 0 0 11px #d6bf96,
+                14px 0 0 10px #c4a574,
+                0 36px 70px -16px rgba(48, 22, 8, 0.4),
                 inset 0 0 48px rgba(120, 78, 28, 0.12);
         }
 
@@ -745,7 +906,7 @@
             transform: none;
         }
         html.tome-still #astrolabe3DViewport {
-            height: 340px;
+            min-height: 360px;
         }
         html.tome-still #closeBookBtn {
             display: none;
@@ -807,13 +968,19 @@
         <!-- ========================================================================= -->
         <!-- STAGE 2: INNER SANCTUM SPREAD & 3D ORBITAL ARMILLARY ASTROLABE            -->
         <!-- ========================================================================= -->
-        <main id="codexInteriorStage" class="max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 flex flex-col justify-center">
-            <div class="close-rail">
-                <button id="closeBookBtn" type="button" class="hidden">Close &amp; Relatch the Tome</button>
-            </div>
+        <main id="codexInteriorStage" class="w-full mx-auto py-3 flex flex-col justify-center">
+            <div class="tome-volume">
+                <div class="leaf-stack leaf-stack-head"></div>
+                <div class="leaf-stack leaf-stack-foot"></div>
+                <div class="leaf-stack leaf-stack-fore"></div>
+                <button id="closeBookBtn" type="button" class="tome-clasp hidden" aria-label="Relatch the tome" title="Relatch the tome">
+                    <span class="clasp-bar clasp-bar-top"></span>
+                    <span class="clasp-hasp"></span>
+                    <span class="clasp-bar clasp-bar-bot"></span>
+                </button>
 
             <!-- DOUBLE-FOLIO SPREAD -->
-            <div class="codex-spread parchment-folio relative overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[760px] my-1">
+            <div class="codex-spread parchment-folio relative grid grid-cols-1 lg:grid-cols-12 min-h-[760px]">
                 <div class="codex-spine hidden lg:block"></div>
 
                 <!-- LEFT FOLIO: FRONTISPIECE, FREE ASTROLABE, WHISPERING CONCORDANCE -->
@@ -877,11 +1044,8 @@
                     <div id="rectoFooterPortal" class="folio-foot pt-4 flex flex-wrap items-center justify-between gap-3 relative z-10"></div>
                 </section>
             </div>
-
-            <!-- BOTTOM SIX SEALS SELECTOR BAR -->
-            <section class="max-w-7xl w-full mx-auto px-1 pb-4 pt-2">
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5" id="bottomSixSealsBar"></div>
-            </section>
+                <nav class="fore-index" id="bottomSixSealsBar" aria-label="The six seals"></nav>
+            </div>
         </main>
 
     </div>
@@ -1692,8 +1856,8 @@
         let targetBookRotY = -0.44;
         let targetBookRotZ = 0.03;
         let targetCameraX = 0;
-        let targetCameraY = 0.05;
-        let targetCameraZ = 13;
+        let targetCameraY = 0.85;
+        let targetCameraZ = 18.5;
 
         // Mechanical Opening Animation State
         let isBookOpening = false;
@@ -1813,7 +1977,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             coverScene = new THREE.Scene();
             coverScene.fog = new THREE.FogExp2(0x040406, 0.02);
 
-            coverCamera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
+            coverCamera = new THREE.PerspectiveCamera(46, width / height, 0.1, 140);
             coverCamera.position.set(0, targetCameraY, targetCameraZ);
 
             coverRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
@@ -2072,10 +2236,12 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
             // 4 Protruding Medieval Scholar's Vellum Index Tabs (Rubric Bookmarks sticking out of the fore-edge)
             const tabConfigs = [
-                { y: 1.18,  z: 0.24,  rotZ: 0.04,  tint: "#7c2d12" }, // Cinnabar Red
-                { y: 0.38,  z: 0.06,  rotZ: -0.03, tint: "#92400e" }, // Golden Ochre
-                { y: -0.44, z: -0.11, rotZ: 0.05,  tint: "#1e3a8a" }, // Lapis Indigo
-                { y: -1.22, z: -0.26, rotZ: -0.04, tint: "#3f3f46" }  // Iron-Gall Umber
+                { y: 1.58,  z: 0.30,  rotZ: 0.03,  tint: "#eab308" },
+                { y: 0.95,  z: 0.18,  rotZ: -0.02, tint: "#ef4444" },
+                { y: 0.32,  z: 0.06,  rotZ: 0.04,  tint: "#38bdf8" },
+                { y: -0.32, z: -0.06, rotZ: -0.03, tint: "#c084fc" },
+                { y: -0.95, z: -0.18, rotZ: 0.03,  tint: "#10b981" },
+                { y: -1.58, z: -0.30, rotZ: -0.04, tint: "#f97316" }
             ];
             tabConfigs.forEach((tc) => {
                 const tabMat = new THREE.MeshStandardMaterial({
@@ -2396,7 +2562,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     nearLens: nearLens,
                     delay: (i / flyingPageCount) * 0.85,
                     vx: Math.cos(elev) * Math.cos(az) * (1.6 + Math.random() * 3.4),
-                    vy: downward ? (-1.1 - Math.random() * 1.8) : (2.4 + Math.random() * 3.3),
+                    vy: downward ? (-0.6 - Math.random() * 1.2) : (3.4 + Math.random() * 4.2),
                     vz: towardLens ? (6.5 + Math.random() * 3.5) : (Math.cos(elev) * Math.sin(az) * (2.2 + Math.random() * 4.4)),
                     grav: 1.9 + Math.random() * 0.8,
                     swirl: (0.6 + Math.random() * 1.4) * (i % 2 === 0 ? 1 : -1),
@@ -2449,9 +2615,9 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
             const mistMap = createSoftParticleTexture();
             cosmicMistGroup = new THREE.Group();
-            cosmicMistGroup.position.set(0, 2.35, 4.2);
+            cosmicMistGroup.position.set(0, 0, 3.4);
             cosmicMistGroup.visible = false;
-            coverScene.add(cosmicMistGroup);
+            bookRoot.add(cosmicMistGroup);
             cosmicMistPuffs = [];
             const mistColors = [0xf59e0b, 0x8b5cf6, 0x38bdf8, 0xea580c, 0xd6bf96];
             for (let m = 0; m < 36; m++) {
@@ -2474,9 +2640,9 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             }
 
             celestialGroup = new THREE.Group();
-            celestialGroup.position.set(0, 2.35, 4.2);
+            celestialGroup.position.set(0, 0, 3.6);
             celestialGroup.visible = false;
-            coverScene.add(celestialGroup);
+            bookRoot.add(celestialGroup);
             celestialSun = new THREE.Mesh(
                 new THREE.SphereGeometry(0.34, 24, 24),
                 new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xd97706, emissiveIntensity: 1.2, roughness: 0.25, metalness: 0.2 })
@@ -2517,8 +2683,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
             fallingArmillary = new THREE.Group();
             fallingArmillary.visible = false;
-            fallingArmillary.position.set(0, 2.35, 4.2);
-            coverScene.add(fallingArmillary);
+            fallingArmillary.position.set(0, 0, 3.6);
+            bookRoot.add(fallingArmillary);
             const armMat = new THREE.MeshStandardMaterial({ color: 0xc4a574, emissive: 0x6b4a1e, emissiveIntensity: 0.25, roughness: 0.35, metalness: 0.72 });
             const armCore = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), new THREE.MeshStandardMaterial({
                 color: 0xd97706, emissive: 0x92400e, emissiveIntensity: 0.7, roughness: 0.3, metalness: 0.3
@@ -2703,7 +2869,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             container.addEventListener("wheel", (e) => {
                 if (isBookOpening || isBookOpened || isBookClosing) return;
                 e.preventDefault();
-                targetCameraZ = Math.max(10, Math.min(16, targetCameraZ + e.deltaY * 0.004));
+                targetCameraZ = Math.max(14, Math.min(24, targetCameraZ + e.deltaY * 0.004));
             }, { passive: false });
 
             window.addEventListener("keydown", (e) => {
@@ -2721,28 +2887,28 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 targetBookRotX = 0.08;
                 targetBookRotY = 0.0;
                 targetBookRotZ = 0.0;
-                targetCameraZ = 13;
+                targetCameraZ = 18.5;
             } else if (preset === "clasps") {
                 targetBookRotX = 0.12;
                 targetBookRotY = -1.25;
                 targetBookRotZ = 0.0;
-                targetCameraZ = 12.4;
+                targetCameraZ = 17.4;
             } else if (preset === "spine") {
                 targetBookRotX = 0.1;
                 targetBookRotY = 1.45;
                 targetBookRotZ = 0.0;
-                targetCameraZ = 12.6;
+                targetCameraZ = 17.6;
             } else if (preset === "back") {
                 targetBookRotX = 0.1;
                 targetBookRotY = Math.PI;
                 targetBookRotZ = 0.0;
-                targetCameraZ = 13;
+                targetCameraZ = 18.5;
             } else {
                 // Isometric lectern tilt
                 targetBookRotX = 0.45;
                 targetBookRotY = -0.52;
                 targetBookRotZ = 0.08;
-                targetCameraZ = 13.4;
+                targetCameraZ = 18.8;
             }
         }
 
@@ -2750,17 +2916,20 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
         // 4. OPENING SHOT. Unlatch, two turns, flatten, pages rise all around,
         //    the sky collapses into the armillary, then the camera lands on the page.
         // ============================================================================
-        const CAM_KEYS = [
-            [0.00, 0, 0.12, 13.0, 0, 0.04, 0],
-            [0.75, 0, 0.55, 14.5, 0, 0.28, 0],
-            [1.65, 0, 1.15, 14.6, 0, 0.55, 0],
-            [2.85, 0, 2.55, 12.2, 0, 2.3, 4.2],
-            [4.15, 0.1, 2.15, 10.2, 0, 2.2, 4.2],
-            [5.15, -0.35, 0.55, 8.4, -1.05, -0.25, 0],
-            [6.05, 0.35, 0.05, 3.4, 0.4, -0.22, 0.15],
-            [6.45, 0.48, -0.08, 1.62, 0.42, -0.28, 0],
-            [6.70, 0.48, -0.08, 1.58, 0.42, -0.28, 0]
+        const OPEN_CAM = [
+            { t: 0.00, cam: [0, 0.85, 18.5], look: [0, 0.08, 0], local: false },
+            { t: 0.70, cam: [0, 1.9, 20.2], look: [0, 0.28, 0], local: false },
+            { t: 1.55, cam: [0, 2.8, 20.8], look: [0, 0.4, 0], local: false },
+            { t: 2.75, cam: [0.2, 12.2, 17.4], look: [0, 0, 0.2], local: true },
+            { t: 3.70, cam: [0.25, 10.6, 16.0], look: [0, 0, 3.5], local: true },
+            { t: 4.40, cam: [-0.15, 9.0, 14.8], look: [0, 0, 3.3], local: true },
+            { t: 5.25, cam: [-2.3, 6.2, 12.4], look: [-2.35, 0, 0.75], local: true },
+            { t: 6.10, cam: [1.05, 4.6, 9.6], look: [1.45, 0, 0.45], local: true },
+            { t: 6.70, cam: [1.7, 3.0, 6.6], look: [1.55, 0, 0.35], local: true }
         ];
+        const _openLook = new THREE.Vector3();
+        const _openLookB = new THREE.Vector3();
+        const _pageOrigin = new THREE.Vector3();
 
         function smooth01(t) {
             const x = Math.max(0, Math.min(1, t));
@@ -2772,32 +2941,43 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             return ((a + Math.PI) % turn + turn) % turn - Math.PI;
         }
 
+        function worldLookFromKey(key, target) {
+            target.set(key.look[0], key.look[1], key.look[2]);
+            if (key.local && bookRoot) bookRoot.localToWorld(target);
+            return target;
+        }
+
         function sampleOpeningCamera(elapsed) {
-            const keys = CAM_KEYS;
+            const keys = OPEN_CAM;
             let i = 0;
-            while (i < keys.length - 2 && elapsed > keys[i + 1][0]) i++;
+            while (i < keys.length - 2 && elapsed > keys[i + 1].t) i++;
             const k0 = keys[Math.max(0, i - 1)];
             const k1 = keys[i];
             const k2 = keys[i + 1];
             const k3 = keys[Math.min(keys.length - 1, i + 2)];
-            const span = Math.max(0.001, k2[0] - k1[0]);
-            let u = (elapsed - k1[0]) / span;
-            const diving = i >= keys.length - 2;
-            if (diving) u = Math.pow(Math.max(0, Math.min(1, u)), 2.05);
+            const span = Math.max(0.001, k2.t - k1.t);
+            let u = (elapsed - k1.t) / span;
+            const diving = i >= keys.length - 3;
+            if (diving) u = Math.pow(Math.max(0, Math.min(1, u)), 1.85);
             else u = Math.max(0, Math.min(1, u));
-            const out = new Array(6);
-            for (let c = 1; c <= 6; c++) {
-                const p0 = k0[c];
-                const p1 = k1[c];
-                const p2 = k2[c];
-                const p3 = k3[c];
+            const catmull = (p0, p1, p2, p3) => {
                 const t2 = u * u;
                 const t3 = t2 * u;
-                out[c - 1] = 0.5 * ((2 * p1) + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3);
-            }
-            coverCamera.position.set(out[0], out[1], Math.max(1.15, out[2]));
-            coverCamera.lookAt(out[3], out[4], out[5]);
-            coverCamera.rotation.z = diving ? -Math.sin(u * Math.PI) * 0.11 : 0;
+                return 0.5 * ((2 * p1) + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3);
+            };
+            coverCamera.position.set(
+                catmull(k0.cam[0], k1.cam[0], k2.cam[0], k3.cam[0]),
+                catmull(k0.cam[1], k1.cam[1], k2.cam[1], k3.cam[1]),
+                catmull(k0.cam[2], k1.cam[2], k2.cam[2], k3.cam[2])
+            );
+            const a = worldLookFromKey(k1, _openLook);
+            const b = worldLookFromKey(k2, _openLookB);
+            coverCamera.lookAt(
+                a.x + (b.x - a.x) * u,
+                a.y + (b.y - a.y) * u,
+                a.z + (b.z - a.z) * u
+            );
+            coverCamera.rotation.z = diving ? -Math.sin(u * Math.PI) * 0.08 : 0;
         }
 
         function hideOpeningSpectacle() {
@@ -2813,7 +2993,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             if (fallingArmillary) {
                 fallingArmillary.visible = false;
                 fallingArmillary.scale.set(1, 1, 1);
-                fallingArmillary.position.set(0, 2.35, 4.2);
+                fallingArmillary.position.set(0, 0, 3.6);
             }
             if (emberParticles) emberParticles.material.opacity = 0.62;
         }
@@ -2870,10 +3050,11 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             if (elapsed >= 1.55) {
                 const flattenT = Math.min(1, (elapsed - 1.55) / 1.0);
                 const easeFlat = smooth01(flattenT);
-                bookRoot.rotation.x = targetBookRotX + ( -0.2 - targetBookRotX) * easeFlat;
-                bookRoot.rotation.y = targetBookRotY + (0.08 - targetBookRotY) * easeFlat;
+                bookRoot.rotation.x = targetBookRotX + (-1.18 - targetBookRotX) * easeFlat;
+                bookRoot.rotation.y = targetBookRotY + (0 - targetBookRotY) * easeFlat;
                 bookRoot.rotation.z = targetBookRotZ * (1 - easeFlat);
-                bookRoot.position.y = 0.42 + (-0.4 - 0.42) * easeFlat;
+                bookRoot.position.y = 0.42 + (-0.12 - 0.42) * easeFlat;
+                bookRoot.position.z = 0.55 * easeFlat;
                 if (frontCoverPivot) frontCoverPivot.rotation.y = -easeFlat * Math.PI;
                 if (innerBookGlowLight) innerBookGlowLight.intensity = 0.2 + easeFlat * 3.6;
                 const count = Math.max(1, hingedPages.length - 1);
@@ -2909,19 +3090,18 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     const rise = d.vy * hang - 0.5 * d.grav * hang * hang;
                     const travel = Math.min(life, 2.15);
                     const eddy = Math.min(1, life / 1.2);
-                    const depth = d.nearLens
-                        ? Math.min(life, 1.7) * d.vz
-                        : d.vz * travel * 0.62;
+                    _pageOrigin.set(0, 0, 0.2);
+                    if (bookRoot) bookRoot.localToWorld(_pageOrigin);
                     sheet.position.set(
-                        d.vx * travel * 0.85 + Math.sin(d.az + life * d.swirl) * d.swirlR * eddy,
-                        bookRoot.position.y + 0.15 + rise,
-                        depth + Math.cos(d.az + life * d.swirl) * d.swirlR * 0.35 * eddy
+                        _pageOrigin.x + d.vx * travel * 0.95 + Math.sin(d.az + life * d.swirl) * d.swirlR * eddy,
+                        _pageOrigin.y + rise,
+                        _pageOrigin.z + d.vz * travel * 0.22 + Math.cos(d.az + life * d.swirl) * d.swirlR * 0.28 * eddy
                     );
                     sheet.rotation.set(life * d.sx, life * d.sy, life * d.sz);
                     const fadeIn = Math.min(1, life * 3.2);
                     const fadeOut = elapsed > 5.05 ? Math.max(0, 1 - (elapsed - 5.05) * 1.15) : 1;
-                    const blockingSky = elapsed > 2.55 && elapsed < 4.4 && Math.abs(sheet.position.x) < 1.9 && sheet.position.z < 3.4;
-                    sheet.material.opacity = fadeIn * fadeOut * (blockingSky ? 0.16 : 1);
+                    const blockingSky = elapsed > 2.7 && elapsed < 4.5 && Math.abs(sheet.position.x) < 1.6 && sheet.position.y > 2.4;
+                    sheet.material.opacity = fadeIn * fadeOut * (blockingSky ? 0.22 : 1);
                     if (life < 2.4 && (d.index % 2 === 0)) {
                         const posAttr = sheet.geometry.attributes.position;
                         const base = sheet.geometry.userData.baseCoords;
@@ -2988,7 +3168,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                         fallingArmillary.visible = true;
                         const grown = 0.15 + col * 0.85;
                         fallingArmillary.scale.set(grown, grown, grown);
-                        fallingArmillary.position.set(0, 2.35, 4.2);
+                        fallingArmillary.position.set(0, 0, 3.6);
                         fallingArmillary.rotation.y = col * Math.PI * 2;
                     }
                 } else {
@@ -3002,24 +3182,20 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 fallingArmillary.visible = true;
                 const fallT = Math.min(1, (elapsed - 4.2) / 0.95);
                 const easeFall = fallT * fallT;
-                let landY = -0.32 + (2.35 - -0.32) * (1 - easeFall);
+                let landZ = 3.6 + (0.58 - 3.6) * easeFall;
                 if (fallT > 0.82) {
                     const bounce = (fallT - 0.82) / 0.18;
-                    landY += Math.sin(bounce * Math.PI) * 0.12 * Math.exp(-bounce * 3);
+                    landZ += Math.sin(bounce * Math.PI) * 0.16 * Math.exp(-bounce * 3);
                 }
-                const landed = elapsed >= 5.15;
-                fallingArmillary.position.set(
-                    -1.15 * easeFall,
-                    landed ? -0.32 : landY,
-                    4.2 + (0.25 - 4.2) * easeFall
-                );
-                fallingArmillary.rotation.y += 0.01;
-                fallingArmillary.scale.set(1, 1, 1);
+                fallingArmillary.position.set(-2.35 * easeFall, 0, landZ);
+                fallingArmillary.rotation.y += 0.012;
+                const sc = 0.95 - easeFall * 0.42;
+                fallingArmillary.scale.set(sc, sc, sc);
             }
 
             sampleOpeningCamera(elapsed);
 
-            if (coverCamera.position.z < 2.05) beginCodexLanding();
+            if (elapsed >= 6.42) beginCodexLanding();
 
             if (progress >= 1) {
                 isBookOpening = false;
@@ -3057,7 +3233,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 bookRoot.rotation.set(0.24, -0.44, 0.03);
             }
             if (coverCamera) {
-                coverCamera.position.set(0, 0.05, 13);
+                coverCamera.position.set(0, 0.85, 18.5);
                 coverCamera.rotation.set(0, 0, 0);
                 coverCamera.lookAt(0, 0, 0);
             }
@@ -3066,8 +3242,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             targetBookRotY = -0.44;
             targetBookRotZ = 0.03;
             targetCameraX = 0;
-            targetCameraY = 0.05;
-            targetCameraZ = 13;
+            targetCameraY = 0.85;
+            targetCameraZ = 18.5;
 
             window.scrollTo({ top: 0, behavior: "instant" });
             document.body.classList.remove("codex-unlocked");
@@ -3110,7 +3286,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             coverStage.classList.remove("stage-hidden");
             void coverStage.offsetWidth;
             coverStage.style.transition = "";
-            closeCamFrom = coverCamera ? coverCamera.position.clone() : new THREE.Vector3(0, 0.05, 13);
+            closeCamFrom = coverCamera ? coverCamera.position.clone() : new THREE.Vector3(0, 0.85, 18.5);
             closeBookFrom = bookRoot ? {
                 x: bookRoot.rotation.x,
                 y: wrapAngle(bookRoot.rotation.y),
@@ -3134,15 +3310,15 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             targetBookRotY = -0.44;
             targetBookRotZ = 0.03;
             targetCameraX = 0;
-            targetCameraY = 0.05;
-            targetCameraZ = 13;
+            targetCameraY = 0.85;
+            targetCameraZ = 18.5;
 
             const pull = smooth01(Math.min(1, elapsed / 0.85));
             if (coverCamera && closeCamFrom) {
                 coverCamera.position.set(
                     closeCamFrom.x + (0 - closeCamFrom.x) * pull,
-                    closeCamFrom.y + (0.35 - closeCamFrom.y) * pull,
-                    closeCamFrom.z + (12.4 - closeCamFrom.z) * pull
+                    closeCamFrom.y + (1.2 - closeCamFrom.y) * pull,
+                    closeCamFrom.z + (18.5 - closeCamFrom.z) * pull
                 );
                 coverCamera.lookAt(0, 0, 0);
                 coverCamera.rotation.z *= (1 - pull);
@@ -3220,12 +3396,14 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
         function frameArmillaryCamera() {
             if (!astrolabeCamera) return;
             const aspect = Math.max(0.35, astrolabeCamera.aspect || 1);
-            const tanV = Math.tan((36 * Math.PI) / 360);
+            const tanV = Math.tan((34 * Math.PI) / 360);
             const tanH = tanV * aspect;
-            const reach = 2.58;
-            const z = Math.max(8.2, reach / tanV, reach / tanH);
-            astrolabeCamera.position.set(0, 0, z);
-            astrolabeCamera.lookAt(0, -0.22, 0);
+            const reach = 2.95;
+            const z = Math.max(9.4, reach / tanV, reach / tanH);
+            astrolabeCamera.fov = 34;
+            astrolabeCamera.position.set(0, 0.12, z);
+            astrolabeCamera.lookAt(0, -0.42, 0);
+            astrolabeCamera.updateProjectionMatrix();
         }
 
         function init3DOrbitalArmillary() {
@@ -3236,7 +3414,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const height = container.clientHeight || 460;
 
             astrolabeScene = new THREE.Scene();
-            astrolabeCamera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
+            astrolabeCamera = new THREE.PerspectiveCamera(34, width / height, 0.1, 100);
             frameArmillaryCamera();
 
             astrolabeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -3897,22 +4075,11 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             if (!bar) return;
             bar.innerHTML = SIX_BOOKS.map((book, idx) => {
                 const isActive = idx === activeBookIndex;
+                const name = book.shortTitle.replace(/^The /, "");
                 return `
-                    <button 
-                        type="button"
-                        onclick="selectBookFolio(${idx})"
-                        class="text-left p-3 rounded-xl border transition-all cursor-pointer ${
-                            isActive 
-                            ? 'folio-card-active bg-obsidian-850 border-amber-400 shadow-lg shadow-amber-500/10' 
-                            : 'bg-obsidian-900/75 border-slate-800/90 hover:border-slate-600'
-                        }"
-                    >
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-mono font-bold ${isActive ? 'text-amber-400' : 'text-slate-400'}">${book.roman}</span>
-                            <span class="w-2 h-2 rounded-full" style="background-color: ${book.accentHex}"></span>
-                        </div>
-                        <div class="font-serif text-xs font-bold text-white mt-1 truncate">${book.shortTitle}</div>
-                        <div class="text-[10px] font-mono text-slate-400 truncate mt-0.5">${book.status}</div>
+                    <button type="button" onclick="selectBookFolio(${idx})" class="fore-tab${isActive ? " active" : ""}" style="--tab:${book.accentHex}" title="${esc(book.fullTitle)}">
+                        <span class="fore-tab-roman">${esc(book.roman.replace("LIBER ", ""))}</span>
+                        <span class="fore-tab-name">${esc(name)}</span>
                     </button>
                 `;
             }).join("");
@@ -4032,7 +4199,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             } catch (err) {}
 
             const start = () => {
-                targetCameraZ = 13;
+                targetCameraZ = 18.5;
                 targetCameraY = 0.0;
                 const stillPage = document.documentElement.classList.contains("tome-still");
                 if (!stillPage && window.THREE) {
