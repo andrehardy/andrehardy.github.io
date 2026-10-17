@@ -81,6 +81,35 @@
             transform: translateY(0);
         }
 
+        /* Once the tome is open, nothing sits above the book except the relatch clasp.
+           Reduced-motion readers keep the ribbon, because they never meet the 3D cover. */
+        html:not(.tome-still) body.codex-unlocked #topArchivalRibbon,
+        html:not(.tome-still) body.tome-closing #topArchivalRibbon {
+            display: none;
+        }
+
+        .close-rail {
+            display: flex;
+            justify-content: center;
+            padding: 0.85rem 1rem 0.2rem;
+        }
+        #closeBookBtn {
+            font-family: Cinzel, serif;
+            letter-spacing: 0.14em;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #f6edd4;
+            background: linear-gradient(180deg, #7a2c22 0%, #4a1510 100%);
+            border: 1px solid #d4af37;
+            border-radius: 999px;
+            padding: 0.5rem 1.05rem;
+            box-shadow: 0 8px 18px rgba(40, 12, 8, 0.28), inset 0 1px 0 rgba(254, 240, 138, 0.35);
+            cursor: pointer;
+        }
+        #closeBookBtn:hover {
+            background: linear-gradient(180deg, #8d3428 0%, #5c1c14 100%);
+        }
+
         /* STAGE LAYERING: Fixed 100vw x 100vh Void for Stage 1, Full Flow for Stage 2 */
         .spatial-stage-wrapper {
             position: relative;
@@ -214,16 +243,29 @@
 
         #astrolabe3DViewport {
             width: 100%;
-            height: 410px;
+            height: 460px;
             position: relative;
             cursor: grab;
             touch-action: none;
-            background: radial-gradient(circle at 50% 50%, rgba(34, 24, 14, 0.72) 0%, rgba(7, 8, 11, 0.98) 85%);
-            box-shadow: inset 0 0 65px rgba(0, 0, 0, 0.85);
+            background: transparent;
+            overflow: visible;
+            z-index: 1;
         }
-        body.registry-parchment #astrolabe3DViewport {
-            background: radial-gradient(circle at 50% 50%, rgba(235, 222, 198, 0.92) 0%, rgba(196, 176, 142, 0.97) 90%);
-            box-shadow: inset 0 0 45px rgba(68, 48, 22, 0.28);
+        .astrolabe-hanger {
+            position: relative;
+            width: 100%;
+            overflow: visible;
+        }
+        .astrolabe-hanger::after {
+            content: "";
+            position: absolute;
+            left: 14%;
+            right: 14%;
+            bottom: 7%;
+            height: 46px;
+            background: radial-gradient(ellipse at center, rgba(42, 24, 10, 0.30), transparent 72%);
+            pointer-events: none;
+            z-index: 0;
         }
         #astrolabe3DViewport:active {
             cursor: grabbing;
@@ -255,32 +297,27 @@
         /* Double-Folio Codex Spread - Real Living Parchment Volume */
         .codex-spread {
             position: relative;
-            background-color: #121017;
-            /* Tactile vellum micro-grain / fiber texture pattern (vellumNoise / vellumGrain) */
-            background-image: 
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='vellumNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.038' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.85  0 0 0 0 0.78  0 0 0 0 0.65  0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23vellumNoise)'/%3E%3C/svg%3E"),
-                /* Realistic double-page curvature with illuminated page valley trough and spine gutter crevice */
-                linear-gradient(90deg, 
-                    #120f18 0%, 
-                    #1b1724 15%, 
-                    #221d2e 38%, 
-                    #16131f 47%, 
-                    #08060b 50%, 
-                    #16131f 53%, 
-                    #221d2e 62%, 
-                    #1b1724 85%, 
-                    #120f18 100%);
-            border: 1px solid rgba(212, 175, 55, 0.42);
-            /* Deckled paper outer edges & stacked leaves fore-edge depth (stackedLeaves / deckledEdge) */
-            box-shadow: 
-                0 45px 110px -20px rgba(0, 0, 0, 0.95),
-                -12px 0 0 -2px #18151f,
-                -15px 0 0 -3px #231d2c,
-                -18px 0 0 -4px #0f0d14,
-                12px 0 0 -2px #18151f,
-                15px 0 0 -3px #231d2c,
-                18px 0 0 -4px #0f0d14,
-                inset 0 0 90px rgba(0, 0, 0, 0.65);
+            background-color: #e8d5b0;
+            background-image:
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='vellumNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.038' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.55  0 0 0 0 0.38  0 0 0 0 0.18  0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23vellumNoise)'/%3E%3C/svg%3E"),
+                linear-gradient(90deg,
+                    #f5ebd6 0%,
+                    #ead9b6 16%,
+                    #f4e6c8 38%,
+                    #d8c09a 47%,
+                    #c4a574 50%,
+                    #d8c09a 53%,
+                    #f4e6c8 62%,
+                    #ead9b6 84%,
+                    #f5ebd6 100%);
+            border: 2px solid #d4af37;
+            outline: 1px solid #fef08a;
+            outline-offset: 0;
+            box-shadow:
+                0 0 0 8px #6e241c,
+                0 0 0 9px #d4af37,
+                0 32px 70px -18px rgba(48, 22, 8, 0.45),
+                inset 0 0 48px rgba(120, 78, 28, 0.14);
         }
 
         body.registry-parchment .codex-spread {
@@ -299,17 +336,12 @@
                     #faf5e8 60%, 
                     #f0e7d3 84%, 
                     #e6dac2 100%);
-            border: 1px solid #9e7f52;
-            /* Realistic deckled paper foreEdgeStack */
-            box-shadow: 
-                0 38px 95px -20px rgba(55, 40, 20, 0.38),
-                -12px 0 0 -2px #e2d3bb,
-                -15px 0 0 -3px #d3c2a6,
-                -18px 0 0 -4px #bfae90,
-                12px 0 0 -2px #e2d3bb,
-                15px 0 0 -3px #d3c2a6,
-                18px 0 0 -4px #bfae90,
-                inset 0 0 90px rgba(130, 95, 50, 0.16);
+            border: 2px solid #d4af37;
+            box-shadow:
+                0 0 0 8px #6e241c,
+                0 0 0 9px #d4af37,
+                0 32px 70px -18px rgba(48, 22, 8, 0.38),
+                inset 0 0 48px rgba(120, 78, 28, 0.12);
         }
 
         /* Deep Spine Gutter Valley Shadow (gutterShadow / spineGutter / pageValley) */
@@ -347,17 +379,15 @@
         /* Authentic Medieval Margin Ruling & Pricking Guides (marginRuling / prickingGuide) */
         .margin-ruling-overlay {
             position: absolute;
-            inset: 16px;
+            inset: 14px;
             pointer-events: none;
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            border-left: 2px solid rgba(212, 175, 55, 0.28);
-            border-right: 2px solid rgba(212, 175, 55, 0.28);
+            border: 1px solid rgba(212, 175, 55, 0.9);
+            box-shadow: inset 0 0 0 5px rgba(140, 28, 22, 0.28);
             z-index: 5;
         }
         body.registry-parchment .margin-ruling-overlay {
-            border: 1px solid rgba(185, 28, 28, 0.15); /* Lead-point / cinnabar rubric guide */
-            border-left: 2px solid rgba(185, 28, 28, 0.28);
-            border-right: 2px solid rgba(185, 28, 28, 0.28);
+            border: 1px solid rgba(212, 175, 55, 0.9);
+            box-shadow: inset 0 0 0 5px rgba(140, 28, 22, 0.28);
         }
 
         /* Historical Foxing Stains & Organic Aging Mottling (foxing / ageSpots) */
@@ -457,6 +487,200 @@
             text-shadow: none;
         }
 
+        .frontispiece {
+            text-align: center;
+            padding: 0.35rem 1.25rem 0.15rem;
+            position: relative;
+            z-index: 10;
+        }
+        .frontispiece-kicker {
+            font-family: Cinzel, serif;
+            letter-spacing: 0.28em;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #8a5a12;
+        }
+        .frontispiece-title {
+            font-family: Cinzel, serif;
+            color: #3b2412;
+            letter-spacing: 0.16em;
+            font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+            line-height: 1.25;
+            margin-top: 0.35rem;
+        }
+        .frontispiece-invite {
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+            color: #5c4033;
+            font-size: 1.05rem;
+            line-height: 1.45;
+            max-width: 38rem;
+            margin: 0.45rem auto 0;
+        }
+        .parchment-folio label,
+        .parchment-folio .text-amber-200,
+        .parchment-folio .text-amber-300,
+        .parchment-folio .text-amber-400,
+        .parchment-folio .text-slate-300,
+        .parchment-folio .text-slate-400,
+        .parchment-folio .text-white {
+            color: #3f2c1c !important;
+        }
+        .parchment-folio #concordanceInput {
+            background: rgba(255, 250, 240, 0.72) !important;
+            color: #23150b !important;
+            border-color: rgba(138, 90, 40, 0.45) !important;
+        }
+        .parchment-folio #concordanceInput::placeholder {
+            color: #8a735c;
+        }
+        .parchment-folio #concordanceModeBadge {
+            background: transparent !important;
+            border: none !important;
+            color: #7f1d1d !important;
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+            letter-spacing: 0.03em;
+            padding: 0;
+        }
+        .parchment-folio .rubric-seed {
+            background: transparent !important;
+            border-color: rgba(138, 90, 40, 0.35) !important;
+            color: #4a3424 !important;
+        }
+        .folio-kicker {
+            font-family: Cinzel, serif;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            color: #7f1d1d;
+        }
+        .folio-title {
+            font-family: Cinzel, serif;
+            color: #2a1a10;
+            font-size: clamp(1.55rem, 2.6vw, 2.15rem);
+            line-height: 1.2;
+            margin-top: 0.3rem;
+        }
+        .folio-epigraph {
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+            font-size: 1.2rem;
+            line-height: 1.5;
+            color: #4a3020;
+            border-left: 2px solid #9a3412;
+            padding: 0.15rem 0 0.15rem 0.9rem;
+            margin: 0.85rem 0;
+        }
+        .folio-body {
+            font-family: "Cormorant Garamond", serif;
+            font-size: 1.2rem;
+            line-height: 1.65;
+            color: #23150b;
+            text-align: justify;
+        }
+        .folio-notes {
+            margin-top: 1.15rem;
+            padding-top: 0.45rem;
+        }
+        .folio-notes-label {
+            font-family: Cinzel, serif;
+            font-size: 0.68rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #7f1d1d;
+            margin-bottom: 0.35rem;
+        }
+        .folio-note {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(138, 90, 40, 0.22);
+            padding: 0.4rem 0;
+            cursor: pointer;
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+            font-size: 1.02rem;
+            color: #3b2a1a;
+        }
+        .folio-note strong {
+            font-family: Cinzel, serif;
+            font-style: normal;
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+            color: #7f1d1d;
+            margin-right: 0.4rem;
+        }
+        .folio-foot {
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+            font-size: 1.05rem;
+            color: #4a3020;
+        }
+        .folio-foot a,
+        .folio-foot button {
+            font-family: Cinzel, serif;
+            font-style: normal;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #7f1d1d;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        #folioRectoSection {
+            position: relative;
+        }
+        #pyroSmokeCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 8;
+        }
+        .pyro-word.pending {
+            color: transparent;
+        }
+        .pyro-word.burning {
+            color: #23150b;
+            animation: paper-scorch 0.72s ease forwards;
+        }
+        .pyro-word.settled {
+            color: #23150b;
+        }
+        .folio-epigraph .pyro-word.settled {
+            color: #4a3020;
+        }
+        .folio-kicker .pyro-word.settled,
+        .folio-notes-label .pyro-word.settled,
+        .folio-note strong .pyro-word.settled {
+            color: #7f1d1d;
+        }
+        .folio-title .pyro-word.settled {
+            color: #2a1a10;
+        }
+        .folio-body > .pyro-word:first-child {
+            font-family: "Cinzel Decorative", serif;
+            font-size: 3.15rem;
+            float: left;
+            line-height: 0.78;
+            padding: 0.2rem 0.55rem 0 0;
+        }
+        .folio-body > .pyro-word:first-child.settled {
+            color: #8a5a12;
+        }
+        @keyframes paper-scorch {
+            0% { color: #1a0906; text-shadow: 0 0 0 transparent; }
+            20% { color: #4a1c10; text-shadow: 0 0 5px rgba(92, 28, 10, 0.42); }
+            100% { color: #23150b; text-shadow: none; }
+        }
+
         /* Parchment Theme Text & Surface Overrides */
         body.registry-parchment .text-white { color: #1c1917 !important; }
         body.registry-parchment .text-slate-200,
@@ -511,7 +735,7 @@
             transform: none;
         }
         html.tome-still #astrolabe3DViewport {
-            height: 220px;
+            height: 340px;
         }
         html.tome-still #closeBookBtn {
             display: none;
@@ -536,10 +760,6 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
-                <button id="closeBookBtn" class="hidden px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 flex items-center gap-1.5 transition cursor-pointer">
-                    <i class="ph-bold ph-cube-focus"></i>
-                    <span>Return Tome to the Void</span>
-                </button>
                 <a href="../magic-registry/" class="text-slate-300 hover:text-amber-400 flex items-center gap-1 transition">
                     <i class="ph-fill ph-seal-check text-amber-400"></i>
                     <span>I. The Magic Registry</span>
@@ -577,79 +797,38 @@
         <!-- ========================================================================= -->
         <!-- STAGE 2: INNER SANCTUM SPREAD & 3D ORBITAL ARMILLARY ASTROLABE            -->
         <!-- ========================================================================= -->
-        <main id="codexInteriorStage" class="max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 flex flex-col justify-center">
-            <header class="max-w-7xl w-full mx-auto px-2 pb-3 text-center space-y-1">
-                <div class="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.25em] text-amber-400">
-                    <span>✦</span>
-                    <span>INDEX RERUM ET SPHAERA ARMILLARIS</span>
-                    <span>✦</span>
-                </div>
-                <h2 class="font-serif text-2xl sm:text-3xl font-bold tracking-widest text-white">
-                    THE MASTER TOME OF THE SIX SEALS
-                </h2>
-                <p class="text-sm sm:text-base italic text-slate-400 max-w-2xl mx-auto">
-                    Spin the 3D Orbital Armillary Astrolabe on the left folio to align any Volume in 3D space, or whisper an inquiry into the Concordance.
-                </p>
-            </header>
+        <main id="codexInteriorStage" class="max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 flex flex-col justify-center">
+            <div class="close-rail">
+                <button id="closeBookBtn" type="button" class="hidden">Close &amp; Relatch the Tome</button>
+            </div>
 
             <!-- DOUBLE-FOLIO SPREAD -->
-            <div class="codex-spread rounded-2xl relative overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[760px] my-1">
+            <div class="codex-spread parchment-folio relative overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[760px] my-1">
                 <div class="codex-spine hidden lg:block"></div>
 
-                <!-- LEFT FOLIO: 3D ORBITAL ARMILLARY ASTROLABE & WHISPERING CONCORDANCE -->
-                <section class="lg:col-span-6 p-5 sm:p-7 flex flex-col justify-between border-b lg:border-b-0 border-amber-500/20 relative z-10 folioVerso">
+                <!-- LEFT FOLIO: FRONTISPIECE, FREE ASTROLABE, WHISPERING CONCORDANCE -->
+                <section class="lg:col-span-6 px-6 sm:px-10 pt-7 pb-6 flex flex-col justify-between border-b lg:border-b-0 border-amber-900/15 relative z-10 folioVerso">
                     <div class="margin-ruling-overlay"></div>
                     <div class="foxing-spot w-8 h-8 top-10 right-14"></div>
                     <div class="foxing-spot w-12 h-10 bottom-28 left-6"></div>
-                    <div class="flex items-center justify-between border-b border-amber-500/20 pb-2 text-xs font-mono text-slate-400 relative z-10">
-                        <span class="tracking-widest uppercase text-amber-400 flex items-center gap-1.5 foliation font-mono">
-                            <i class="ph-fill ph-planet"></i> [ FOLIO VERSO // FOL. VIII v ]
-                        </span>
-                        <span id="astrolabeDegreeReadout" class="text-amber-300 font-semibold">ORBIT ALIGNED: LIBER I</span>
-                    </div>
 
-                    <!-- 3D ORBITAL ARMILLARY VIEWPORT + FLOATING 3D NODE LABELS -->
-                    <div class="my-auto py-2 flex flex-col items-center justify-center relative">
-                        <div class="w-full rounded-2xl border border-amber-500/35 overflow-hidden relative shadow-2xl">
-                            <div id="astrolabe3DViewport">
-                                <!-- 3D Projected HTML Labels Overlay -->
-                                <div id="orbitalLabelsOverlay" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-                            </div>
+                    <header class="frontispiece">
+                        <div class="frontispiece-kicker">✦ Index Rerum et Sphaera Armillaris ✦</div>
+                        <h2 class="frontispiece-title">The Master Tome of the Six Seals</h2>
+                        <p class="frontispiece-invite">Spin the 3D Orbital Armillary Astrolabe on the left folio to align any Volume in 3D space, or whisper an inquiry into the Concordance.</p>
+                    </header>
 
-                            <!-- HUD Instructions Overlay -->
-                            <div class="absolute top-2.5 left-3 right-3 flex items-center justify-between pointer-events-none text-[10px] font-mono">
-                                <span class="px-2 py-0.5 rounded bg-obsidian-950/80 text-amber-300 border border-amber-500/30">
-                                    5 Gimbaled Rings • 6 Orbital Relics
-                                </span>
-                                <span class="px-2 py-0.5 rounded bg-obsidian-950/80 text-slate-300 border border-slate-700/70">
-                                    Drag 3D Sphere or Click Any Planet
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Orbital Gimbal Controls -->
-                        <div class="flex flex-wrap items-center justify-center gap-2 mt-3">
-                            <button id="rotatePrevBtn" class="px-3 py-1.5 rounded-lg bg-obsidian-900 hover:bg-slate-800 border border-amber-500/35 text-xs font-mono text-amber-300 flex items-center gap-1.5 transition cursor-pointer">
-                                <i class="ph-bold ph-arrow-counter-clockwise"></i> Orbit Counter-Sunwise
-                            </button>
-                            <button id="resetArmillaryBtn" class="px-2.5 py-1.5 rounded-lg bg-obsidian-950 hover:bg-slate-800 border border-slate-700 text-[11px] font-mono text-slate-300 transition cursor-pointer">
-                                Reset Gimbal Axis
-                            </button>
-                            <button id="rotateNextBtn" class="px-3 py-1.5 rounded-lg bg-obsidian-900 hover:bg-slate-800 border border-amber-500/35 text-xs font-mono text-amber-300 flex items-center gap-1.5 transition cursor-pointer">
-                                Orbit Sunwise <i class="ph-bold ph-arrow-clockwise"></i>
-                            </button>
-                        </div>
+                    <div class="astrolabe-hanger my-1">
+                        <div id="astrolabe3DViewport"></div>
                     </div>
 
                     <!-- THE WHISPERING CONCORDANCE -->
                     <div class="pt-3 border-t border-amber-500/20 space-y-2.5 relative z-10">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col items-start gap-0.5">
                             <label for="concordanceInput" class="text-xs font-mono uppercase tracking-widest text-amber-400 flex items-center gap-1.5">
-                                <i class="ph-fill ph-feather"></i> The Whispering Concordance (Inquire of the Tome)
+                                <i class="ph-fill ph-feather"></i> The Whispering Concordance
                             </label>
-                            <span id="concordanceModeBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                                Mode: Folio Inspection
-                            </span>
+                            <span id="concordanceModeBadge">Folio inspection</span>
                         </div>
 
                         <form id="concordanceForm" class="relative">
@@ -667,33 +846,25 @@
 
                         <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
                             <span class="text-[10px] font-mono uppercase text-slate-400 mr-1">Rubric Seeds:</span>
-                            <button type="button" onclick="triggerConcordanceSeed('winter')" class="px-2.5 py-0.5 rounded-md bg-obsidian-900 hover:border-amber-400 border border-slate-800 text-xs font-editorial italic text-slate-300 transition cursor-pointer">“Winter & Ice”</button>
-                            <button type="button" onclick="triggerConcordanceSeed('blood')" class="px-2.5 py-0.5 rounded-md bg-obsidian-900 hover:border-amber-400 border border-slate-800 text-xs font-editorial italic text-slate-300 transition cursor-pointer">“Blood & Covenant”</button>
-                            <button type="button" onclick="triggerConcordanceSeed('ghosts')" class="px-2.5 py-0.5 rounded-md bg-obsidian-900 hover:border-amber-400 border border-slate-800 text-xs font-editorial italic text-slate-300 transition cursor-pointer">“Ghosts & The Veil”</button>
-                            <button type="button" onclick="triggerConcordanceSeed('bronze')" class="px-2.5 py-0.5 rounded-md bg-obsidian-900 hover:border-amber-400 border border-slate-800 text-xs font-editorial italic text-slate-300 transition cursor-pointer">“Bronze & Sun”</button>
-                            <button type="button" onclick="triggerConcordanceSeed('obsidian')" class="px-2.5 py-0.5 rounded-md bg-obsidian-900 hover:border-amber-400 border border-slate-800 text-xs font-editorial italic text-slate-300 transition cursor-pointer">“Obsidian & Mirrors”</button>
-                            <button type="button" onclick="triggerConcordanceSeed('iron')" class="px-2.5 py-0.5 rounded-md bg-obsidian-900 hover:border-amber-400 border border-slate-800 text-xs font-editorial italic text-slate-300 transition cursor-pointer">“Herbs & Cold Iron”</button>
+                            <button type="button" onclick="triggerConcordanceSeed('winter')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs font-editorial italic transition cursor-pointer">“Winter & Ice”</button>
+                            <button type="button" onclick="triggerConcordanceSeed('blood')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs font-editorial italic transition cursor-pointer">“Blood & Covenant”</button>
+                            <button type="button" onclick="triggerConcordanceSeed('ghosts')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs font-editorial italic transition cursor-pointer">“Ghosts & The Veil”</button>
+                            <button type="button" onclick="triggerConcordanceSeed('bronze')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs font-editorial italic transition cursor-pointer">“Bronze & Sun”</button>
+                            <button type="button" onclick="triggerConcordanceSeed('obsidian')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs font-editorial italic transition cursor-pointer">“Obsidian & Mirrors”</button>
+                            <button type="button" onclick="triggerConcordanceSeed('iron')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs font-editorial italic transition cursor-pointer">“Herbs & Cold Iron”</button>
                         </div>
                     </div>
                 </section>
 
                 <!-- RIGHT FOLIO: THE LIVING VELLUM INSCRIPTION & MARGINALIA -->
-                <section class="lg:col-span-6 p-5 sm:p-7 flex flex-col justify-between relative z-10 folioRecto">
+                <section id="folioRectoSection" class="lg:col-span-6 px-8 sm:px-12 pt-10 pb-8 flex flex-col justify-between relative z-10 folioRecto">
                     <div class="margin-ruling-overlay"></div>
                     <div class="foxing-spot w-10 h-10 top-8 left-12"></div>
                     <div class="foxing-spot w-6 h-6 bottom-14 right-10"></div>
-                    <div class="flex items-center justify-between border-b border-amber-500/20 pb-2 text-xs font-mono text-slate-400 relative z-10">
-                        <span id="rectoHeaderLabel" class="tracking-widest uppercase text-amber-400 flex items-center gap-1.5 foliation font-mono">
-                            <i class="ph-fill ph-book-open-text"></i> [ FOLIO RECTO // FOL. IX r ] • LIBER PRIMUS
-                        </span>
-                        <span id="rectoCatalogueCode" class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/25 font-mono">
-                            HEX-TOM-01
-                        </span>
-                    </div>
 
-                    <div id="livingManuscriptContainer" class="my-auto py-4 space-y-4 relative z-10"></div>
+                    <div id="livingManuscriptContainer" class="my-auto py-3 relative z-10"></div>
 
-                    <div id="rectoFooterPortal" class="pt-4 border-t border-amber-500/20 flex flex-wrap items-center justify-between gap-3 relative z-10"></div>
+                    <div id="rectoFooterPortal" class="folio-foot pt-4 flex flex-wrap items-center justify-between gap-3 relative z-10"></div>
                 </section>
             </div>
 
@@ -1506,8 +1677,11 @@
         // Mechanical Opening Animation State
         let isBookOpening = false;
         let isBookOpened = false;
+        let isBookClosing = false;
         let openAnimStartTime = 0;
+        let closeAnimStartTime = 0;
         const OPEN_DURATION = 4.2;
+        const CLOSE_DURATION = 3.1;
 
         // Materialization: the tome condenses out of the void behind a burning edge.
         const FORM_DURATION = 2800;
@@ -2364,14 +2538,14 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
         function setupBookViewportInteractions(container) {
             container.addEventListener("pointerdown", (e) => {
-                if (isBookOpening || isBookOpened || bookForming) return;
+                if (isBookOpening || isBookOpened || isBookClosing || bookForming) return;
                 isDraggingBook = true;
                 bookPointerDownPos = { x: e.clientX, y: e.clientY };
                 bookPrevPointer = { x: e.clientX, y: e.clientY };
             });
 
             window.addEventListener("pointermove", (e) => {
-                if (isBookOpening || isBookOpened) return;
+                if (isBookOpening || isBookOpened || isBookClosing) return;
                 if (isDraggingBook) {
                     const dx = e.clientX - bookPrevPointer.x;
                     const dy = e.clientY - bookPrevPointer.y;
@@ -2395,7 +2569,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 isDraggingBook = false;
                 const moveDist = Math.hypot(e.clientX - bookPointerDownPos.x, e.clientY - bookPointerDownPos.y);
                 // Clean click without dragging on any part of the 3D tome or its clasps opens the book
-                if (moveDist < 6 && !isBookOpening && !isBookOpened) {
+                if (moveDist < 6 && !isBookOpening && !isBookOpened && !isBookClosing && !bookForming) {
                     const rect = container.getBoundingClientRect();
                     if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
                         bookMouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -2410,13 +2584,13 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             });
 
             container.addEventListener("wheel", (e) => {
-                if (isBookOpening || isBookOpened) return;
+                if (isBookOpening || isBookOpened || isBookClosing) return;
                 e.preventDefault();
                 targetCameraZ = Math.max(10, Math.min(16, targetCameraZ + e.deltaY * 0.004));
             }, { passive: false });
 
             window.addEventListener("keydown", (e) => {
-                if (isBookOpening || isBookOpened) return;
+                if (isBookOpening || isBookOpened || isBookClosing || bookForming) return;
                 if (e.key !== "Enter" && e.key !== " ") return;
                 const tag = document.activeElement && document.activeElement.tagName;
                 if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON" || tag === "A") return;
@@ -2459,7 +2633,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
         // 4. MECHANICAL OPENING & PAGE MANIFESTATION SEQUENCE (4.2 SECONDS)
         // ============================================================================
         function triggerMechanicalBookOpening() {
-            if (isBookOpening || isBookOpened || bookForming) return;
+            if (isBookOpening || isBookOpened || isBookClosing || bookForming) return;
             isBookOpening = true;
             openAnimStartTime = performance.now();
 
@@ -2665,11 +2839,98 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
             window.scrollTo({ top: 0, behavior: "instant" });
             document.body.classList.remove("codex-unlocked");
+            document.body.classList.remove("tome-closing");
             document.getElementById("codexInteriorStage").classList.remove("stage-active");
             document.getElementById("frontCoverStage").classList.remove("stage-hidden");
             document.getElementById("closeBookBtn").classList.add("hidden");
 
             resizeAll3DViewports();
+        }
+
+        function flattenHingedPage(pageMesh) {
+            const posAttr = pageMesh.geometry.attributes.position;
+            const baseCoords = pageMesh.geometry.userData.baseCoords;
+            if (!posAttr || !baseCoords) return;
+            for (let v = 0; v < posAttr.count; v++) {
+                posAttr.setXYZ(v, baseCoords[v * 3], baseCoords[v * 3 + 1], 0);
+            }
+            posAttr.needsUpdate = true;
+        }
+
+        function triggerMechanicalBookClosing() {
+            if (!isBookOpened || isBookClosing || isBookOpening || bookForming) return;
+            isBookClosing = true;
+            isBookOpened = false;
+            closeAnimStartTime = performance.now();
+            if (typeof finishInscription === "function") finishInscription();
+            document.body.classList.add("tome-closing");
+            document.body.classList.remove("codex-unlocked");
+            document.getElementById("codexInteriorStage").classList.remove("stage-active");
+            const coverStage = document.getElementById("frontCoverStage");
+            coverStage.style.transition = "none";
+            coverStage.classList.remove("stage-hidden");
+            void coverStage.offsetWidth;
+            coverStage.style.transition = "";
+            document.getElementById("closeBookBtn").classList.add("hidden");
+            flyingPages.forEach((fp) => {
+                fp.visible = false;
+                fp.material.opacity = 0;
+            });
+            window.scrollTo({ top: 0, behavior: "instant" });
+        }
+
+        function updateBookClosingTimeline(now) {
+            const elapsed = (now - closeAnimStartTime) / 1000;
+            const progress = Math.min(1, elapsed / CLOSE_DURATION);
+
+            targetBookRotX = 0.24;
+            targetBookRotY = -0.44;
+            targetBookRotZ = 0.03;
+            targetCameraX = 0;
+            targetCameraY = 0.05;
+            targetCameraZ = 13;
+
+            const pageCount = hingedPages.length;
+            hingedPages.forEach((pageMesh, idx) => {
+                const start = (pageCount - 1 - idx) * 0.038;
+                const local = Math.min(1, Math.max(0, (elapsed - start) / 0.4));
+                const eased = local < 0.5 ? 2 * local * local : 1 - Math.pow(-2 * local + 2, 2) / 2;
+                pageMesh.visible = local < 1;
+                pageMesh.rotation.y = -2.65 * (1 - eased);
+                const arch = Math.sin(local * Math.PI) * 0.28;
+                const posAttr = pageMesh.geometry.attributes.position;
+                const baseCoords = pageMesh.geometry.userData.baseCoords;
+                if (posAttr && baseCoords) {
+                    for (let v = 0; v < posAttr.count; v++) {
+                        const bx = baseCoords[v * 3];
+                        const by = baseCoords[v * 3 + 1];
+                        const waveZ = Math.sin((bx / 3.0) * Math.PI) * arch;
+                        posAttr.setXYZ(v, bx, by, waveZ);
+                    }
+                    posAttr.needsUpdate = true;
+                }
+                if (local >= 1) flattenHingedPage(pageMesh);
+            });
+
+            const coverLocal = Math.min(1, Math.max(0, (elapsed - 1.15) / 1.15));
+            const coverEased = 1 - Math.pow(1 - coverLocal, 3);
+            if (frontCoverPivot) frontCoverPivot.rotation.y = -2.75 * (1 - coverEased);
+            if (innerBookGlowLight) innerBookGlowLight.intensity = 4.1 * (1 - coverEased) + 0.08 * coverEased;
+
+            const claspLocal = Math.min(1, Math.max(0, (elapsed - 2.22) / 0.62));
+            let claspAngle = 2.4 * (1 - Math.min(1, claspLocal / 0.82));
+            if (claspLocal > 0.82 && claspLocal < 1) {
+                claspAngle = -0.14 * Math.sin(((claspLocal - 0.82) / 0.18) * Math.PI);
+            }
+            if (claspLocal >= 1) claspAngle = 0;
+            if (topClaspPivot) topClaspPivot.rotation.y = claspAngle;
+            if (bottomClaspPivot) bottomClaspPivot.rotation.y = claspAngle;
+
+            if (progress >= 1) {
+                isBookClosing = false;
+                hingedPages.forEach(flattenHingedPage);
+                resetBookToClosed3DStage();
+            }
         }
 
         // ============================================================================
@@ -2690,17 +2951,27 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
         let armillaryRaycaster = new THREE.Raycaster();
         let armillaryMouse = new THREE.Vector2();
 
+        function frameArmillaryCamera() {
+            if (!astrolabeCamera) return;
+            const aspect = Math.max(0.35, astrolabeCamera.aspect || 1);
+            const tanV = Math.tan((36 * Math.PI) / 360);
+            const tanH = tanV * aspect;
+            const reach = 2.85;
+            const z = Math.max(8.2, reach / tanV, reach / tanH);
+            astrolabeCamera.position.set(0, 0.22, z);
+            astrolabeCamera.lookAt(0, 0, 0);
+        }
+
         function init3DOrbitalArmillary() {
             const container = document.getElementById("astrolabe3DViewport");
             if (!container) return;
 
             const width = container.clientWidth || 520;
-            const height = container.clientHeight || 410;
+            const height = container.clientHeight || 460;
 
             astrolabeScene = new THREE.Scene();
-            astrolabeCamera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-            astrolabeCamera.position.set(0, 0.25, 7.1);
-            astrolabeCamera.lookAt(0, 0, 0);
+            astrolabeCamera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
+            frameArmillaryCamera();
 
             astrolabeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             astrolabeRenderer.setSize(width, height);
@@ -2721,9 +2992,28 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             astrolabeScene.add(sunPoint);
 
             const keyLight = new THREE.DirectionalLight(0xffcf87, 1.85);
-            keyLight.position.set(4, 6, 5);
+            keyLight.position.set(4, 7, 5);
             keyLight.castShadow = true;
+            keyLight.shadow.mapSize.width = 1024;
+            keyLight.shadow.mapSize.height = 1024;
+            keyLight.shadow.camera.near = 0.4;
+            keyLight.shadow.camera.far = 24;
+            keyLight.shadow.camera.left = -6;
+            keyLight.shadow.camera.right = 6;
+            keyLight.shadow.camera.top = 6;
+            keyLight.shadow.camera.bottom = -6;
+            keyLight.shadow.bias = -0.0015;
+            keyLight.shadow.camera.updateProjectionMatrix();
             astrolabeScene.add(keyLight);
+
+            const shadowCatcher = new THREE.Mesh(
+                new THREE.PlaneGeometry(8, 5.5),
+                new THREE.ShadowMaterial({ opacity: 0.34 })
+            );
+            shadowCatcher.rotation.x = -Math.PI / 2;
+            shadowCatcher.position.y = -2.62;
+            shadowCatcher.receiveShadow = true;
+            astrolabeScene.add(shadowCatcher);
 
             const rimLight = new THREE.PointLight(0x648296, 1.1, 18);
             rimLight.position.set(-4, -3, -4);
@@ -2832,8 +3122,6 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             // 6 Interactive Mineral Gemstone Relic Nodes
             orbitalPlanetNodes = [];
             htmlOrbitalTags = [];
-            const labelsOverlay = document.getElementById("orbitalLabelsOverlay");
-            if (labelsOverlay) labelsOverlay.innerHTML = "";
 
             const sphericalCoords = [
                 { lon: 0,               lat: 0.18,  radius: 2.15, mineralHex: 0xb45309 }, // I: Baltic Amber
@@ -2886,19 +3174,6 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 spokeMesh.lookAt(0, 0, 0);
                 spokeMesh.rotateX(Math.PI / 2);
                 armillaryRoot.add(spokeMesh);
-
-                if (labelsOverlay) {
-                    const tag = document.createElement("button");
-                    tag.type = "button";
-                    tag.className = "orbital-node-tag pointer-events-auto";
-                    tag.innerHTML = `<span style="color:${book.accentHex}">◆</span> ${book.roman}: ${book.shortTitle.replace("The ", "")}`;
-                    tag.addEventListener("click", (ev) => {
-                        ev.stopPropagation();
-                        selectBookFolio(idx);
-                    });
-                    labelsOverlay.appendChild(tag);
-                    htmlOrbitalTags.push({ element: tag, group: planetGroup, bookIndex: idx });
-                }
             });
 
             container.addEventListener("pointerdown", (e) => {
@@ -2971,6 +3246,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 if (bookForming) updateMaterialization(now);
                 if (isBookOpening) {
                     updateBookOpeningTimeline(now);
+                } else if (isBookClosing) {
+                    updateBookClosingTimeline(now);
                 } else if (!isDraggingBook && !isBookOpened) {
                     // Grounded, weighty levitation and subtle breathing
                     bookRoot.position.y = Math.sin(now * 0.0014) * 0.065;
@@ -3058,9 +3335,10 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const astroContainer = document.getElementById("astrolabe3DViewport");
             if (astroContainer && astrolabeRenderer && astrolabeCamera) {
                 const aw = astroContainer.clientWidth || 520;
-                const ah = astroContainer.clientHeight || 410;
+                const ah = astroContainer.clientHeight || 460;
                 astrolabeCamera.aspect = aw / ah;
                 astrolabeCamera.updateProjectionMatrix();
+                frameArmillaryCamera();
                 astrolabeRenderer.setSize(aw, ah);
             }
         }
@@ -3084,85 +3362,42 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const degreeReadout = document.getElementById("astrolabeDegreeReadout");
             const modeBadge = document.getElementById("concordanceModeBadge");
             if (degreeReadout) degreeReadout.textContent = `ORBIT ALIGNED: ${book.roman} (${(activeBookIndex * 60)}°)`;
-            if (modeBadge) modeBadge.textContent = "Mode: Folio Inspection";
+            if (modeBadge) modeBadge.textContent = "Folio inspection";
 
             renderRightFolioForBook(book);
             renderBottomSixSealsBar();
         }
 
         function renderRightFolioForBook(book) {
-            const headerLabel = document.getElementById("rectoHeaderLabel");
-            const catalogueCode = document.getElementById("rectoCatalogueCode");
-            if (headerLabel) headerLabel.innerHTML = `<i class="ph-fill ${book.icon}"></i> [ FOLIO RECTO // FOL. IX r ] • ${book.roman} (${book.status})`;
-            if (catalogueCode) catalogueCode.textContent = book.catalogueCode;
-
             const container = document.getElementById("livingManuscriptContainer");
             if (!container) return;
-            container.innerHTML = `
-                <div class="space-y-4 font-editorial">
-                    <div class="ink-reveal ink-delay-1 space-y-1">
-                        <div class="text-xs font-mono uppercase tracking-widest iron-gall-rubric" style="color: ${book.accentHex}">
-                            ${book.latinSubtitle} • ${book.element}
-                        </div>
-                        <h3 class="font-serif text-2xl sm:text-3xl font-bold text-white iron-gall-title leading-tight">
-                            ${book.fullTitle}
-                        </h3>
-                    </div>
-
-                    <blockquote class="ink-reveal ink-delay-2 p-3.5 rounded-xl bg-obsidian-950/90 border-l-2 border-amber-400 italic text-base sm:text-lg text-amber-200/90 iron-gall-quote">
-                        ${book.epigraph}
-                    </blockquote>
-
-                    <p class="ink-reveal ink-delay-3 drop-cap text-base sm:text-[17px] text-slate-200 ironGall iron-gall-text leading-relaxed text-justify">
-                        ${book.manuscriptBody}
-                    </p>
-
-                    <div class="ink-reveal ink-delay-4 pt-2 space-y-2">
-                        <div class="text-xs font-mono uppercase tracking-wider text-amber-400 flex items-center gap-1.5 iron-gall-rubric">
-                            <i class="ph-fill ph-git-branch"></i> Interlocking Marginalia (Click to Gimbal-Align 3D Sphere)
-                        </div>
-                        <div class="space-y-2">
-                            ${book.marginalia.map(m => `
-                                <button 
-                                    type="button"
-                                    onclick="selectBookFolio(${m.targetIdx})"
-                                    class="w-full text-left p-3 rounded-xl bg-obsidian-950/85 hover:bg-obsidian-900 border border-slate-800/90 hover:border-amber-500/50 transition flex items-start justify-between gap-3 group cursor-pointer"
-                                >
-                                    <div>
-                                        <div class="text-xs font-mono font-semibold text-amber-400 group-hover:underline">${m.book}</div>
-                                        <p class="text-xs sm:text-sm text-slate-300 mt-0.5 font-sans iron-gall-text">${m.note}</p>
-                                    </div>
-                                    <i class="ph-bold ph-arrow-elbow-right text-slate-500 group-hover:text-amber-400 mt-1 shrink-0"></i>
-                                </button>
-                            `).join("")}
-                        </div>
-                    </div>
+            const notes = book.marginalia.map(m => `
+                <button type="button" onclick="selectBookFolio(${m.targetIdx})" class="folio-note">
+                    <strong>${esc(m.book)}</strong> ${esc(m.note)}
+                </button>
+            `).join("");
+            inscribeManuscript(container, `
+                <div class="folio-kicker">${esc(book.latinSubtitle)} · ${esc(book.element)}</div>
+                <h3 class="folio-title">${esc(book.fullTitle)}</h3>
+                <blockquote class="folio-epigraph">${esc(book.epigraph)}</blockquote>
+                <p class="folio-body">${esc(book.manuscriptBody)}</p>
+                <div class="folio-notes">
+                    <div class="folio-notes-label">Marginalia</div>
+                    ${notes}
                 </div>
-            `;
+            `);
 
             const footer = document.getElementById("rectoFooterPortal");
             if (!footer) return;
             if (book.liveUrl) {
                 footer.innerHTML = `
-                    <div class="text-xs font-mono text-emerald-400 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>LIVE DEPLOYED VOLUME</span>
-                    </div>
-                    <a href="${book.liveUrl}" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-500/15 transition">
-                        <span>Enter ${book.shortTitle}</span>
-                        <i class="ph-bold ph-arrow-up-right"></i>
-                    </a>
+                    <span>This volume is open.</span>
+                    <a href="${book.liveUrl}">Enter ${esc(book.shortTitle)}</a>
                 `;
             } else {
                 footer.innerHTML = `
-                    <div class="text-xs font-mono text-purple-300 flex items-center gap-1.5">
-                        <i class="ph-fill ph-sparkle"></i>
-                        <span>STATUS: ${book.status}</span>
-                    </div>
-                    <button type="button" onclick="openFolioBlueprintModal(${activeBookIndex})" class="px-4 py-2 rounded-xl bg-obsidian-900 hover:bg-slate-800 text-amber-300 border border-amber-500/40 font-mono text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition cursor-pointer">
-                        <i class="ph-fill ph-scroll"></i>
-                        <span>Inspect Volume Blueprint</span>
-                    </button>
+                    <span>${esc(book.status)}</span>
+                    <button type="button" onclick="openFolioBlueprintModal(${activeBookIndex})">Inspect the blueprint</button>
                 `;
             }
         }
@@ -3208,66 +3443,185 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             targetArmillaryRotY += Math.PI * 0.65;
 
             const modeBadge = document.getElementById("concordanceModeBadge");
-            const headerLabel = document.getElementById("rectoHeaderLabel");
-            const catalogueCode = document.getElementById("rectoCatalogueCode");
-            if (modeBadge) modeBadge.textContent = "Mode: Oracle Synthesis";
-            if (headerLabel) headerLabel.innerHTML = `<i class="ph-fill ph-feather"></i> FOLIO RECTO // CONCORDANTIA VIVA`;
-            if (catalogueCode) catalogueCode.textContent = entry.rubricCode;
+            if (modeBadge) modeBadge.textContent = "Oracle synthesis";
 
             const container = document.getElementById("livingManuscriptContainer");
             if (!container) return;
-            const inked = (value) => esc(value).replace(/\*\*(.+?)\*\*/g, '<strong class="text-amber-300 font-semibold">$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
-            container.innerHTML = `
-                <div class="space-y-4">
-                    <div class="ink-reveal ink-delay-1 space-y-1">
-                        <div class="text-xs font-mono uppercase tracking-widest text-purple-300">
-                            Cross-Volume Whispered Synthesis • All Six Seals
-                        </div>
-                        <h3 class="font-serif text-2xl sm:text-3xl font-bold text-white leading-tight">
-                            ${esc(entry.title)}
-                        </h3>
-                    </div>
-
-                    <blockquote class="ink-reveal ink-delay-2 p-3.5 rounded-xl bg-obsidian-950/90 border-l-2 border-purple-400 italic text-base sm:text-lg text-purple-200">
-                        ${esc(entry.epigraph)}
-                    </blockquote>
-
-                    <p class="ink-reveal ink-delay-3 drop-cap text-base sm:text-[17px] text-slate-200 leading-relaxed">
-                        ${inked(entry.synthesis)}
-                    </p>
-
-                    <div class="ink-reveal ink-delay-4 pt-2 space-y-2">
-                        <div class="text-xs font-mono uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                            <i class="ph-fill ph-sparkle"></i> Woven Threads Across the Six Books (Click to Align 3D Sphere)
-                        </div>
-                        <div class="grid grid-cols-1 gap-2">
-                            ${entry.threads.map(t => `
-                                <button 
-                                    type="button"
-                                    onclick="selectBookFolio(${t.bookIdx})"
-                                    class="w-full text-left p-3 rounded-xl bg-obsidian-950/90 hover:bg-obsidian-900 border border-slate-800 hover:border-amber-400 transition flex items-center justify-between gap-3 group cursor-pointer"
-                                >
-                                    <div>
-                                        <span class="text-xs font-mono font-bold text-amber-400">${esc(t.label)}</span>
-                                        <p class="text-xs sm:text-sm text-slate-200 font-sans mt-0.5">${esc(t.entry)}</p>
-                                    </div>
-                                    <i class="ph-bold ph-compass text-slate-400 group-hover:text-amber-400 text-lg shrink-0"></i>
-                                </button>
-                            `).join("")}
-                        </div>
-                    </div>
+            const inked = (value) => esc(value).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\*(.+?)\*/g, "<em>$1</em>");
+            const threads = entry.threads.map(t => `
+                <button type="button" onclick="selectBookFolio(${t.bookIdx})" class="folio-note">
+                    <strong>${esc(t.label)}</strong> ${esc(t.entry)}
+                </button>
+            `).join("");
+            inscribeManuscript(container, `
+                <div class="folio-kicker">Whispered across the six seals</div>
+                <h3 class="folio-title">${esc(entry.title)}</h3>
+                <blockquote class="folio-epigraph">${esc(entry.epigraph)}</blockquote>
+                <p class="folio-body">${inked(entry.synthesis)}</p>
+                <div class="folio-notes">
+                    <div class="folio-notes-label">Threads</div>
+                    ${threads}
                 </div>
-            `;
+            `);
 
             const footer = document.getElementById("rectoFooterPortal");
             if (footer) {
                 footer.innerHTML = `
-                    <span class="text-xs font-mono text-slate-400">Click any thread above to gimbal-lock the 3D Armillary Sphere</span>
-                    <button type="button" onclick="selectBookFolio(${activeBookIndex})" class="px-3 py-1.5 rounded-lg bg-obsidian-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono text-amber-300 transition cursor-pointer">
-                        Return to ${SIX_BOOKS[activeBookIndex].roman}
-                    </button>
+                    <span>A thread turns the astrolabe to that liber.</span>
+                    <button type="button" onclick="selectBookFolio(${activeBookIndex})">Return to ${esc(SIX_BOOKS[activeBookIndex].roman)}</button>
                 `;
             }
+        }
+
+        let inscribeToken = 0;
+        let pyroParticles = [];
+        let pyroDrawing = false;
+
+        function finishInscription() {
+            inscribeToken += 1;
+            document.querySelectorAll("#livingManuscriptContainer .pyro-word").forEach((el) => {
+                el.classList.remove("pending", "burning");
+                el.classList.add("settled");
+            });
+            pyroParticles = [];
+        }
+
+        function wrapScorchWords(root) {
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+                acceptNode(node) {
+                    if (!node.textContent || !node.textContent.trim()) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+            const nodes = [];
+            while (walker.nextNode()) nodes.push(walker.currentNode);
+            const words = [];
+            nodes.forEach((node) => {
+                const parts = node.textContent.split(/(\s+)/);
+                const frag = document.createDocumentFragment();
+                parts.forEach((part) => {
+                    if (!part) return;
+                    if (/^\s+$/.test(part)) {
+                        frag.appendChild(document.createTextNode(part));
+                        return;
+                    }
+                    const span = document.createElement("span");
+                    span.className = "pyro-word pending";
+                    span.textContent = part;
+                    frag.appendChild(span);
+                    words.push(span);
+                });
+                node.parentNode.replaceChild(frag, node);
+            });
+            return words;
+        }
+
+        function ensurePyroCanvas() {
+            const host = document.getElementById("folioRectoSection");
+            if (!host) return null;
+            let canvas = document.getElementById("pyroSmokeCanvas");
+            if (!canvas) {
+                canvas = document.createElement("canvas");
+                canvas.id = "pyroSmokeCanvas";
+                host.appendChild(canvas);
+            }
+            const rect = host.getBoundingClientRect();
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+            canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+            return canvas;
+        }
+
+        function spawnPaperScorch(word) {
+            const canvas = document.getElementById("pyroSmokeCanvas");
+            const host = document.getElementById("folioRectoSection");
+            if (!canvas || !host) return;
+            const wr = word.getBoundingClientRect();
+            const hr = host.getBoundingClientRect();
+            const x = wr.left - hr.left + wr.width * 0.4;
+            const y = wr.top - hr.top + wr.height * 0.72;
+            pyroParticles.push({
+                x, y,
+                vx: (Math.random() - 0.5) * 0.1,
+                vy: -0.16 - Math.random() * 0.14,
+                life: 1,
+                r: 1.5 + Math.random() * 0.9,
+                kind: "soot"
+            });
+            if (Math.random() < 0.22) {
+                pyroParticles.push({
+                    x: x + (Math.random() - 0.5) * 2,
+                    y,
+                    vx: (Math.random() - 0.5) * 0.18,
+                    vy: -0.26 - Math.random() * 0.12,
+                    life: 1,
+                    r: 0.65,
+                    kind: "ember"
+                });
+            }
+            if (pyroParticles.length > 16) pyroParticles.splice(0, pyroParticles.length - 16);
+            if (!pyroDrawing) {
+                pyroDrawing = true;
+                requestAnimationFrame(drawPaperScorch);
+            }
+        }
+
+        function drawPaperScorch() {
+            const canvas = document.getElementById("pyroSmokeCanvas");
+            if (!canvas) {
+                pyroDrawing = false;
+                return;
+            }
+            const ctx = canvas.getContext("2d");
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+            pyroParticles = pyroParticles.filter((p) => p.life > 0.05);
+            pyroParticles.forEach((p) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= p.kind === "ember" ? 0.05 : 0.03;
+                const alpha = Math.max(0, p.life);
+                ctx.beginPath();
+                if (p.kind === "ember") {
+                    ctx.fillStyle = `rgba(104, 30, 12, ${alpha * 0.5})`;
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                } else {
+                    ctx.fillStyle = `rgba(26, 14, 8, ${alpha * 0.2})`;
+                    ctx.ellipse(p.x, p.y, p.r * (1.3 + (1 - alpha) * 0.4), p.r * 0.65, 0, 0, Math.PI * 2);
+                }
+                ctx.fill();
+            });
+            if (pyroParticles.length) requestAnimationFrame(drawPaperScorch);
+            else pyroDrawing = false;
+        }
+
+        function inscribeManuscript(container, html) {
+            const token = ++inscribeToken;
+            pyroParticles = [];
+            container.innerHTML = html;
+            const words = wrapScorchWords(container);
+            const still = document.documentElement.classList.contains("tome-still")
+                || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            if (still || !words.length) {
+                words.forEach((word) => {
+                    word.classList.remove("pending");
+                    word.classList.add("settled");
+                });
+                return;
+            }
+            ensurePyroCanvas();
+            let index = 0;
+            const tick = () => {
+                if (token !== inscribeToken) return;
+                for (let n = 0; n < 2 && index < words.length; n += 1, index += 1) {
+                    words[index].classList.remove("pending");
+                    words[index].classList.add("burning");
+                    spawnPaperScorch(words[index]);
+                }
+                if (index < words.length) window.setTimeout(tick, 36);
+            };
+            tick();
         }
 
         function renderBottomSixSealsBar() {
@@ -3312,7 +3666,14 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
         function attachUIListeners() {
             const closeBtn = document.getElementById("closeBookBtn");
             if (closeBtn) {
-                closeBtn.addEventListener("click", resetBookToClosed3DStage);
+                closeBtn.addEventListener("click", triggerMechanicalBookClosing);
+            }
+            const recto = document.getElementById("folioRectoSection");
+            if (recto) {
+                recto.addEventListener("click", (event) => {
+                    if (event.target.closest("button, a")) return;
+                    finishInscription();
+                });
             }
 
             const rotPrev = document.getElementById("rotatePrevBtn");
