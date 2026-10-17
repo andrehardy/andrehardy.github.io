@@ -154,6 +154,64 @@
             cursor: grabbing;
         }
 
+        /* While the tome's leather, iron and vellum are still being made, a point of
+           light gathers in the void. Transform and opacity only, so it keeps moving
+           while the main thread is busy. */
+        #tomeGathering {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 0;
+            height: 0;
+            z-index: 2;
+            pointer-events: none;
+            animation: tome-gather-in 1.4s ease 0.2s both;
+        }
+        #tomeGathering::before {
+            content: "";
+            position: absolute;
+            left: -3px;
+            top: -3px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ffdf9a;
+            box-shadow: 0 0 12px 4px rgba(255, 196, 102, 0.55), 0 0 44px 16px rgba(212, 140, 40, 0.2);
+            animation: tome-gather-pulse 1.8s ease-in-out infinite;
+        }
+        #tomeGathering::after {
+            content: "";
+            position: absolute;
+            left: -70px;
+            top: -70px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 1px solid rgba(223, 177, 91, 0.32);
+            animation: tome-gather-ring 2.4s cubic-bezier(0.3, 0.1, 0.25, 1) infinite;
+        }
+        #frontCoverStage.forming #tomeGathering {
+            animation: tome-gather-out 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes tome-gather-in {
+            from { opacity: 0; }
+        }
+        @keyframes tome-gather-pulse {
+            0%, 100% { transform: scale(0.8); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; }
+        }
+        @keyframes tome-gather-ring {
+            from { transform: scale(1.6); opacity: 0; }
+            45% { opacity: 0.55; }
+            to { transform: scale(0.1); opacity: 0; }
+        }
+        @keyframes tome-gather-out {
+            to { opacity: 0; transform: scale(2.4); }
+        }
+        html.tome-still #tomeGathering {
+            display: none;
+        }
+
         #astrolabe3DViewport {
             width: 100%;
             height: 410px;
@@ -513,6 +571,7 @@
         <!-- ========================================================================= -->
         <section id="frontCoverStage">
             <div id="book3DViewport"></div>
+            <div id="tomeGathering" aria-hidden="true"></div>
         </section>
 
         <!-- ========================================================================= -->
@@ -1450,6 +1509,101 @@
         let openAnimStartTime = 0;
         const OPEN_DURATION = 4.2;
 
+        // Materialization: the tome condenses out of the void behind a burning edge.
+        const FORM_DURATION = 2800;
+        const FORM_DONE = 9.0;
+        const formUniform = { value: -0.05 };
+        let bookForming = false;
+        let bookFormStart = 0;
+        let formShadowCasters = [];
+
+        function patchMaterialization(mat) {
+            if (!mat || !mat.isMeshStandardMaterial || mat.userData.formPatched) return;
+            mat.userData.formPatched = true;
+            mat.onBeforeCompile = (shader) => {
+                shader.uniforms.uForm = formUniform;
+                shader.vertexShader = shader.vertexShader
+                    .replace("#include <common>", "#include <common>\nvarying vec3 vFormPos;")
+                    .replace("#include <begin_vertex>", "#include <begin_vertex>\nvFormPos = (modelMatrix * vec4(transformed, 1.0)).xyz;");
+                shader.fragmentShader = shader.fragmentShader
+                    .replace("#include <common>", `#include <common>
+uniform float uForm;
+varying vec3 vFormPos;
+float formHash(vec3 p) {
+    p = fract(p * 0.3183099 + 0.1);
+    p *= 17.0;
+    return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+}
+float formNoise(vec3 x) {
+    vec3 i = floor(x);
+    vec3 f = fract(x);
+    f = f * f * (3.0 - 2.0 * f);
+    return mix(
+        mix(mix(formHash(i), formHash(i + vec3(1.0, 0.0, 0.0)), f.x),
+            mix(formHash(i + vec3(0.0, 1.0, 0.0)), formHash(i + vec3(1.0, 1.0, 0.0)), f.x), f.y),
+        mix(mix(formHash(i + vec3(0.0, 0.0, 1.0)), formHash(i + vec3(1.0, 0.0, 1.0)), f.x),
+            mix(formHash(i + vec3(0.0, 1.0, 1.0)), formHash(i + vec3(1.0, 1.0, 1.0)), f.x), f.y),
+        f.z);
+}`)
+                    .replace("#include <clipping_planes_fragment>", `#include <clipping_planes_fragment>
+float formF = clamp(length(vFormPos.xy) / 2.9, 0.0, 1.0) * 0.62
+    + (formNoise(vFormPos * 2.6) * 0.6 + formNoise(vFormPos * 7.0) * 0.4) * 0.38;
+if (formF > uForm) discard;`)
+                    .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>
+float formEdge = 1.0 - smoothstep(0.0, 0.028, uForm - formF);
+float formEmber = 1.0 - smoothstep(0.0, 0.11, uForm - formF);
+totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.16, 0.02) * formEmber * 0.5;`);
+            };
+            mat.needsUpdate = true;
+        }
+
+        function prepareMaterialization() {
+            bookRoot.traverse((obj) => {
+                if (!obj.isMesh || !obj.visible) return;
+                (Array.isArray(obj.material) ? obj.material : [obj.material]).forEach(patchMaterialization);
+                if (obj.castShadow) {
+                    formShadowCasters.push(obj);
+                    obj.castShadow = false;
+                }
+            });
+            if (emberParticles) {
+                emberParticles.material.opacity = 0;
+                emberParticles.scale.setScalar(1.9);
+            }
+            bookRoot.rotation.y = targetBookRotY - 0.6;
+            bookRoot.rotation.x = targetBookRotX + 0.12;
+            coverCamera.position.z = 15.4;
+            formUniform.value = -0.05;
+            bookForming = true;
+            bookFormStart = 0;
+            try { coverRenderer.compile(coverScene, coverCamera); } catch (err) {}
+        }
+
+        function updateMaterialization(now) {
+            if (!bookFormStart) {
+                bookFormStart = now;
+                const stage = document.getElementById("frontCoverStage");
+                if (stage) stage.classList.add("forming");
+            }
+            const t = Math.min(1, (now - bookFormStart) / FORM_DURATION);
+            const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            formUniform.value = -0.05 + ease * 1.08;
+            if (emberParticles) {
+                const settle = 1 - Math.pow(1 - t, 3);
+                emberParticles.material.opacity = 0.62 * Math.min(1, t * 1.6);
+                emberParticles.scale.setScalar(1 + 0.9 * (1 - settle));
+            }
+            if (t >= 0.78 && formShadowCasters.length) {
+                formShadowCasters.forEach((m) => { m.castShadow = true; });
+                formShadowCasters = [];
+            }
+            if (t >= 1) {
+                formUniform.value = FORM_DONE;
+                if (emberParticles) emberParticles.scale.setScalar(1);
+                bookForming = false;
+            }
+        }
+
         let bookRaycaster = new THREE.Raycaster();
         let bookMouse = new THREE.Vector2();
         let clickableCoverMeshes = [];
@@ -2097,6 +2251,7 @@
 
             bookRoot.rotation.set(targetBookRotX, targetBookRotY, targetBookRotZ);
             setupBookViewportInteractions(container);
+            prepareMaterialization();
         }
 
         function addBeveledLeatherEdges(boardGroup, bookW, bookH, zPos, radius, leatherMat) {
@@ -2209,7 +2364,7 @@
 
         function setupBookViewportInteractions(container) {
             container.addEventListener("pointerdown", (e) => {
-                if (isBookOpening || isBookOpened) return;
+                if (isBookOpening || isBookOpened || bookForming) return;
                 isDraggingBook = true;
                 bookPointerDownPos = { x: e.clientX, y: e.clientY };
                 bookPrevPointer = { x: e.clientX, y: e.clientY };
@@ -2304,7 +2459,7 @@
         // 4. MECHANICAL OPENING & PAGE MANIFESTATION SEQUENCE (4.2 SECONDS)
         // ============================================================================
         function triggerMechanicalBookOpening() {
-            if (isBookOpening || isBookOpened) return;
+            if (isBookOpening || isBookOpened || bookForming) return;
             isBookOpening = true;
             openAnimStartTime = performance.now();
 
@@ -2813,6 +2968,7 @@
 
             // The cover rests once the clasps have opened.
             if (!isBookOpened && bookRoot && coverRenderer && coverScene && coverCamera) {
+                if (bookForming) updateMaterialization(now);
                 if (isBookOpening) {
                     updateBookOpeningTimeline(now);
                 } else if (!isDraggingBook && !isBookOpened) {
