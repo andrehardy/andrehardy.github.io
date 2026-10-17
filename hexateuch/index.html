@@ -161,6 +161,16 @@
             transform: scale(1);
         }
 
+        /* The dive lands on the page. No scale-pop, and the cover fades off the vellum. */
+        #codexInteriorStage.stage-landed,
+        #codexInteriorStage.stage-landed.stage-active {
+            transform: none;
+            transition: none;
+        }
+        #frontCoverStage.stage-landing {
+            transition: opacity 0.42s linear, visibility 0.42s linear;
+        }
+
         /* 3D Canvas Containers */
         #book3DViewport {
             width: 100vw;
@@ -1662,6 +1672,17 @@
         let hingedPages = [];
         let flyingPages = [];
         let emberParticles;
+        let cosmicMistGroup = null;
+        let cosmicMistPuffs = [];
+        let celestialGroup = null;
+        let celestialSun = null;
+        let celestialCorona = null;
+        let celestialRings = [];
+        let celestialPlanets = [];
+        let fallingArmillary = null;
+        let openHandoffStarted = false;
+        let closeCamFrom = null;
+        let closeBookFrom = null;
 
         // Interactive Rotation & Camera Target State
         let isDraggingBook = false;
@@ -1680,8 +1701,8 @@
         let isBookClosing = false;
         let openAnimStartTime = 0;
         let closeAnimStartTime = 0;
-        const OPEN_DURATION = 4.2;
-        const CLOSE_DURATION = 3.1;
+        const OPEN_DURATION = 6.7;
+        const CLOSE_DURATION = 3.6;
 
         // Materialization: the tome condenses out of the void behind a burning edge.
         const FORM_DURATION = 2800;
@@ -2340,14 +2361,14 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 hingedPages.push(pageMesh);
             }
 
-            // 7. IMMERSIVE FLYING MANIFESTATION PAGES (56 Curling Vellum Sheets in 360-degree Vortex)
-            const flyingPageCount = 56;
+            // 7. PAGES LEAVE THE GUTTER AND RISE. A fountain around the viewer, not a sideways ribbon.
+            const flyingPageCount = 84;
             flyingPages = [];
             for (let i = 0; i < flyingPageCount; i++) {
-                const isHeroPage = (i === 0);
-                const width = isHeroPage ? 1.65 : (0.95 + (i % 5) * 0.14);
-                const height = isHeroPage ? 2.25 : (1.30 + (i % 4) * 0.16);
-                const fGeo = new THREE.PlaneGeometry(width, height, 14, 10);
+                const nearLens = i % 7 === 0;
+                const width = nearLens ? 1.85 + (i % 3) * 0.28 : 0.78 + (i % 5) * 0.15;
+                const height = nearLens ? 2.45 + (i % 3) * 0.22 : 1.05 + (i % 4) * 0.18;
+                const fGeo = new THREE.PlaneGeometry(width, height, 4, 3);
                 const posAttr = fGeo.attributes.position;
                 const baseCoords = new Float32Array(posAttr.array.length);
                 baseCoords.set(posAttr.array);
@@ -2358,30 +2379,33 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     side: THREE.DoubleSide,
                     transparent: true,
                     opacity: 0,
-                    roughness: 0.68,
-                    metalness: 0.05,
-                    emissive: isHeroPage ? 0xb45309 : 0x78350f,
-                    emissiveIntensity: isHeroPage ? 0.35 : 0.18
+                    roughness: 0.72,
+                    metalness: 0.04,
+                    emissive: 0x3d2412,
+                    emissiveIntensity: 0.12
                 });
 
                 const fMesh = new THREE.Mesh(fGeo, fMat);
                 fMesh.visible = false;
-                const theta = (i * 2.39996) + Math.random() * 0.3; // golden ratio angle distribution
+                const az = Math.random() * Math.PI * 2;
+                const elev = -0.35 + Math.random() * 1.35;
+                const towardLens = i % 3 === 0;
+                const downward = i % 11 === 0;
                 fMesh.userData = {
                     index: i,
-                    isHeroPage: isHeroPage,
-                    heroLandingPage: isHeroPage,
-                    spiralAngle: theta,
-                    elevationAngle: (Math.sin(i * 1.7) * 0.8), // vertical spherical dispersion
-                    spiralRadius: isHeroPage ? 0.01 : (1.2 + (i % 7) * 0.55),
-                    spiralSpeed: (1.8 + (i % 5) * 0.45) * ((i % 2 === 0) ? 1 : -0.85),
-                    riseSpeed: 0.8 + (i % 4) * 0.6,
-                    spinSpeedX: (Math.random() - 0.5) * 4.2,
-                    spinSpeedY: (Math.random() - 0.5) * 4.2,
-                    spinSpeedZ: (Math.random() - 0.5) * 2.8,
-                    flutterSpeed: 14 + (i % 6) * 3, // aerodynamic flutter frequency
-                    flutterAmp: 0.12 + (i % 3) * 0.06,
-                    flightDelay: (i === 0) ? 0.25 : (0.05 + (i / flyingPageCount) * 1.4) // staggered burst waves
+                    nearLens: nearLens,
+                    delay: (i / flyingPageCount) * 0.85,
+                    vx: Math.cos(elev) * Math.cos(az) * (1.6 + Math.random() * 3.4),
+                    vy: downward ? (-1.1 - Math.random() * 1.8) : (2.4 + Math.random() * 3.3),
+                    vz: towardLens ? (6.5 + Math.random() * 3.5) : (Math.cos(elev) * Math.sin(az) * (2.2 + Math.random() * 4.4)),
+                    grav: 1.9 + Math.random() * 0.8,
+                    swirl: (0.6 + Math.random() * 1.4) * (i % 2 === 0 ? 1 : -1),
+                    swirlR: 0.4 + Math.random() * 1.8,
+                    az: az,
+                    sx: (Math.random() - 0.5) * 3.4,
+                    sy: (Math.random() - 0.5) * 3.4,
+                    sz: (Math.random() - 0.5) * 2.6,
+                    flutter: 9 + (i % 5) * 2
                 };
                 coverScene.add(fMesh);
                 flyingPages.push(fMesh);
@@ -2422,6 +2446,99 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             // candlelightDust / volumetric atmospheric dust motes
             emberParticles = new THREE.Points(emberGeo, emberMat);
             coverScene.add(emberParticles);
+
+            const mistMap = createSoftParticleTexture();
+            cosmicMistGroup = new THREE.Group();
+            cosmicMistGroup.position.set(0, 2.35, 4.2);
+            cosmicMistGroup.visible = false;
+            coverScene.add(cosmicMistGroup);
+            cosmicMistPuffs = [];
+            const mistColors = [0xf59e0b, 0x8b5cf6, 0x38bdf8, 0xea580c, 0xd6bf96];
+            for (let m = 0; m < 36; m++) {
+                const puff = new THREE.Sprite(new THREE.SpriteMaterial({
+                    map: mistMap,
+                    color: mistColors[m % mistColors.length],
+                    transparent: true,
+                    opacity: 0,
+                    blending: THREE.AdditiveBlending,
+                    depthWrite: false
+                }));
+                const ang = (m / 36) * Math.PI * 2;
+                const rad = 1.4 + (m % 5) * 0.7;
+                puff.position.set(Math.cos(ang) * rad, (Math.random() - 0.35) * 2.2, Math.sin(ang) * rad * 0.75);
+                const sc = 1.6 + Math.random() * 2.2;
+                puff.scale.set(sc, sc, 1);
+                puff.userData.base = sc;
+                cosmicMistGroup.add(puff);
+                cosmicMistPuffs.push(puff);
+            }
+
+            celestialGroup = new THREE.Group();
+            celestialGroup.position.set(0, 2.35, 4.2);
+            celestialGroup.visible = false;
+            coverScene.add(celestialGroup);
+            celestialSun = new THREE.Mesh(
+                new THREE.SphereGeometry(0.34, 24, 24),
+                new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xd97706, emissiveIntensity: 1.2, roughness: 0.25, metalness: 0.2 })
+            );
+            celestialGroup.add(celestialSun);
+            celestialCorona = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: mistMap, color: 0xfbbf24, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false
+            }));
+            celestialCorona.scale.set(2.1, 2.1, 1);
+            celestialSun.add(celestialCorona);
+            celestialRings = [];
+            [0.85, 1.25, 1.7, 2.15, 2.6].forEach((radius, idx) => {
+                const group = new THREE.Group();
+                group.rotation.x = (idx - 2) * 0.16;
+                group.rotation.z = (idx % 2 === 0 ? 1 : -1) * 0.12;
+                const ring = new THREE.Mesh(
+                    new THREE.TorusGeometry(radius, 0.012, 8, 48),
+                    new THREE.MeshStandardMaterial({
+                        color: mistColors[idx], emissive: mistColors[idx], emissiveIntensity: 0.55,
+                        roughness: 0.4, metalness: 0.6, transparent: true, opacity: 0.85
+                    })
+                );
+                group.add(ring);
+                celestialGroup.add(group);
+                celestialRings.push(group);
+            });
+            celestialPlanets = [];
+            const planetHex = [0xb45309, 0x7f1d1d, 0x1e3a8a, 0x581c87, 0x065f46, 0x9a3412];
+            planetHex.forEach((hex, idx) => {
+                const radius = 0.95 + idx * 0.32;
+                const body = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.11 + (idx % 3) * 0.02, 16, 16),
+                    new THREE.MeshStandardMaterial({ color: hex, emissive: hex, emissiveIntensity: 0.35, roughness: 0.4, metalness: 0.2 })
+                );
+                celestialGroup.add(body);
+                celestialPlanets.push({ mesh: body, radius: radius, angle: idx * 1.05, speed: 0.55 + idx * 0.08 });
+            });
+
+            fallingArmillary = new THREE.Group();
+            fallingArmillary.visible = false;
+            fallingArmillary.position.set(0, 2.35, 4.2);
+            coverScene.add(fallingArmillary);
+            const armMat = new THREE.MeshStandardMaterial({ color: 0xc4a574, emissive: 0x6b4a1e, emissiveIntensity: 0.25, roughness: 0.35, metalness: 0.72 });
+            const armCore = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), new THREE.MeshStandardMaterial({
+                color: 0xd97706, emissive: 0x92400e, emissiveIntensity: 0.7, roughness: 0.3, metalness: 0.3
+            }));
+            fallingArmillary.add(armCore);
+            [0.42, 0.62, 0.84, 1.05, 1.28].forEach((radius, idx) => {
+                const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.018, 8, 40), armMat);
+                ring.rotation.x = idx * 0.55;
+                ring.rotation.y = idx * 0.4;
+                fallingArmillary.add(ring);
+            });
+            planetHex.forEach((hex, idx) => {
+                const gem = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.07, 12, 12),
+                    new THREE.MeshStandardMaterial({ color: hex, emissive: hex, emissiveIntensity: 0.4, roughness: 0.3, metalness: 0.25 })
+                );
+                const ang = idx * (Math.PI / 3);
+                gem.position.set(Math.cos(ang) * 1.05, Math.sin(ang * 2) * 0.18, Math.sin(ang) * 1.05);
+                fallingArmillary.add(gem);
+            });
 
             bookRoot.rotation.set(targetBookRotX, targetBookRotY, targetBookRotZ);
             setupBookViewportInteractions(container);
@@ -2630,183 +2747,286 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
         }
 
         // ============================================================================
-        // 4. MECHANICAL OPENING & PAGE MANIFESTATION SEQUENCE (4.2 SECONDS)
+        // 4. OPENING SHOT. Unlatch, two turns, flatten, pages rise all around,
+        //    the sky collapses into the armillary, then the camera lands on the page.
         // ============================================================================
+        const CAM_KEYS = [
+            [0.00, 0, 0.12, 13.0, 0, 0.04, 0],
+            [0.75, 0, 0.55, 14.5, 0, 0.28, 0],
+            [1.65, 0, 1.15, 14.6, 0, 0.55, 0],
+            [2.85, 0, 2.55, 12.2, 0, 2.3, 4.2],
+            [4.15, 0.1, 2.15, 10.2, 0, 2.2, 4.2],
+            [5.15, -0.35, 0.55, 8.4, -1.05, -0.25, 0],
+            [6.05, 0.35, 0.05, 3.4, 0.4, -0.22, 0.15],
+            [6.45, 0.48, -0.08, 1.62, 0.42, -0.28, 0],
+            [6.70, 0.48, -0.08, 1.58, 0.42, -0.28, 0]
+        ];
+
+        function smooth01(t) {
+            const x = Math.max(0, Math.min(1, t));
+            return x * x * (3 - 2 * x);
+        }
+
+        function wrapAngle(a) {
+            const turn = Math.PI * 2;
+            return ((a + Math.PI) % turn + turn) % turn - Math.PI;
+        }
+
+        function sampleOpeningCamera(elapsed) {
+            const keys = CAM_KEYS;
+            let i = 0;
+            while (i < keys.length - 2 && elapsed > keys[i + 1][0]) i++;
+            const k0 = keys[Math.max(0, i - 1)];
+            const k1 = keys[i];
+            const k2 = keys[i + 1];
+            const k3 = keys[Math.min(keys.length - 1, i + 2)];
+            const span = Math.max(0.001, k2[0] - k1[0]);
+            let u = (elapsed - k1[0]) / span;
+            const diving = i >= keys.length - 2;
+            if (diving) u = Math.pow(Math.max(0, Math.min(1, u)), 2.05);
+            else u = Math.max(0, Math.min(1, u));
+            const out = new Array(6);
+            for (let c = 1; c <= 6; c++) {
+                const p0 = k0[c];
+                const p1 = k1[c];
+                const p2 = k2[c];
+                const p3 = k3[c];
+                const t2 = u * u;
+                const t3 = t2 * u;
+                out[c - 1] = 0.5 * ((2 * p1) + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3);
+            }
+            coverCamera.position.set(out[0], out[1], Math.max(1.15, out[2]));
+            coverCamera.lookAt(out[3], out[4], out[5]);
+            coverCamera.rotation.z = diving ? -Math.sin(u * Math.PI) * 0.11 : 0;
+        }
+
+        function hideOpeningSpectacle() {
+            if (cosmicMistGroup) cosmicMistGroup.visible = false;
+            cosmicMistPuffs.forEach((puff) => { puff.material.opacity = 0; });
+            if (celestialGroup) {
+                celestialGroup.visible = false;
+                celestialGroup.scale.set(1, 1, 1);
+            }
+            if (celestialSun) celestialSun.visible = true;
+            celestialRings.forEach((ring) => { ring.visible = true; ring.scale.set(1, 1, 1); });
+            celestialPlanets.forEach((planet) => { planet.mesh.visible = true; planet.mesh.scale.set(1, 1, 1); });
+            if (fallingArmillary) {
+                fallingArmillary.visible = false;
+                fallingArmillary.scale.set(1, 1, 1);
+                fallingArmillary.position.set(0, 2.35, 4.2);
+            }
+            if (emberParticles) emberParticles.material.opacity = 0.62;
+        }
+
+        function beginCodexLanding() {
+            if (openHandoffStarted) return;
+            openHandoffStarted = true;
+            const interior = document.getElementById("codexInteriorStage");
+            const cover = document.getElementById("frontCoverStage");
+            if (interior) interior.classList.add("stage-landed", "stage-active");
+            if (cover) cover.classList.add("stage-landing", "stage-hidden");
+            document.body.classList.add("codex-unlocked");
+            const closeBtn = document.getElementById("closeBookBtn");
+            if (closeBtn) closeBtn.classList.remove("hidden");
+            if (typeof selectBookFolio === "function") selectBookFolio(activeBookIndex || 0);
+        }
+
         function triggerMechanicalBookOpening() {
             if (isBookOpening || isBookOpened || isBookClosing || bookForming) return;
             isBookOpening = true;
+            openHandoffStarted = false;
             openAnimStartTime = performance.now();
-
-            // Prepare hinged and flying pages
-            hingedPages.forEach(p => {
-                p.visible = true;
-                p.rotation.y = 0;
+            hingedPages.forEach((page) => {
+                page.visible = true;
+                page.rotation.y = 0;
             });
-            flyingPages.forEach(fp => {
-                fp.visible = true;
-                fp.material.opacity = 0;
+            flyingPages.forEach((sheet) => {
+                sheet.visible = false;
+                sheet.material.opacity = 0;
             });
+            hideOpeningSpectacle();
         }
 
         function updateBookOpeningTimeline(now) {
             const elapsed = (now - openAnimStartTime) / 1000;
             const progress = Math.min(1, elapsed / OPEN_DURATION);
 
-            // The book opens where it stands, held in the void.
-            targetBookRotX = 0.12;
-            targetBookRotY = -0.18;
-            targetBookRotZ = 0;
+            const claspT = Math.min(1, elapsed / 0.62);
+            let clasp = 2.35;
+            if (claspT < 0.72) clasp = (claspT / 0.72) * 2.55;
+            else clasp = 2.35 + Math.sin(((claspT - 0.72) / 0.28) * Math.PI) * 0.16;
+            if (topClaspPivot) topClaspPivot.rotation.y = clasp;
+            if (bottomClaspPivot) bottomClaspPivot.rotation.y = clasp;
 
-            // STAGE A (0.0s - 0.7s): Unlatch Iron/Bronze Fore-Edge Clasps
-            const claspT = Math.min(1, elapsed / 0.65);
-            const easeClasp = 1 - Math.pow(1 - claspT, 3);
-            if (topClaspPivot && bottomClaspPivot) {
-                topClaspPivot.rotation.y = easeClasp * 2.4;
-                bottomClaspPivot.rotation.y = easeClasp * 2.4;
+            const spinT = Math.max(0, Math.min(1, (elapsed - 0.22) / 1.33));
+            const easeSpin = spinT < 0.5 ? 4 * spinT * spinT * spinT : 1 - Math.pow(-2 * spinT + 2, 3) / 2;
+            if (elapsed < 1.55) {
+                bookRoot.rotation.y = targetBookRotY + easeSpin * Math.PI * 4;
+                bookRoot.rotation.x = targetBookRotX + Math.sin(easeSpin * Math.PI) * 0.34;
+                bookRoot.rotation.z = targetBookRotZ + Math.sin(easeSpin * Math.PI * 2) * 0.16;
+                bookRoot.position.y = Math.sin(easeSpin * Math.PI) * 0.42;
             }
 
-            // STAGE B (0.55s - 1.85s): Heavy Front Cover Swings Open on Left Hinge
-            if (elapsed >= 0.55) {
-                const coverT = Math.min(1, (elapsed - 0.55) / 1.25);
-                const easeCover = coverT < 0.5 ? 2 * coverT * coverT : 1 - Math.pow(-2 * coverT + 2, 2) / 2;
-                frontCoverPivot.rotation.y = -easeCover * 2.75; // Opens ~158 degrees
-                innerBookGlowLight.intensity = 0.3 + easeCover * 3.8;
-            }
-
-            // STAGE C (1.05s - 3.6s): 28 Hinged Vellum Pages Riffle + 24 Flying Pages Manifest
-            if (elapsed >= 1.05) {
-                // Riffle each of the 28 hinged spine pages with real vertex arch curvature
+            if (elapsed >= 1.55) {
+                const flattenT = Math.min(1, (elapsed - 1.55) / 1.0);
+                const easeFlat = smooth01(flattenT);
+                bookRoot.rotation.x = targetBookRotX + ( -0.2 - targetBookRotX) * easeFlat;
+                bookRoot.rotation.y = targetBookRotY + (0.08 - targetBookRotY) * easeFlat;
+                bookRoot.rotation.z = targetBookRotZ * (1 - easeFlat);
+                bookRoot.position.y = 0.42 + (-0.4 - 0.42) * easeFlat;
+                if (frontCoverPivot) frontCoverPivot.rotation.y = -easeFlat * Math.PI;
+                if (innerBookGlowLight) innerBookGlowLight.intensity = 0.2 + easeFlat * 3.6;
+                const count = Math.max(1, hingedPages.length - 1);
                 hingedPages.forEach((pageMesh, idx) => {
-                    const pageStart = 1.05 + idx * 0.062;
-                    const pageDur = 0.68;
-                    const pt = Math.max(0, Math.min(1, (elapsed - pageStart) / pageDur));
-                    const easePt = pt < 0.5 ? 2 * pt * pt : 1 - Math.pow(-2 * pt + 2, 2) / 2;
-
-                    // Flip page from 0 to -152 degrees
-                    pageMesh.rotation.y = -easePt * 2.65;
-
-                    // Apply realistic vertex wave arch while the page is mid-turn
-                    const archIntensity = Math.sin(pt * Math.PI) * 0.42;
-                    const posAttr = pageMesh.geometry.attributes.position;
-                    const baseCoords = pageMesh.geometry.userData.baseCoords;
-                    for (let v = 0; v < posAttr.count; v++) {
-                        const bx = baseCoords[v * 3];
-                        const by = baseCoords[v * 3 + 1];
-                        const normX = bx / 3.0;
-                        const waveZ = Math.sin(normX * Math.PI) * archIntensity;
-                        posAttr.setXYZ(v, bx, by, waveZ);
+                    const fan = -(idx / count) * 2.55;
+                    pageMesh.rotation.y = easeFlat * fan;
+                    if (flattenT < 0.98) {
+                        const arch = Math.sin(flattenT * Math.PI) * 0.22;
+                        const posAttr = pageMesh.geometry.attributes.position;
+                        const base = pageMesh.geometry.userData.baseCoords;
+                        if (posAttr && base) {
+                            for (let v = 0; v < posAttr.count; v++) {
+                                const bx = base[v * 3];
+                                posAttr.setXYZ(v, bx, base[v * 3 + 1], Math.sin((bx / 3) * Math.PI) * arch);
+                            }
+                            posAttr.needsUpdate = true;
+                        }
                     }
-                    posAttr.needsUpdate = true;
+                });
+            }
+
+            if (elapsed >= 1.55) {
+                const flyElapsed = elapsed - 1.55;
+                flyingPages.forEach((sheet) => {
+                    const d = sheet.userData;
+                    const life = flyElapsed - d.delay;
+                    if (life <= 0) {
+                        sheet.visible = false;
+                        return;
+                    }
+                    sheet.visible = true;
+                    const hang = Math.min(life, 2.6);
+                    const rise = d.vy * hang - 0.5 * d.grav * hang * hang;
+                    const travel = Math.min(life, 2.15);
+                    const eddy = Math.min(1, life / 1.2);
+                    const depth = d.nearLens
+                        ? Math.min(life, 1.7) * d.vz
+                        : d.vz * travel * 0.62;
+                    sheet.position.set(
+                        d.vx * travel * 0.85 + Math.sin(d.az + life * d.swirl) * d.swirlR * eddy,
+                        bookRoot.position.y + 0.15 + rise,
+                        depth + Math.cos(d.az + life * d.swirl) * d.swirlR * 0.35 * eddy
+                    );
+                    sheet.rotation.set(life * d.sx, life * d.sy, life * d.sz);
+                    const fadeIn = Math.min(1, life * 3.2);
+                    const fadeOut = elapsed > 5.05 ? Math.max(0, 1 - (elapsed - 5.05) * 1.15) : 1;
+                    const blockingSky = elapsed > 2.55 && elapsed < 4.4 && Math.abs(sheet.position.x) < 1.9 && sheet.position.z < 3.4;
+                    sheet.material.opacity = fadeIn * fadeOut * (blockingSky ? 0.16 : 1);
+                    if (life < 2.4 && (d.index % 2 === 0)) {
+                        const posAttr = sheet.geometry.attributes.position;
+                        const base = sheet.geometry.userData.baseCoords;
+                        const amp = d.nearLens ? 0.05 : 0.09;
+                        for (let v = 0; v < posAttr.count; v++) {
+                            const bx = base[v * 3];
+                            const by = base[v * 3 + 1];
+                            const wave = Math.sin(life * d.flutter + bx * 3.1) * amp;
+                            const curl = (bx > 0.25 && by < -0.2) ? 0.1 : 0;
+                            posAttr.setXYZ(v, bx, by, wave + curl);
+                        }
+                        posAttr.needsUpdate = true;
+                    }
                 });
 
-                // Whirl the 56 Flying Manifestation Pages in an immersive 3D vortex surrounding the viewer
-                const flyElapsed = elapsed - 1.05;
-                if (flyElapsed > 0) {
-                    flyingPages.forEach((fp) => {
-                        const d = fp.userData;
-                        const localT = Math.max(0, (flyElapsed - d.flightDelay) / 2.35);
-                        if (localT <= 0) {
-                            fp.visible = false;
-                            return;
-                        }
-                        fp.visible = true;
-
-                        if (d.isHeroPage) {
-                            // Hero Landing Page: surges out of the tome directly toward the camera,
-                            // sweeps into center screen, faces viewer with gentle deceleration, and lands seamlessly
-                            // as the doorway folio into the unlocked codex!
-                            const heroT = Math.min(1, localT * 1.32);
-                            const easeHero = 1 - Math.pow(1 - heroT, 3);
-                            fp.material.opacity = heroT < 0.2 ? heroT * 5.0 : Math.min(1, 1.0 - (heroT > 0.82 ? (heroT - 0.82) * 5.5 : 0));
-                            
-                            // Fly right toward viewer (heroLandingPage coordinates), settling right in front
-                            fp.position.set(
-                                Math.sin(heroT * Math.PI) * 0.22,
-                                -0.15 + easeHero * 0.32,
-                                0.6 + easeHero * 2.2
-                            );
-                            // Smoothly align rotation to square with camera lens
-                            fp.rotation.set(
-                                (1 - easeHero) * -0.72 + Math.sin(flyElapsed * 4) * 0.02 * (1 - easeHero),
-                                (1 - easeHero) * 0.88,
-                                (1 - easeHero) * -0.28
-                            );
-
-                            // Gentle living parchment flutter and leaf curl on the hero landing page
-                            const posAttr = fp.geometry.attributes.position;
-                            const base = fp.geometry.userData.baseCoords;
-                            for (let v = 0; v < posAttr.count; v++) {
-                                const bx = base[v * 3];
-                                const by = base[v * 3 + 1];
-                                const flutter = Math.sin(flyElapsed * 8 + bx * 3) * (0.07 * (1 - easeHero * 0.85));
-                                const cornerCurl = (bx > 0.4 && by < -0.4) ? 0.12 * (1 - easeHero) : 0;
-                                posAttr.setXYZ(v, bx, by, flutter + cornerCurl);
-                            }
-                            posAttr.needsUpdate = true;
-                        } else {
-                            // Swarm pages: expand in a wide 360-degree helical vortex that encompasses the camera,
-                            // swooping past the viewer's head, left, right, and behind!
-                            // cameraWrap / surroundViewer depth: Z travels past camera (vortexDepth goes past camera Z: 7.8)
-                            const swirlAngle = d.spiralAngle + localT * d.spiralSpeed;
-                            const currentRadius = d.spiralRadius * (0.45 + localT * 0.55);
-                            const zTravel = 0.35 + localT * 2.4; // pastCamera depth stays inside the void, short of the lens
-                            
-                            fp.position.set(
-                                Math.cos(swirlAngle) * currentRadius,
-                                -0.15 + Math.sin(d.elevationAngle) * currentRadius * 0.28 + localT * d.riseSpeed * 0.45,
-                                zTravel
-                            );
-
-                            // Smooth fade in as page emerges, and fade out as it shoots past the viewer's field of view
-                            const distToCam = Math.abs(zTravel - coverCamera.position.z);
-                            const proximityFade = distToCam < 1.2 ? distToCam / 1.2 : 1.0;
-                            fp.material.opacity = (localT < 0.18 ? localT * 5.5 : Math.max(0, 1 - (localT - 0.68) * 3.2)) * proximityFade;
-
-                            // Aerodynamic flight tumbling and responsive angular roll
-                            fp.rotation.x = localT * d.spinSpeedX + Math.sin(flyElapsed * 3 + d.index) * 0.4;
-                            fp.rotation.y = swirlAngle + localT * d.spinSpeedY;
-                            fp.rotation.z = Math.sin(flyElapsed * 2.5 + d.index) * 0.6;
-
-                            // Dynamic vellum aerodynamic leaf curl and dual-axis corner flutter
-                            const posAttr = fp.geometry.attributes.position;
-                            const base = fp.geometry.userData.baseCoords;
-                            for (let v = 0; v < posAttr.count; v++) {
-                                const bx = base[v * 3];
-                                const by = base[v * 3 + 1];
-                                const leafCurl = Math.sin(bx * 2.8 + localT * 7.5) * 0.24 + Math.cos(by * 2.2 + localT * 5.0) * 0.14;
-                                const edgeFlutter = Math.sin(flyElapsed * d.flutterSpeed + bx * 4) * d.flutterAmp;
-                                const cornerCurl = (bx > 0.35 && by < -0.35) ? 0.18 : 0;
-                                posAttr.setXYZ(v, bx, by, leafCurl + edgeFlutter + cornerCurl);
-                            }
-                            posAttr.needsUpdate = true;
-                        }
+                if (cosmicMistGroup) {
+                    cosmicMistGroup.visible = true;
+                    cosmicMistGroup.rotation.y = flyElapsed * 0.22;
+                    const mistIn = Math.min(1, Math.max(0, (flyElapsed - 0.15) / 0.8));
+                    const mistOut = elapsed > 4.7 ? Math.max(0, 1 - (elapsed - 4.7) * 1.4) : 1;
+                    cosmicMistPuffs.forEach((puff, idx) => {
+                        const pulse = 1 + Math.sin(flyElapsed * 2.2 + idx) * 0.12;
+                        const scale = puff.userData.base * mistIn * pulse;
+                        puff.scale.set(scale, scale, 1);
+                        puff.material.opacity = mistIn * mistOut * 0.22;
                     });
-
-                    // Vortex air displacement & camera tremor as the torrential cloud of folios rushes past
-                    if (flyElapsed > 0.4 && flyElapsed < 2.4) {
-                        const intensity = Math.sin((flyElapsed - 0.4) / 2.0 * Math.PI) * 0.022;
-                        const cameraShake = Math.sin(flyElapsed * 48) * intensity;
-                        const cameraJitter = Math.cos(flyElapsed * 36) * intensity * 0.7;
-                        coverCamera.position.x += cameraShake;
-                        coverCamera.position.y += cameraJitter;
-                    }
+                }
+                if (emberParticles) {
+                    const glow = Math.min(1, Math.max(0, (elapsed - 1.55) / 0.6));
+                    const dim = elapsed > 5.1 ? Math.max(0.62, 0.95 - (elapsed - 5.1)) : 0.62 + glow * 0.28;
+                    emberParticles.material.opacity = dim;
                 }
             }
 
-            // The opening stays in the void. The camera does not dive into the book.
+            if (elapsed >= 2.25 && celestialGroup) {
+                const sky = elapsed - 2.25;
+                celestialGroup.visible = true;
+                if (sky < 1.15) {
+                    const form = smooth01(sky / 1.0);
+                    celestialGroup.scale.set(form, form, form);
+                    celestialPlanets.forEach((planet) => {
+                        planet.angle += 0.012 * planet.speed;
+                        planet.mesh.position.set(
+                            Math.cos(planet.angle) * planet.radius,
+                            Math.sin(planet.angle * 2) * planet.radius * 0.12,
+                            Math.sin(planet.angle) * planet.radius
+                        );
+                    });
+                    celestialRings.forEach((ring, idx) => {
+                        ring.rotation.y += 0.004 + idx * 0.001;
+                    });
+                    if (celestialCorona) celestialCorona.material.opacity = 0.35 + form * 0.45;
+                } else if (sky < 1.9) {
+                    const col = smooth01((sky - 1.15) / 0.75);
+                    const shrink = Math.max(0.04, 1 - col);
+                    if (celestialSun) celestialSun.scale.set(shrink, shrink, shrink);
+                    celestialRings.forEach((ring) => ring.scale.set(shrink, shrink, shrink));
+                    celestialPlanets.forEach((planet) => planet.mesh.scale.set(shrink, shrink, shrink));
+                    if (celestialCorona) {
+                        celestialCorona.material.opacity = 0.8 * (1 - col) + Math.sin(col * Math.PI) * 0.35;
+                        celestialCorona.scale.set(2.1 + col * 2.4, 2.1 + col * 2.4, 1);
+                    }
+                    if (fallingArmillary) {
+                        fallingArmillary.visible = true;
+                        const grown = 0.15 + col * 0.85;
+                        fallingArmillary.scale.set(grown, grown, grown);
+                        fallingArmillary.position.set(0, 2.35, 4.2);
+                        fallingArmillary.rotation.y = col * Math.PI * 2;
+                    }
+                } else {
+                    if (celestialSun) celestialSun.visible = false;
+                    celestialRings.forEach((ring) => { ring.visible = false; });
+                    celestialPlanets.forEach((planet) => { planet.mesh.visible = false; });
+                }
+            }
 
-            // Complete Transition -> Reveal Inner Sanctum & 3D Orbital Armillary
+            if (elapsed >= 4.2 && fallingArmillary) {
+                fallingArmillary.visible = true;
+                const fallT = Math.min(1, (elapsed - 4.2) / 0.95);
+                const easeFall = fallT * fallT;
+                let landY = -0.32 + (2.35 - -0.32) * (1 - easeFall);
+                if (fallT > 0.82) {
+                    const bounce = (fallT - 0.82) / 0.18;
+                    landY += Math.sin(bounce * Math.PI) * 0.12 * Math.exp(-bounce * 3);
+                }
+                const landed = elapsed >= 5.15;
+                fallingArmillary.position.set(
+                    -1.15 * easeFall,
+                    landed ? -0.32 : landY,
+                    4.2 + (0.25 - 4.2) * easeFall
+                );
+                fallingArmillary.rotation.y += 0.01;
+                fallingArmillary.scale.set(1, 1, 1);
+            }
+
+            sampleOpeningCamera(elapsed);
+
+            if (coverCamera.position.z < 2.05) beginCodexLanding();
+
             if (progress >= 1) {
                 isBookOpening = false;
                 isBookOpened = true;
-
-                document.body.classList.add("codex-unlocked");
-                document.getElementById("frontCoverStage").classList.add("stage-hidden");
-                document.getElementById("codexInteriorStage").classList.add("stage-active");
-                document.getElementById("closeBookBtn").classList.remove("hidden");
-
+                beginCodexLanding();
                 resizeAll3DViewports();
-                window.scrollTo({ top: 0, behavior: "smooth" });
+                window.scrollTo({ top: 0, behavior: "instant" });
             }
         }
 
@@ -2830,18 +3050,35 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 fp.visible = false;
                 fp.material.opacity = 0;
             });
+            hideOpeningSpectacle();
+            openHandoffStarted = false;
+            if (bookRoot) {
+                bookRoot.position.set(0, 0, 0);
+                bookRoot.rotation.set(0.24, -0.44, 0.03);
+            }
+            if (coverCamera) {
+                coverCamera.position.set(0, 0.05, 13);
+                coverCamera.rotation.set(0, 0, 0);
+                coverCamera.lookAt(0, 0, 0);
+            }
 
             targetBookRotX = 0.24;
             targetBookRotY = -0.44;
             targetBookRotZ = 0.03;
-            targetCameraZ = 13;
+            targetCameraX = 0;
             targetCameraY = 0.05;
+            targetCameraZ = 13;
 
             window.scrollTo({ top: 0, behavior: "instant" });
             document.body.classList.remove("codex-unlocked");
             document.body.classList.remove("tome-closing");
-            document.getElementById("codexInteriorStage").classList.remove("stage-active");
-            document.getElementById("frontCoverStage").classList.remove("stage-hidden");
+            const interiorStage = document.getElementById("codexInteriorStage");
+            const coverStage = document.getElementById("frontCoverStage");
+            if (interiorStage) interiorStage.classList.remove("stage-active", "stage-landed");
+            if (coverStage) {
+                coverStage.classList.remove("stage-hidden", "stage-landing");
+                coverStage.style.transition = "";
+            }
             document.getElementById("closeBookBtn").classList.add("hidden");
 
             resizeAll3DViewports();
@@ -2865,12 +3102,22 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             if (typeof finishInscription === "function") finishInscription();
             document.body.classList.add("tome-closing");
             document.body.classList.remove("codex-unlocked");
-            document.getElementById("codexInteriorStage").classList.remove("stage-active");
+            const interiorStage = document.getElementById("codexInteriorStage");
+            if (interiorStage) interiorStage.classList.remove("stage-active", "stage-landed");
             const coverStage = document.getElementById("frontCoverStage");
+            coverStage.classList.remove("stage-landing");
             coverStage.style.transition = "none";
             coverStage.classList.remove("stage-hidden");
             void coverStage.offsetWidth;
             coverStage.style.transition = "";
+            closeCamFrom = coverCamera ? coverCamera.position.clone() : new THREE.Vector3(0, 0.05, 13);
+            closeBookFrom = bookRoot ? {
+                x: bookRoot.rotation.x,
+                y: wrapAngle(bookRoot.rotation.y),
+                z: bookRoot.rotation.z,
+                py: bookRoot.position.y
+            } : { x: 0.24, y: -0.44, z: 0.03, py: 0 };
+            hideOpeningSpectacle();
             document.getElementById("closeBookBtn").classList.add("hidden");
             flyingPages.forEach((fp) => {
                 fp.visible = false;
@@ -2890,13 +3137,32 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             targetCameraY = 0.05;
             targetCameraZ = 13;
 
+            const pull = smooth01(Math.min(1, elapsed / 0.85));
+            if (coverCamera && closeCamFrom) {
+                coverCamera.position.set(
+                    closeCamFrom.x + (0 - closeCamFrom.x) * pull,
+                    closeCamFrom.y + (0.35 - closeCamFrom.y) * pull,
+                    closeCamFrom.z + (12.4 - closeCamFrom.z) * pull
+                );
+                coverCamera.lookAt(0, 0, 0);
+                coverCamera.rotation.z *= (1 - pull);
+            }
+            if (bookRoot && closeBookFrom) {
+                const settle = smooth01(Math.min(1, elapsed / 1.15));
+                bookRoot.rotation.x = closeBookFrom.x + (0.24 - closeBookFrom.x) * settle;
+                bookRoot.rotation.y = closeBookFrom.y + (-0.44 - closeBookFrom.y) * settle;
+                bookRoot.rotation.z = closeBookFrom.z * (1 - settle);
+                bookRoot.position.y = closeBookFrom.py * (1 - settle);
+            }
+
             const pageCount = hingedPages.length;
             hingedPages.forEach((pageMesh, idx) => {
-                const start = (pageCount - 1 - idx) * 0.038;
-                const local = Math.min(1, Math.max(0, (elapsed - start) / 0.4));
+                const start = (pageCount - 1 - idx) * 0.03;
+                const local = Math.min(1, Math.max(0, (elapsed - 0.35 - start) / 0.42));
                 const eased = local < 0.5 ? 2 * local * local : 1 - Math.pow(-2 * local + 2, 2) / 2;
+                const openAngle = -(idx / Math.max(1, pageCount - 1)) * 2.55;
                 pageMesh.visible = local < 1;
-                pageMesh.rotation.y = -2.65 * (1 - eased);
+                pageMesh.rotation.y = openAngle * (1 - eased);
                 const arch = Math.sin(local * Math.PI) * 0.28;
                 const posAttr = pageMesh.geometry.attributes.position;
                 const baseCoords = pageMesh.geometry.userData.baseCoords;
@@ -2912,12 +3178,12 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 if (local >= 1) flattenHingedPage(pageMesh);
             });
 
-            const coverLocal = Math.min(1, Math.max(0, (elapsed - 1.15) / 1.15));
+            const coverLocal = Math.min(1, Math.max(0, (elapsed - 1.35) / 1.15));
             const coverEased = 1 - Math.pow(1 - coverLocal, 3);
-            if (frontCoverPivot) frontCoverPivot.rotation.y = -2.75 * (1 - coverEased);
+            if (frontCoverPivot) frontCoverPivot.rotation.y = -Math.PI * (1 - coverEased);
             if (innerBookGlowLight) innerBookGlowLight.intensity = 4.1 * (1 - coverEased) + 0.08 * coverEased;
 
-            const claspLocal = Math.min(1, Math.max(0, (elapsed - 2.22) / 0.62));
+            const claspLocal = Math.min(1, Math.max(0, (elapsed - 2.55) / 0.7));
             let claspAngle = 2.4 * (1 - Math.min(1, claspLocal / 0.82));
             if (claspLocal > 0.82 && claspLocal < 1) {
                 claspAngle = -0.14 * Math.sin(((claspLocal - 0.82) / 0.18) * Math.PI);
@@ -2956,10 +3222,10 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const aspect = Math.max(0.35, astrolabeCamera.aspect || 1);
             const tanV = Math.tan((36 * Math.PI) / 360);
             const tanH = tanV * aspect;
-            const reach = 2.85;
+            const reach = 2.58;
             const z = Math.max(8.2, reach / tanV, reach / tanH);
-            astrolabeCamera.position.set(0, 0.22, z);
-            astrolabeCamera.lookAt(0, 0, 0);
+            astrolabeCamera.position.set(0, 0, z);
+            astrolabeCamera.lookAt(0, -0.22, 0);
         }
 
         function init3DOrbitalArmillary() {
@@ -3266,14 +3532,16 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     bookmarkRibbon2.rotation.z = 0.08 + Math.cos(now * 0.0026) * 0.035;
                 }
 
-                // Smoothly damp book rotation & camera position
-                bookRoot.rotation.x += (targetBookRotX - bookRoot.rotation.x) * 0.075;
-                bookRoot.rotation.y += (targetBookRotY - bookRoot.rotation.y) * 0.075;
-                bookRoot.rotation.z += (targetBookRotZ - bookRoot.rotation.z) * 0.075;
+                // The opening and the close own the camera. Damping would drag the shot back to the lectern.
+                if (!isBookOpening && !isBookClosing) {
+                    bookRoot.rotation.x += (targetBookRotX - bookRoot.rotation.x) * 0.075;
+                    bookRoot.rotation.y += (targetBookRotY - bookRoot.rotation.y) * 0.075;
+                    bookRoot.rotation.z += (targetBookRotZ - bookRoot.rotation.z) * 0.075;
 
-                coverCamera.position.x += (targetCameraX - coverCamera.position.x) * 0.085;
-                coverCamera.position.y += (targetCameraY - coverCamera.position.y) * 0.085;
-                coverCamera.position.z += (targetCameraZ - coverCamera.position.z) * 0.085;
+                    coverCamera.position.x += (targetCameraX - coverCamera.position.x) * 0.085;
+                    coverCamera.position.y += (targetCameraY - coverCamera.position.y) * 0.085;
+                    coverCamera.position.z += (targetCameraZ - coverCamera.position.z) * 0.085;
+                }
 
                 // Slow, mechanical horological rotation on cover medallion rings
                 if (coverMedallionRing1) coverMedallionRing1.rotation.z = now * 0.00035;
