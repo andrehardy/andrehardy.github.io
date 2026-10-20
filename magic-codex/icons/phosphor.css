@@ -37,6 +37,9 @@
 .ph.ph-eye:before {
   content: "\e220";
 }
+.ph.ph-feather:before {
+  content: "\e9c0";
+}
 .ph.ph-flask:before {
   content: "\e79e";
 }
@@ -54,6 +57,9 @@
 }
 .ph.ph-skull:before {
   content: "\e916";
+}
+.ph.ph-sparkle:before {
+  content: "\e6a2";
 }
 .ph.ph-x:before {
   content: "\e4f6";
@@ -98,6 +104,9 @@
 .ph-bold.ph-eye:before {
   content: "\e220";
 }
+.ph-bold.ph-feather:before {
+  content: "\e9c0";
+}
 .ph-bold.ph-flask:before {
   content: "\e79e";
 }
@@ -115,6 +124,9 @@
 }
 .ph-bold.ph-skull:before {
   content: "\e916";
+}
+.ph-bold.ph-sparkle:before {
+  content: "\e6a2";
 }
 .ph-bold.ph-x:before {
   content: "\e4f6";
@@ -159,6 +171,9 @@
 .ph-fill.ph-eye:before {
   content: "\e220";
 }
+.ph-fill.ph-feather:before {
+  content: "\e9c0";
+}
 .ph-fill.ph-flask:before {
   content: "\e79e";
 }
@@ -176,6 +191,9 @@
 }
 .ph-fill.ph-skull:before {
   content: "\e916";
+}
+.ph-fill.ph-sparkle:before {
+  content: "\e6a2";
 }
 .ph-fill.ph-x:before {
   content: "\e4f6";
