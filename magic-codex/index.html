@@ -1,0 +1,3919 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The Magic Codex, the master tome of the six seals: a clasped book that opens onto an armillary of its six volumes.">
+    <meta name="theme-color" content="#040508">
+    <title>The Magic Codex | Master Tome of the Six Seals</title>
+    <link rel="preload" href="./fonts/cinzel-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./fonts/cinzel-decorative-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="./magic-codex.css">
+    <link rel="stylesheet" href="./icons/phosphor.css">
+    <script src="./vendor/three.min.js"></script>
+    <script src="./vendor/CSS3DRenderer.js"></script>
+    <script>
+        // A still reader, or a browser without WebGL, steps straight into the open codex.
+        (() => {
+            let still = false;
+            let gl = false;
+            try { still = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (err) { still = true; }
+            try {
+                const probe = document.createElement("canvas");
+                gl = !!(probe.getContext("webgl") || probe.getContext("experimental-webgl"));
+            } catch (err) { gl = false; }
+            if (!gl) document.documentElement.classList.add("tome-still");
+            else if (still) document.documentElement.classList.add("tome-quiet");
+        })();
+    </script>
+    <style>
+        :root {
+            --candle-x: 50%;
+            --candle-y: 45%;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            background-color: #040508;
+            color: #e2e8f0;
+            font-family: 'Cormorant Garamond', serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            background-image:
+                radial-gradient(900px circle at var(--candle-x) var(--candle-y), rgba(212, 163, 56, 0.09), transparent 72%),
+                radial-gradient(circle at 50% 50%, rgba(180, 120, 40, 0.07) 0%, transparent 65%);
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        body.codex-unlocked {
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        body.registry-parchment {
+            background-color: #efe5d2;
+            color: #1c1917;
+            background-image:
+                radial-gradient(900px circle at var(--candle-x) var(--candle-y), rgba(160, 105, 25, 0.14), transparent 72%),
+                linear-gradient(to right, rgba(28, 25, 23, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(28, 25, 23, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* Top Nav hidden while in the pure 3D Book Void */
+        #topArchivalRibbon {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(-100%);
+            transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.8s;
+        }
+
+        body.codex-unlocked #topArchivalRibbon {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        html:not(.tome-still) body.codex-unlocked #topArchivalRibbon,
+        html:not(.tome-still) body.tome-closing #topArchivalRibbon {
+            display: none;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        #css3dOverlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 3;
+        }
+        #css3dOverlay > div {
+            pointer-events: none;
+        }
+        .page-leaf {
+            width: 720px;
+            height: 960px;
+            overflow: hidden;
+            pointer-events: auto;
+            background: #ead9b6;
+            color: #23150b;
+            box-sizing: border-box;
+            padding: 28px 36px 24px;
+        }
+        .page-leaf .folio-title {
+            font-size: 1.32rem;
+        }
+        .page-leaf .folio-body {
+            font-size: 1.02rem;
+            line-height: 1.42;
+        }
+        .page-leaf .folio-epigraph {
+            font-size: 1.02rem;
+            margin: 0.45rem 0;
+        }
+        .page-leaf .folio-notes {
+            margin-top: 0.55rem;
+        }
+        .page-leaf.left-leaf {
+            border-radius: 4px 0 0 4px;
+        }
+        .page-leaf.right-leaf {
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* STAGE LAYERING: Fixed 100vw x 100vh Void for Stage 1, Full Flow for Stage 2 */
+        .spatial-stage-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body.codex-unlocked .spatial-stage-wrapper {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #frontCoverStage {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 40;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.9s;
+        }
+
+        #frontCoverStage.stage-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #stillFallback {
+            display: none;
+        }
+
+        /* 3D Canvas Containers */
+        #book3DViewport {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            inset: 0;
+            cursor: grab;
+            touch-action: none;
+            background:
+                radial-gradient(circle at 50% 46%, rgba(42, 26, 12, 0.38) 0%, rgba(12, 9, 6, 0.78) 52%, #030406 100%);
+        }
+        #book3DViewport::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            box-shadow: inset 0 0 140px 45px rgba(0, 0, 0, 0.88);
+        }
+        #book3DViewport:active {
+            cursor: grabbing;
+        }
+
+        /* While the tome's leather, iron and vellum are still being made, a point of
+           light gathers in the void. Transform and opacity only, so it keeps moving
+           while the main thread is busy. */
+        #tomeGathering {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 0;
+            height: 0;
+            z-index: 2;
+            pointer-events: none;
+            animation: tome-gather-in 1.4s ease 0.2s both;
+        }
+        #tomeGathering::before {
+            content: "";
+            position: absolute;
+            left: -3px;
+            top: -3px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ffdf9a;
+            box-shadow: 0 0 12px 4px rgba(255, 196, 102, 0.55), 0 0 44px 16px rgba(212, 140, 40, 0.2);
+            animation: tome-gather-pulse 1.8s ease-in-out infinite;
+        }
+        #tomeGathering::after {
+            content: "";
+            position: absolute;
+            left: -70px;
+            top: -70px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 1px solid rgba(223, 177, 91, 0.32);
+            animation: tome-gather-ring 2.4s cubic-bezier(0.3, 0.1, 0.25, 1) infinite;
+        }
+        #frontCoverStage.forming #tomeGathering {
+            animation: tome-gather-out 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes tome-gather-in {
+            from { opacity: 0; }
+        }
+        @keyframes tome-gather-pulse {
+            0%, 100% { transform: scale(0.8); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; }
+        }
+        @keyframes tome-gather-ring {
+            from { transform: scale(1.6); opacity: 0; }
+            45% { opacity: 0.55; }
+            to { transform: scale(0.1); opacity: 0; }
+        }
+        @keyframes tome-gather-out {
+            to { opacity: 0; transform: scale(2.4); }
+        }
+        html.tome-still #tomeGathering,
+        html.tome-quiet #tomeGathering {
+            display: none;
+        }
+
+        .armillary-hint {
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+            font-size: 1.05rem;
+            color: #5c4033;
+            text-align: center;
+            margin: 0.4rem 0 0.8rem;
+        }
+
+        /* Forged Iron & Cast Bronze Button */
+        .forged-clasp-btn {
+            background: linear-gradient(135deg, #facc15 0%, #b45309 48%, #3b1806 100%);
+            box-shadow: 
+                0 14px 34px rgba(0, 0, 0, 0.85),
+                0 0 25px rgba(234, 179, 8, 0.25),
+                inset 0 2px 3px rgba(255, 255, 255, 0.55),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.7);
+            border: 1px solid #fef08a;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .forged-clasp-btn:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 
+                0 18px 40px rgba(234, 179, 8, 0.4),
+                0 0 35px rgba(250, 204, 21, 0.45),
+                inset 0 2px 5px rgba(255, 255, 255, 0.8);
+        }
+        .forged-clasp-btn:disabled {
+            opacity: 0.75;
+            cursor: wait;
+        }
+
+        .page-leaf {
+            background-color: #ead9b6;
+            background-image:
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='vellumNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.038' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.55  0 0 0 0 0.38  0 0 0 0 0.18  0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23vellumNoise)'/%3E%3C/svg%3E"),
+                linear-gradient(90deg, #f5ebd6 0%, #ead9b6 42%, #d8c09a 100%);
+        }
+        .page-leaf.left-leaf {
+            background-image:
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='vellumNoiseL'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.038' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.55  0 0 0 0 0.38  0 0 0 0 0.18  0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23vellumNoiseL)'/%3E%3C/svg%3E"),
+                linear-gradient(90deg, #f5ebd6 0%, #ead9b6 70%, #c4a574 100%);
+        }
+        .page-leaf.right-leaf {
+            background-image:
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='vellumNoiseR'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.038' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.55  0 0 0 0 0.38  0 0 0 0 0.18  0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23vellumNoiseR)'/%3E%3C/svg%3E"),
+                linear-gradient(90deg, #c4a574 0%, #ead9b6 30%, #f5ebd6 100%);
+        }
+
+        /* Authentic Medieval Margin Ruling & Pricking Guides (marginRuling / prickingGuide) */
+        .margin-ruling-overlay {
+            position: absolute;
+            inset: 14px;
+            pointer-events: none;
+            border: 1px solid rgba(212, 175, 55, 0.9);
+            box-shadow: inset 0 0 0 5px rgba(140, 28, 22, 0.28);
+            z-index: 5;
+        }
+        body.registry-parchment .margin-ruling-overlay {
+            border: 1px solid rgba(212, 175, 55, 0.9);
+            box-shadow: inset 0 0 0 5px rgba(140, 28, 22, 0.28);
+        }
+
+        /* Historical Foxing Stains & Organic Aging Mottling (foxing / ageSpots) */
+        .foxing-spot {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(2px);
+            pointer-events: none;
+            z-index: 6;
+            background: radial-gradient(circle, rgba(160, 115, 60, 0.35) 0%, rgba(120, 80, 35, 0.15) 55%, transparent 75%);
+        }
+        body.registry-parchment .foxing-spot {
+            background: radial-gradient(circle, rgba(138, 85, 32, 0.42) 0%, rgba(100, 60, 20, 0.18) 55%, transparent 75%);
+        }
+
+        /* Iron-Gall Ink Typography Palette & Foliation (ironGall / folioVerso / folioRecto) */
+        .iron-gall-text {
+            color: #f1f5f9;
+        }
+        body.registry-parchment .iron-gall-text,
+        body.registry-parchment .ironGall {
+            color: #231c16 !important; /* Authentic high-tannin iron gall ink */
+        }
+        body.registry-parchment .iron-gall-title {
+            color: #16110c !important;
+        }
+        body.registry-parchment .iron-gall-rubric {
+            color: #881337 !important; /* Vermilion cinnabar rubric ink */
+        }
+
+        /* 3D Projected Orbital Node Labels */
+        .orbital-node-tag {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: 'IM Fell English SC', serif;
+            font-size: 10px;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            background: rgba(8, 10, 16, 0.86);
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            color: #f8fafc;
+            backdrop-filter: blur(4px);
+            z-index: 15;
+        }
+        .orbital-node-tag:hover {
+            border-color: #facc15;
+            box-shadow: 0 0 12px rgba(250, 204, 21, 0.45);
+            z-index: 30;
+        }
+        .orbital-node-tag.active-node {
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.95), rgba(161, 98, 7, 0.95));
+            color: #090a0f;
+            font-weight: 700;
+            border-color: #fef08a;
+            box-shadow: 0 0 18px rgba(250, 204, 21, 0.65);
+            z-index: 25;
+        }
+        body.registry-parchment .orbital-node-tag:not(.active-node) {
+            background: rgba(251, 248, 241, 0.92);
+            color: #1c1917;
+            border-color: #a16207;
+        }
+
+        /* Living Ink Materialization */
+        @keyframes inkMaterialize {
+            0% { opacity: 0; filter: blur(4px); transform: translateY(5px); }
+            100% { opacity: 1; filter: blur(0px); transform: translateY(0); }
+        }
+        .ink-reveal {
+            animation: inkMaterialize 0.52s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        .ink-delay-1 { animation-delay: 0.04s; opacity: 0; }
+        .ink-delay-2 { animation-delay: 0.11s; opacity: 0; }
+        .ink-delay-3 { animation-delay: 0.18s; opacity: 0; }
+        .ink-delay-4 { animation-delay: 0.25s; opacity: 0; }
+
+        /* Illuminated Drop Cap */
+        .drop-cap::first-letter {
+            float: left;
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 3.5rem;
+            line-height: 0.82;
+            padding-top: 4px;
+            padding-right: 12px;
+            padding-bottom: 4px;
+            color: #eab308;
+            font-weight: 700;
+            text-shadow: 0 0 18px rgba(234, 179, 8, 0.35);
+        }
+        body.registry-parchment .drop-cap::first-letter {
+            color: #9a5b13;
+            text-shadow: none;
+        }
+
+        .frontispiece {
+            text-align: center;
+            padding: 0.35rem 1.25rem 0.15rem;
+            position: relative;
+            z-index: 10;
+        }
+        .frontispiece-kicker {
+            font-family: Cinzel, serif;
+            letter-spacing: 0.28em;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #8a5a12;
+        }
+        .frontispiece-title {
+            font-family: Cinzel, serif;
+            color: #3b2412;
+            letter-spacing: 0.16em;
+            font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+            line-height: 1.25;
+            margin-top: 0.35rem;
+        }
+        .frontispiece-invite {
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+            color: #5c4033;
+            font-size: 1.05rem;
+            line-height: 1.45;
+            max-width: 38rem;
+            margin: 0.45rem auto 0;
+        }
+        .parchment-folio label,
+        .parchment-folio .text-amber-200,
+        .parchment-folio .text-amber-300,
+        .parchment-folio .text-amber-400,
+        .parchment-folio .text-slate-300,
+        .parchment-folio .text-slate-400,
+        .parchment-folio .text-white {
+            color: #3f2c1c !important;
+        }
+        .parchment-folio #concordanceInput {
+            background: rgba(255, 250, 240, 0.72) !important;
+            color: #23150b !important;
+            border-color: rgba(138, 90, 40, 0.45) !important;
+        }
+        .parchment-folio #concordanceInput::placeholder {
+            color: #8a735c;
+        }
+        .parchment-folio #concordanceModeBadge {
+            background: transparent !important;
+            border: none !important;
+            color: #7f1d1d !important;
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+            letter-spacing: 0.03em;
+            padding: 0;
+        }
+        .parchment-folio .rubric-seed {
+            background: transparent !important;
+            border-color: rgba(138, 90, 40, 0.35) !important;
+            color: #4a3424 !important;
+        }
+        .folio-kicker {
+            font-family: Cinzel, serif;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            color: #7f1d1d;
+        }
+        .folio-title {
+            font-family: Cinzel, serif;
+            color: #2a1a10;
+            font-size: clamp(1.55rem, 2.6vw, 2.15rem);
+            line-height: 1.2;
+            margin-top: 0.3rem;
+        }
+        .folio-epigraph {
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+            font-size: 1.2rem;
+            line-height: 1.5;
+            color: #4a3020;
+            border-left: 2px solid #9a3412;
+            padding: 0.15rem 0 0.15rem 0.9rem;
+            margin: 0.85rem 0;
+        }
+        .folio-body {
+            font-family: "Cormorant Garamond", serif;
+            font-size: 1.2rem;
+            line-height: 1.65;
+            color: #23150b;
+            text-align: justify;
+        }
+        .folio-notes {
+            margin-top: 1.15rem;
+            padding-top: 0.45rem;
+        }
+        .folio-notes-label {
+            font-family: Cinzel, serif;
+            font-size: 0.68rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #7f1d1d;
+            margin-bottom: 0.35rem;
+        }
+        .folio-note {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(138, 90, 40, 0.22);
+            padding: 0.4rem 0;
+            cursor: pointer;
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+            font-size: 1.02rem;
+            color: #3b2a1a;
+        }
+        .folio-note strong {
+            font-family: Cinzel, serif;
+            font-style: normal;
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+            color: #7f1d1d;
+            margin-right: 0.4rem;
+        }
+        .folio-foot {
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+            font-size: 1.05rem;
+            color: #4a3020;
+        }
+        .folio-foot a,
+        .folio-foot button {
+            font-family: Cinzel, serif;
+            font-style: normal;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #7f1d1d;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        #folioRectoSection {
+            position: relative;
+        }
+        #pyroSmokeCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 8;
+        }
+        .pyro-word.pending {
+            color: transparent;
+        }
+        .pyro-word.burning {
+            color: #23150b;
+            animation: paper-scorch 0.72s ease forwards;
+        }
+        .pyro-word.settled {
+            color: #23150b;
+        }
+        .folio-epigraph .pyro-word.settled {
+            color: #4a3020;
+        }
+        .folio-kicker .pyro-word.settled,
+        .folio-notes-label .pyro-word.settled,
+        .folio-note strong .pyro-word.settled {
+            color: #7f1d1d;
+        }
+        .folio-title .pyro-word.settled {
+            color: #2a1a10;
+        }
+        .folio-body > .pyro-word:first-child {
+            font-family: "Cinzel Decorative", serif;
+            font-size: 3.15rem;
+            float: left;
+            line-height: 0.78;
+            padding: 0.2rem 0.55rem 0 0;
+        }
+        .folio-body > .pyro-word:first-child.settled {
+            color: #8a5a12;
+        }
+        @keyframes paper-scorch {
+            0% { color: #1a0906; text-shadow: 0 0 0 transparent; }
+            20% { color: #4a1c10; text-shadow: 0 0 5px rgba(92, 28, 10, 0.42); }
+            100% { color: #23150b; text-shadow: none; }
+        }
+
+        /* Parchment Theme Text & Surface Overrides */
+        body.registry-parchment .text-white { color: #1c1917 !important; }
+        body.registry-parchment .text-slate-200,
+        body.registry-parchment .text-slate-300 { color: #3b332b !important; }
+        body.registry-parchment .text-slate-400 { color: #6b5e51 !important; }
+        body.registry-parchment .text-amber-400,
+        body.registry-parchment .text-amber-300,
+        body.registry-parchment .text-amber-200\/90 { color: #9a5b13 !important; }
+        body.registry-parchment .text-purple-300,
+        body.registry-parchment .text-purple-200 { color: #5b21b6 !important; }
+        body.registry-parchment .bg-obsidian-950,
+        body.registry-parchment .bg-obsidian-950\/90,
+        body.registry-parchment .bg-obsidian-950\/85,
+        body.registry-parchment .bg-obsidian-900,
+        body.registry-parchment .bg-obsidian-900\/75,
+        body.registry-parchment .bg-obsidian-850 {
+            background-color: #efe7d8 !important;
+            border-color: #c7b69b !important;
+        }
+        body.registry-parchment .folio-card-active {
+            background: linear-gradient(135deg, #fdfaf3 0%, #f3e8d2 100%) !important;
+            border-color: #b45309 !important;
+        }
+
+        button:focus-visible,
+        a:focus-visible {
+            outline: 2px solid #f8f1de;
+            outline-offset: 3px;
+        }
+        html.tome-still body {
+            overflow: hidden;
+            height: 100vh;
+        }
+        html.tome-still #topArchivalRibbon {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: none;
+        }
+        html.tome-still #frontCoverStage {
+            display: none;
+        }
+        html.tome-still #stillFallback {
+            display: flex;
+            position: fixed;
+            inset: 44px 0 0 0;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        html.tome-still .still-spread {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: min(96vw, 1100px);
+            height: min(calc(100vh - 72px), 740px);
+            background: #ead9b6;
+            border: 2px solid #d4af37;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+        }
+        html.tome-still .still-spread > section {
+            overflow: hidden;
+            padding: 1.4rem 1.6rem;
+        }
+        @media (max-width: 760px) {
+            html.tome-still .still-spread {
+                grid-template-columns: 1fr;
+            }
+            html.tome-still .still-spread > section:first-child {
+                display: none;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .ink-reveal { animation: none; opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- TOP ARCHIVAL BOOKMARK RIBBON (Revealed Only After Tome Opens) -->
+    <nav id="topArchivalRibbon" class="bg-obsidian-950 border-b border-amber-500/25 text-[11px] font-mono py-2.5 px-4 sm:px-6 lg:px-8 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <span class="px-2.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/35 font-semibold tracking-wider">
+                    CODEX MAGNUS // THE MAGIC CODEX
+                </span>
+                <span class="text-slate-400 hidden md:inline">
+                    3D Leather, Cedar & Forged Iron Master Tome • Orbital Armillary Astrolabe
+                </span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+                <a href="../magic-registry/" class="text-slate-300 hover:text-amber-400 flex items-center gap-1 transition">
+                    <i class="ph-fill ph-seal-check text-amber-400"></i>
+                    <span>I. The Magic Registry</span>
+                </a>
+                <span class="text-slate-700">|</span>
+                <a href="../magic-registry/bestiary/" class="text-slate-300 hover:text-amber-400 flex items-center gap-1 transition">
+                    <i class="ph-fill ph-skull text-amber-400"></i>
+                    <span>II. The Bestiary</span>
+                </a>
+                <span class="text-slate-700">|</span>
+                <a href="../ChronoMythos/" class="text-slate-300 hover:text-amber-400 flex items-center gap-1 transition">
+                    <i class="ph-fill ph-compass-tool text-amber-400"></i>
+                    <span>III. ChronoMythos</span>
+                </a>
+                <span class="text-slate-700 hidden sm:inline">|</span>
+                <button id="themeToggleBtn" class="px-2.5 py-1 rounded-lg bg-obsidian-900 hover:bg-slate-800 text-slate-200 border border-slate-700/80 text-[11px] font-mono flex items-center gap-1.5 transition cursor-pointer">
+                    <i id="themeToggleIcon" class="ph-fill ph-scroll text-amber-400"></i>
+                    <span id="themeToggleLabel">Parchment Folio</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SPATIAL STAGE WRAPPER -->
+    <div class="spatial-stage-wrapper flex-1">
+
+        <section id="frontCoverStage">
+            <div id="book3DViewport"></div>
+            <div id="css3dOverlay"></div>
+            <div id="tomeGathering" aria-hidden="true"></div>
+        </section>
+
+        <main id="stillFallback" class="still-fallback">
+            <div class="still-spread parchment-folio">
+                <section class="folioVerso" id="stillConcordanceMount"></section>
+                <section id="folioRectoSection" class="folioRecto relative">
+                    <div id="livingManuscriptContainer" class="relative z-10"></div>
+                    <div id="rectoFooterPortal" class="folio-foot pt-4"></div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="pageLeafTemplates" hidden>
+        <div id="leftFolioLeaf" class="page-leaf left-leaf parchment-folio">
+            <header class="frontispiece">
+                <div class="frontispiece-kicker">Index of the six seals</div>
+                <h2 class="frontispiece-title">The Magic Codex</h2>
+                <p class="armillary-hint">Spin the armillary on this leaf to turn to a volume, or look up a word below.</p>
+            </header>
+            <div class="space-y-2 relative z-10">
+                <div class="flex flex-col items-start gap-0.5">
+                    <label for="concordanceInput" class="text-xs font-mono uppercase tracking-widest">The Concordance</label>
+                    <span id="concordanceModeBadge">Looking through the book</span>
+                </div>
+                <form id="concordanceForm" class="relative">
+                    <input
+                        id="concordanceInput"
+                        type="text"
+                        placeholder="Look up a word (e.g. ghost, curse, witch)"
+                        class="w-full pl-3 pr-24 py-2.5 border border-amber-900/30 rounded-xl text-sm italic"
+                    >
+                    <button type="submit" class="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-mono text-[11px] font-bold uppercase">Look up</button>
+                </form>
+                <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
+                    <span class="text-[10px] font-mono uppercase mr-1">Words:</span>
+                    <button type="button" onclick="triggerConcordanceSeed('witch')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs italic">Witch</button>
+                    <button type="button" onclick="triggerConcordanceSeed('ghost')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs italic">Ghost</button>
+                    <button type="button" onclick="triggerConcordanceSeed('vampire')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs italic">Vampire</button>
+                    <button type="button" onclick="triggerConcordanceSeed('curse')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs italic">Curse</button>
+                    <button type="button" onclick="triggerConcordanceSeed('spell')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs italic">Spell</button>
+                    <button type="button" onclick="triggerConcordanceSeed('charm')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs italic">Protection charm</button>
+                    <button type="button" onclick="triggerConcordanceSeed('psychic')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs italic">Psychic</button>
+                    <button type="button" onclick="triggerConcordanceSeed('place')" class="rubric-seed px-2.5 py-0.5 rounded-md border text-xs italic">Sacred place</button>
+                </div>
+            </div>
+        </div>
+        <div id="rightFolioLeaf" class="page-leaf right-leaf parchment-folio relative">
+            <div id="livingManuscriptContainer3d" class="relative z-10"></div>
+            <div id="rectoFooterPortal3d" class="folio-foot pt-4"></div>
+        </div>
+    </div>
+
+    <nav id="tabA11y" class="sr-only" aria-label="The six seals"></nav>
+
+    <!-- MODAL FOR PREVIEWING UPCOMING BOOKS -->
+    <div id="folioPreviewModal" role="dialog" aria-modal="true" aria-labelledby="modalFolioTitle" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="bg-obsidian-900 border border-amber-500/40 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative">
+            <button id="closePreviewModalBtn" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center cursor-pointer">
+                <i class="ph-bold ph-x"></i>
+            </button>
+            <div class="flex items-center gap-2">
+                <span id="modalFolioRoman" class="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-amber-500 text-slate-950 uppercase"></span>
+                <span id="modalFolioStatus" class="px-2.5 py-0.5 rounded text-xs font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30"></span>
+            </div>
+            <h3 id="modalFolioTitle" class="font-serif text-2xl font-bold text-white"></h3>
+            <p id="modalFolioDesc" class="text-base text-slate-200 leading-relaxed"></p>
+            <div class="p-4 rounded-xl bg-obsidian-950 border border-slate-800 space-y-2">
+                <div class="text-xs font-mono uppercase text-amber-400">Planned Ledger Architecture</div>
+                <p id="modalFolioBlueprint" class="text-sm text-slate-300 leading-relaxed font-sans"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // 1. THE SIX BOOKS OF THE MAGIC CODEX DATASET
+        // ============================================================================
+        const SIX_BOOKS = [
+            {
+                id: "magic-registry",
+                roman: "LIBER I",
+                shortTitle: "The Magic Registry",
+                fullTitle: "Book I: The Sovereign Registry of Practitioners",
+                latinSubtitle: "Registrum Magorum et Artificum",
+                catalogueCode: "HEX-TOM-01 // PRACTITIONERS",
+                status: "LIVE TOME",
+                liveUrl: "../magic-registry/",
+                accentHex: "#eab308",
+                icon: "ph-seal-check",
+                epochTie: "All Ages • High Orders & Rogue Adepts",
+                element: "Aether & Will",
+                epigraph: "“To name the practitioner is to measure the weight of their oath; every working leaves its signature in the ledger.”",
+                manuscriptBody: "Herein are inscribed the formal dossiers of the Awakened—those who shape reality through codified discipline, bloodline covenant, or forbidden grimoire. Unlike the untutored Sighted who merely perceive the currents beyond the Veil, a registered Practitioner alters the weave itself, bearing a classification stamp, a known lineage, and a ciphered record of their workings.",
+                marginalia: [
+                    { book: "Cross-Ref // Book IV (The Sighted)", note: "Distinguishes active ritual Thaumaturges from passive Human Baselines who sense spirits without casting.", targetIdx: 3 },
+                    { book: "Cross-Ref // Book III (ChronoMythos)", note: "Traces the shift from Paleolithic antlered shamans to Renaissance Hermetic magi (John Dee, Paracelsus).", targetIdx: 2 },
+                    { book: "Cross-Ref // Book V (Materia Magica)", note: "Catalogues the foci, obsidian mirrors, and alchemical rings bound to registered adepts.", targetIdx: 4 }
+                ],
+                blueprint: "Live companion archive deployed at andrehardy.github.io/magic-registry/ with dual cipher/plaintext ocular inspection."
+            },
+            {
+                id: "bestiary",
+                roman: "LIBER II",
+                shortTitle: "The Bestiary",
+                fullTitle: "Book II: The Bestiary of Primordial & Liminal Entities",
+                latinSubtitle: "Bestiarium Monstrorum et Spirituum",
+                catalogueCode: "HEX-TOM-02 // ENTITIES",
+                status: "LIVE TOME",
+                liveUrl: "../magic-registry/bestiary/",
+                accentHex: "#ef4444",
+                icon: "ph-skull",
+                epochTie: "Paleolithic Megafauna to Medieval Wyrms",
+                element: "Fang, Ash & Marrow",
+                epigraph: "“Before man raised his first wall of mud-brick at Jericho, the dark beyond the fire already had teeth and a name.”",
+                manuscriptBody: "A natural and unnatural history of the creatures that share the Middle Earth and the borders of the Otherworld. Drawn from hunters' testimonies, monastic illuminations, and carved temple reliefs, this volume classifies beasts of flesh and bone alongside revenants, therianthropes, Djinn of smokeless fire, and the Fair Folk who retreated beneath the barrows.",
+                marginalia: [
+                    { book: "Cross-Ref // Book III (ChronoMythos)", note: "Tracks how Ice Age predators and archaic hominins echoed into folklore as trolls, dragons, and wights.", targetIdx: 2 },
+                    { book: "Cross-Ref // Book V (Materia Magica)", note: "Prescribes cold-forged iron, rowan wood, silver salt, and protective sigils required to ward each class of beast.", targetIdx: 4 },
+                    { book: "Cross-Ref // Book VI (Cosmographia)", note: "Maps the lairs, peat bogs, and subterranean limestone caverns where ancient entities still slumber.", targetIdx: 5 }
+                ],
+                blueprint: "Classifies entities by anatomical tier, folkloric origin, threat rubric, weakness/warding rites, and historical sightings."
+            },
+            {
+                id: "chronomythos",
+                roman: "LIBER III",
+                shortTitle: "ChronoMythos",
+                fullTitle: "Book III: ChronoMythos — The Ledger of Ages",
+                latinSubtitle: "Chronicon Mundi et Fabularum",
+                catalogueCode: "HEX-TOM-03 // TIMELINE",
+                status: "LIVE TOME",
+                liveUrl: "../ChronoMythos/",
+                accentHex: "#38bdf8",
+                icon: "ph-compass-tool",
+                epochTie: "20,000 BCE – 1,600 CE (Six Volumes)",
+                element: "Time, Memory & Myth",
+                epigraph: "“History is the bone; myth is the marrow that kept the memory alive across twenty millennia of winter and bronze.”",
+                manuscriptBody: "Divided into Six Volumes from the Upper Paleolithic Ice Age to the Renaissance Age of Alchemy, this chronicle charts the great transitions of mortal civilization. Each epoch is dissected by its millennia, centuries, and turning-point years—revealing how climate cataclysms, bronze collapses, and plagues forged the gods, rituals, and stories that humanity still tells.",
+                marginalia: [
+                    { book: "Cross-Ref // Book I (Magic Registry)", note: "Contexts the historical rise of temple priesthoods, Celtic druids, Norse völvas, and Renaissance alchemists.", targetIdx: 0 },
+                    { book: "Cross-Ref // Book II (The Bestiary)", note: "Pairs each historical age with the monsters born from its fears—from Humbaba in Uruk to the Golem of Prague.", targetIdx: 1 },
+                    { book: "Cross-Ref // Book VI (Cosmographia)", note: "Chronicles the consecration of Göbekli Tepe, Newgrange, Stonehenge, Delphi, and Tenochtitlan.", targetIdx: 5 }
+                ],
+                blueprint: "Live companion archive deployed at andrehardy.github.io/ChronoMythos/ featuring 4-layer progressive disclosure and media vault."
+            },
+            {
+                id: "sighted-census",
+                roman: "LIBER IV",
+                shortTitle: "The Sighted Census",
+                fullTitle: "Book IV: The Liminal Baseline — Mediums, Seers & The Sighted",
+                latinSubtitle: "Liber Videntium et Sensibilium",
+                catalogueCode: "HEX-TOM-04 // SENSITIVES",
+                status: "SIXTH SEAL",
+                liveUrl: null,
+                accentHex: "#c084fc",
+                icon: "ph-eye",
+                epochTie: "The Unbroken Human Baseline",
+                element: "Breath, Trance & Echo",
+                epigraph: "“They cast no circle and speak no Enochian; yet when a bell rings in the house of the dead, it is their ear that bleeds.”",
+                manuscriptBody: "Not all who touch the unseen are Practitioners. Across every century exists a quiet, uninitiated stratum of humanity born with a porous Veil: the Seventh Sons, the Pythian prophetesses, the keen-women, the psychics, the sleepwalkers, and the mediums. They possess no formal spellcraft, yet they serve as living tuning forks for grief, omen, and ancestral memory.",
+                marginalia: [
+                    { book: "Cross-Ref // Book I (Magic Registry)", note: "Contrasts innate, involuntary Second Sight with the deliberate, structured spellwork of registered Magi.", targetIdx: 0 },
+                    { book: "Cross-Ref // Book III (ChronoMythos)", note: "From the Oracle of Delphi inhaling chasm vapors (480 BCE) to village cunning-folk and Victorian spiritualists.", targetIdx: 2 },
+                    { book: "Cross-Ref // Book V (Materia Magica)", note: "Documents the tools of the baseline sensitive: pendulum weights, smoke-blackened mirrors, bone dice, and rosemary.", targetIdx: 4 }
+                ],
+                blueprint: "Dedicated volume profiling non-practitioner human sensitives: Mediums, Psychics, Harbingers, Oneiromancers (Dreamers), and Place-Empaths."
+            },
+            {
+                id: "materia-magica",
+                roman: "LIBER V",
+                shortTitle: "Materia Magica",
+                fullTitle: "Book V: The Reliquary of Artifacts, Flora & Rites",
+                latinSubtitle: "Theatrum Chemicum et Reliquiarum",
+                catalogueCode: "HEX-TOM-05 // RELIQUARY",
+                status: "IN CODIFICATION",
+                liveUrl: null,
+                accentHex: "#10b981",
+                icon: "ph-flask",
+                epochTie: "Flint & Ochre to Philosopher's Mercury",
+                element: "Salt, Sulfur & Iron",
+                epigraph: "“A blade is merely iron until it is quenched in a name; an herb is merely grass until gathered under a waning moon.”",
+                manuscriptBody: "The physical pharmacopoeia and armory of the Compendium. Modelled after ancient lapidaries and alchemical herbals, this volume records the material vessels that anchor the unseen: red ochre pigments of Lascaux, Bronze Age liver-divination tablets, cold-iron nails, mandragora roots, Aztec scrying mirrors of polished obsidian, and cursed heirlooms.",
+                marginalia: [
+                    { book: "Cross-Ref // Book I (Magic Registry)", note: "Lists the custody chain of high relics currently held or sought by registered Practitioners.", targetIdx: 0 },
+                    { book: "Cross-Ref // Book II (The Bestiary)", note: "Details monster-derived reagents (basilisk ash, grave-wax, sea-ivory) and protective counter-charms.", targetIdx: 1 },
+                    { book: "Cross-Ref // Book IV (The Sighted)", note: "Explains how psychometry allows a Sensitive to read the violent history of a relic by touch alone.", targetIdx: 3 }
+                ],
+                blueprint: "Three-tiered compendium of (1) Sacred & Cursed Relics, (2) Botanical & Mineral Materia, and (3) Spoken Rites & Incantations."
+            },
+            {
+                id: "cosmographia",
+                roman: "LIBER VI",
+                shortTitle: "Cosmographia",
+                fullTitle: "Book VI: The Mappa Mundi of Thin Places & Sanctuaries",
+                latinSubtitle: "Cosmographia Locorum Sacrorum",
+                catalogueCode: "HEX-TOM-06 // SANCTUARIES",
+                status: "IN CODIFICATION",
+                liveUrl: null,
+                accentHex: "#f97316",
+                icon: "ph-globe-hemisphere-east",
+                epochTie: "Sunken Doggerland to the Golden Lane of Prague",
+                element: "Stone, Ley & Horizon",
+                epigraph: "“There are crossroads where the earth's skin is worn so thin that a stone dropped in the grass splashes in the Underworld.”",
+                manuscriptBody: "A sacred gazetteer of the world's mythic geography. Where mundane cartographers draw borders of kingdoms, the Cosmographia charts the places where the Three-Tiered Cosmos converges: drowned post-glacial plains, solstice-aligned passage tombs, sacred oak groves of Anglesey, subterranean acoustic caves, and hidden urban sanctuaries.",
+                marginalia: [
+                    { book: "Cross-Ref // Book III (ChronoMythos)", note: "Maps the physical locations of every milestone in ChronoMythos—from Chauvet and Ur to Brú na Bóinne.", targetIdx: 2 },
+                    { book: "Cross-Ref // Book IV (The Sighted)", note: "Explores why baseline Sensitives experience overwhelming visions when standing atop megalithic fault lines.", targetIdx: 3 },
+                    { book: "Cross-Ref // Book II (The Bestiary)", note: "Marks the territorial boundaries of genius loci, guardian spirits, and bog-dwelling entities.", targetIdx: 1 }
+                ],
+                blueprint: "Interactive gazetteer of Thin Places, Sunken Lands, Sacred Architecture, and Planar Thresholds with coordinates and field notes."
+            }
+        ];
+
+        const CONCORDANCE_GLOSSARY = {
+            witch: {
+                title: "Witch",
+                synonyms: ["witches", "coven", "sorceress", "warlock"],
+                definition: "A person who works magic through skill, a family line, or a pact — not someone who only senses spirits.",
+                threads: [
+                    { bookIdx: 0, label: "I. Magic Registry", entry: "Named practitioners and their recorded workings." },
+                    { bookIdx: 4, label: "V. Materia Magica", entry: "Herbs, tools, and rites a witch actually uses." }
+                ]
+            },
+            ghost: {
+                title: "Ghost",
+                synonyms: ["ghosts", "haunting", "haunt", "spirit", "shade", "dead"],
+                definition: "A dead person still present to the living: a voice, a figure, or a weight in a house.",
+                threads: [
+                    { bookIdx: 3, label: "IV. Sighted Census", entry: "People who hear or see the dead without training." },
+                    { bookIdx: 1, label: "II. The Bestiary", entry: "Restless dead and household spirits." }
+                ]
+            },
+            vampire: {
+                title: "Vampire",
+                synonyms: ["vampires", "revenant", "striga"],
+                definition: "A once-living being that survives by feeding on the living, usually blood or breath.",
+                threads: [
+                    { bookIdx: 1, label: "II. The Bestiary", entry: "How the creature hunts, and what stops it." },
+                    { bookIdx: 4, label: "V. Materia Magica", entry: "Wards, iron, and relics used against it." }
+                ]
+            },
+            curse: {
+                title: "Curse",
+                synonyms: ["curses", "hex", "malediction"],
+                definition: "Harm spoken or bound into a person, object, or place so it keeps acting after the moment of the rite.",
+                threads: [
+                    { bookIdx: 0, label: "I. Magic Registry", entry: "Who is known to lay or lift curses." },
+                    { bookIdx: 4, label: "V. Materia Magica", entry: "Cursed objects and the words that bind them." }
+                ]
+            },
+            spell: {
+                title: "Spell",
+                synonyms: ["spells", "working", "rite", "ritual", "incantation"],
+                definition: "A deliberate act of magic: words, gesture, and often a tool, done on purpose.",
+                threads: [
+                    { bookIdx: 0, label: "I. Magic Registry", entry: "Trained practitioners and their methods." },
+                    { bookIdx: 4, label: "V. Materia Magica", entry: "Spoken rites and the materials they need." }
+                ]
+            },
+            charm: {
+                title: "Protection charm",
+                synonyms: ["charm", "ward", "amulet", "protection", "talisman"],
+                definition: "A small object or mark meant to keep harm out of a body, a doorway, or a house.",
+                threads: [
+                    { bookIdx: 4, label: "V. Materia Magica", entry: "Iron, salt, rowan, and other common wards." },
+                    { bookIdx: 1, label: "II. The Bestiary", entry: "What each kind of creature is kept off by." }
+                ]
+            },
+            psychic: {
+                title: "Psychic",
+                synonyms: ["medium", "seer", "sensitive", "sighted", "second sight"],
+                definition: "Someone who notices spirits, omens, or other people's feelings without casting a spell.",
+                threads: [
+                    { bookIdx: 3, label: "IV. Sighted Census", entry: "The untrained human baseline: mediums and seers." },
+                    { bookIdx: 0, label: "I. Magic Registry", entry: "How this differs from a registered practitioner." }
+                ]
+            },
+            place: {
+                title: "Sacred place",
+                synonyms: ["thin place", "sanctuary", "ley", "temple", "threshold"],
+                definition: "A location where the ordinary world feels worn thin: a tomb, a grove, a well, a city shrine.",
+                threads: [
+                    { bookIdx: 5, label: "VI. Cosmographia", entry: "Maps of thin places and sanctuaries." },
+                    { bookIdx: 2, label: "III. ChronoMythos", entry: "When those places were built and used." }
+                ]
+            }
+        };
+
+        // ============================================================================
+        // 2. PROCEDURAL PBR CANVAS TEXTURE, BUMP & ROUGHNESS MAP GENERATORS
+        // ============================================================================
+        function createSoftParticleTexture() {
+            const canvas = document.createElement("canvas");
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext("2d");
+            const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            grad.addColorStop(0, "rgba(255, 243, 200, 1)");
+            grad.addColorStop(0.35, "rgba(217, 155, 56, 0.65)");
+            grad.addColorStop(0.7, "rgba(146, 84, 22, 0.18)");
+            grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 64, 64);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function createLeatherTexture(isFrontCover = false) {
+            const size = 1024;
+            const canvas = document.createElement("canvas");
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext("2d");
+
+            // Deep, earthy vegetable-tanned walnut & oxblood leather base
+            const grad = ctx.createRadialGradient(size * 0.48, size * 0.45, 60, size * 0.5, size * 0.5, size * 0.72);
+            grad.addColorStop(0, "#2b150c");
+            grad.addColorStop(0.55, "#1b0c06");
+            grad.addColorStop(0.85, "#110703");
+            grad.addColorStop(1, "#080301");
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, size, size);
+
+            // Multi-layered organic hide pores & pebble grain
+            for (let i = 0; i < 24000; i++) {
+                const x = Math.random() * size;
+                const y = Math.random() * size;
+                const r = 0.7 + Math.random() * 2.6;
+                ctx.fillStyle = Math.random() > 0.48
+                    ? "rgba(68, 35, 19, 0.11)"
+                    : "rgba(6, 2, 1, 0.24)";
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Organic skin wrinkles, veins & handling wear
+            for (let i = 0; i < 260; i++) {
+                ctx.strokeStyle = i % 3 === 0 ? "rgba(78, 42, 22, 0.12)" : "rgba(5, 2, 1, 0.28)";
+                ctx.lineWidth = 0.6 + Math.random() * 1.4;
+                ctx.beginPath();
+                const sx = Math.random() * size;
+                const sy = Math.random() * size;
+                ctx.moveTo(sx, sy);
+                ctx.bezierCurveTo(
+                    sx + (Math.random() - 0.5) * 130, sy + (Math.random() - 0.5) * 130,
+                    sx + (Math.random() - 0.5) * 130, sy + (Math.random() - 0.5) * 130,
+                    sx + (Math.random() - 0.5) * 190, sy + (Math.random() - 0.5) * 190
+                );
+                ctx.stroke();
+            }
+
+            // Phase 4: Realistic Leather Handling Wear, Thumb Grime & Lectern Scuffs
+            // 1. Darker handlingWear patches along edges, corners, and spine where hands hold the tome
+            for (let w = 0; w < 32; w++) {
+                const wx = Math.random() < 0.5 ? Math.random() * 140 : size - Math.random() * 140;
+                const wy = Math.random() * size;
+                const wr = 30 + Math.random() * 95;
+                const handlingWearGrad = ctx.createRadialGradient(wx, wy, 4, wx, wy, wr);
+                handlingWearGrad.addColorStop(0, "rgba(5, 2, 1, 0.38)");
+                handlingWearGrad.addColorStop(0.6, "rgba(18, 8, 3, 0.16)");
+                handlingWearGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+                ctx.fillStyle = handlingWearGrad;
+                ctx.beginPath();
+                ctx.arc(wx, wy, wr, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 2. Lighter scuff and rubbing abrasion patches on high-contact raised surfaces
+            for (let s = 0; s < 45; s++) {
+                const sx = size * 0.15 + Math.random() * (size * 0.7);
+                const sy = size * 0.15 + Math.random() * (size * 0.7);
+                const sr = 12 + Math.random() * 45;
+                const scuffGrad = ctx.createRadialGradient(sx, sy, 2, sx, sy, sr);
+                scuffGrad.addColorStop(0, "rgba(95, 54, 28, 0.22)");
+                scuffGrad.addColorStop(0.7, "rgba(65, 34, 16, 0.08)");
+                scuffGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+                ctx.fillStyle = scuffGrad;
+                ctx.beginPath();
+                ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Recessed blind-tooled double monastery border
+            ctx.strokeStyle = "rgba(5, 2, 0, 0.65)";
+            ctx.lineWidth = 6;
+            ctx.strokeRect(52, 52, size - 104, size - 104);
+            ctx.strokeRect(72, 72, size - 144, size - 144);
+
+            // Worn antique gold-leaf border rule
+            ctx.strokeStyle = "rgba(176, 134, 58, 0.42)";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(62, 62, size - 124, size - 124);
+
+            // Coarse waxed linen saddle-stitching along perimeter
+            ctx.setLineDash([10, 9]);
+            ctx.strokeStyle = "rgba(168, 132, 78, 0.38)";
+            ctx.lineWidth = 2.4;
+            ctx.strokeRect(34, 34, size - 68, size - 68);
+            ctx.setLineDash([]);
+
+            // Embossed & weathered gold-leaf title on Front Cover with Flaked Gold Leaf Erosion
+            if (isFrontCover) {
+                ctx.save();
+                ctx.textAlign = "center";
+
+                // Deep debossed shadow trench
+                ctx.fillStyle = "rgba(4, 1, 0, 0.9)";
+                ctx.font = "700 62px 'Cinzel', serif";
+                ctx.fillText("THE MAGIC CODEX", size * 0.515, 188);
+
+                // Weathered antique gold leaf fill
+                const goldGrad = ctx.createLinearGradient(200, 140, 820, 200);
+                goldGrad.addColorStop(0, "rgba(168, 126, 48, 0.78)");
+                goldGrad.addColorStop(0.5, "rgba(218, 178, 92, 0.88)");
+                goldGrad.addColorStop(1, "rgba(148, 108, 38, 0.75)");
+                ctx.fillStyle = goldGrad;
+                ctx.fillText("THE MAGIC CODEX", size * 0.515, 185);
+
+                // Flaked / Chipped Gold Leaf Erosion (micro-chips revealing under-leather)
+                ctx.fillStyle = "rgba(10, 4, 2, 0.65)";
+                for (let fg = 0; fg < 220; fg++) {
+                    const flakedGoldX = 220 + Math.random() * 580;
+                    const flakedGoldY = 145 + Math.random() * 50;
+                    const flakedGoldRadius = 0.6 + Math.random() * 1.8;
+                    ctx.beginPath();
+                    ctx.arc(flakedGoldX, flakedGoldY, flakedGoldRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Subtle botanical/alchemical divider line
+                ctx.strokeStyle = "rgba(176, 134, 58, 0.52)";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(310, 212);
+                ctx.lineTo(740, 212);
+                ctx.stroke();
+
+                // Lower colophon stamping
+                ctx.font = "600 24px 'IM Fell English SC', serif";
+                ctx.fillStyle = "rgba(165, 128, 58, 0.68)";
+                ctx.fillText("CODEX MAGNUS • LIBER SEX", size * 0.515, 885);
+                ctx.restore();
+            }
+
+            // Dark beeswax burnishedEdge vignette
+            const vig = ctx.createRadialGradient(size / 2, size / 2, size * 0.35, size / 2, size / 2, size * 0.55);
+            vig.addColorStop(0, "rgba(0,0,0,0)");
+            vig.addColorStop(1, "rgba(4, 1, 0, 0.55)");
+            ctx.fillStyle = vig;
+            ctx.fillRect(0, 0, size, size);
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.anisotropy = 4;
+            return tex;
+        }
+
+        function createWoodTexture() {
+            const size = 512;
+            const canvas = document.createElement("canvas");
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext("2d");
+
+            // Warm aged cedar & dark walnut heartwood base
+            const baseGrad = ctx.createLinearGradient(0, 0, size, 0);
+            baseGrad.addColorStop(0, "#2d180b");
+            baseGrad.addColorStop(0.5, "#3d2210");
+            baseGrad.addColorStop(1, "#241207");
+            ctx.fillStyle = baseGrad;
+            ctx.fillRect(0, 0, size, size);
+
+            // Longitudinal wood grain fibers & growth rings
+            for (let i = 0; i < 420; i++) {
+                const y = Math.random() * size;
+                const h = 1 + Math.random() * 3.5;
+                ctx.fillStyle = i % 2 === 0
+                    ? "rgba(18, 8, 3, 0.28)"
+                    : "rgba(92, 54, 26, 0.16)";
+                ctx.fillRect(0, y, size, h);
+            }
+
+            // Organic wavy timber rings
+            for (let i = 0; i < 65; i++) {
+                ctx.strokeStyle = i % 3 === 0 ? "rgba(15, 6, 2, 0.35)" : "rgba(110, 68, 34, 0.18)";
+                ctx.lineWidth = 0.8 + Math.random() * 1.8;
+                ctx.beginPath();
+                let yBase = (i / 65) * size;
+                ctx.moveTo(0, yBase);
+                for (let x = 0; x <= size; x += 32) {
+                    const wave = Math.sin(x * 0.02 + i * 0.6) * 6;
+                    ctx.lineTo(x, yBase + wave);
+                }
+                ctx.stroke();
+            }
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.anisotropy = 4;
+            return tex;
+        }
+
+        function createMetalTexture(type = "bronze") {
+            const size = 512;
+            const canvas = document.createElement("canvas");
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext("2d");
+
+            if (type === "iron") {
+                ctx.fillStyle = "#2b2f36";
+            } else if (type === "steel") {
+                ctx.fillStyle = "#8a949e";
+            } else {
+                // Antique cast bronze
+                ctx.fillStyle = "#8c6932";
+            }
+            ctx.fillRect(0, 0, size, size);
+
+            // Hand-hammered dimples, forge scale & oxidation pits
+            for (let i = 0; i < 4500; i++) {
+                const x = Math.random() * size;
+                const y = Math.random() * size;
+                const r = 0.8 + Math.random() * 3.8;
+                if (type === "bronze" && Math.random() < 0.08) {
+                    // Subtle antique verdigris & umber patina in recessed pits
+                    ctx.fillStyle = "rgba(42, 68, 56, 0.16)";
+                } else {
+                    ctx.fillStyle = Math.random() > 0.5
+                        ? "rgba(255, 245, 220, 0.08)"
+                        : "rgba(8, 10, 12, 0.24)";
+                }
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Brushed anvil & file marks
+            for (let i = 0; i < 180; i++) {
+                ctx.strokeStyle = Math.random() > 0.5
+                    ? "rgba(255, 255, 255, 0.05)"
+                    : "rgba(0, 0, 0, 0.18)";
+                ctx.lineWidth = 0.5 + Math.random() * 1.2;
+                ctx.beginPath();
+                const sx = Math.random() * size;
+                const sy = Math.random() * size;
+                ctx.moveTo(sx, sy);
+                ctx.lineTo(sx + (Math.random() - 0.5) * 90, sy + (Math.random() - 0.5) * 25);
+                ctx.stroke();
+            }
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.anisotropy = 4;
+            return tex;
+        }
+
+        function createPageEdgeTexture(orientation = "fore") {
+            const size = 1024;
+            const canvas = document.createElement("canvas");
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext("2d");
+
+            // Base warm antique rag-vellum & unbleached linen paper tone with gildedEdge golden wash
+            ctx.fillStyle = "#bfa77e";
+            ctx.fillRect(0, 0, size, size);
+
+            // Gilded fore-edge gold tint
+            const isFore = orientation === "fore";
+            if (isFore) {
+                const giltWash = ctx.createLinearGradient(0, 0, size, 0);
+                giltWash.addColorStop(0, "rgba(212, 175, 55, 0.35)");
+                giltWash.addColorStop(0.5, "rgba(180, 140, 45, 0.25)");
+                giltWash.addColorStop(1, "rgba(212, 175, 55, 0.40)");
+                ctx.fillStyle = giltWash;
+                ctx.fillRect(0, 0, size, size);
+            }
+
+            // 1. Generate ~180 irregular, wavy, hand-cut vellum sheets & sewn quires
+            let pos = 0;
+            let quireCounter = 0;
+            while (pos < size) {
+                const sheetWidth = 2.2 + Math.random() * 4.8;
+                quireCounter++;
+                const isQuireGap = quireCounter % 11 === 0;
+
+                const waveAmp = 0.8 + Math.random() * 1.8;
+                const waveFreq = 0.008 + Math.random() * 0.015;
+                const phase = Math.random() * Math.PI * 2;
+
+                const toneRoll = Math.random();
+                let sheetColor;
+                if (isQuireGap) {
+                    sheetColor = "rgba(32, 18, 8, 0.88)";
+                } else if (toneRoll < 0.22) {
+                    sheetColor = isFore ? "#f0e0b0" : "#dfd1b4"; // Gilded highlight
+                } else if (toneRoll < 0.55) {
+                    sheetColor = isFore ? "#d4af37" : "#c7b089"; // Gilded antique gold
+                } else if (toneRoll < 0.82) {
+                    sheetColor = isFore ? "#b38c28" : "#a88d64"; // Oxidized gold
+                } else {
+                    sheetColor = "#5e4326";
+                }
+
+                ctx.fillStyle = sheetColor;
+                ctx.beginPath();
+                if (isFore) {
+                    ctx.moveTo(pos, 0);
+                    for (let y = 0; y <= size; y += 32) {
+                        const offset = Math.sin(y * waveFreq + phase) * waveAmp;
+                        ctx.lineTo(pos + offset, y);
+                    }
+                    for (let y = size; y >= 0; y -= 32) {
+                        const offset = Math.sin(y * waveFreq + phase) * waveAmp;
+                        ctx.lineTo(pos + sheetWidth + offset, y);
+                    }
+                } else {
+                    ctx.moveTo(0, pos);
+                    for (let x = 0; x <= size; x += 32) {
+                        const offset = Math.sin(x * waveFreq + phase) * waveAmp;
+                        ctx.lineTo(x, pos + offset);
+                    }
+                    for (let x = size; x >= 0; x -= 32) {
+                        const offset = Math.sin(x * waveFreq + phase) * waveAmp;
+                        ctx.lineTo(x, pos + sheetWidth + offset);
+                    }
+                }
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.strokeStyle = isQuireGap ? "rgba(18, 9, 3, 0.92)" : (isFore ? "rgba(140, 100, 30, 0.55)" : "rgba(48, 30, 14, 0.45)");
+                ctx.lineWidth = isQuireGap ? 2.2 : 0.9;
+                ctx.stroke();
+
+                pos += sheetWidth;
+            }
+
+            // 2. Organic rag-paper fibrous grain, water stains & tea/iron-gall foxing blotches
+            for (let i = 0; i < 6500; i++) {
+                const fx = Math.random() * size;
+                const fy = Math.random() * size;
+                const r = 0.6 + Math.random() * 2.8;
+                ctx.fillStyle = Math.random() > 0.45
+                    ? "rgba(68, 42, 18, 0.14)"
+                    : "rgba(245, 234, 210, 0.12)";
+                ctx.beginPath();
+                ctx.arc(fx, fy, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            for (let i = 0; i < 65; i++) {
+                const sx = Math.random() * size;
+                const sy = Math.random() * size;
+                const sr = 18 + Math.random() * 75;
+                const stainGrad = ctx.createRadialGradient(sx, sy, 2, sx, sy, sr);
+                stainGrad.addColorStop(0, "rgba(82, 48, 18, 0.18)");
+                stainGrad.addColorStop(0.6, "rgba(110, 70, 28, 0.08)");
+                stainGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+                ctx.fillStyle = stainGrad;
+                ctx.fillRect(sx - sr, sy - sr, sr * 2, sr * 2);
+            }
+
+            // 3. Centuries of thumb-wear darkening in the center of the fore-edge & soot at the corners
+            if (isFore) {
+                // Darkened thumb-grip hollow in the middle of the fore-edge where readers pull the cover open
+                const thumbWear = ctx.createRadialGradient(size * 0.5, size * 0.5, 30, size * 0.5, size * 0.5, size * 0.42);
+                thumbWear.addColorStop(0, "rgba(58, 34, 14, 0.36)");
+                thumbWear.addColorStop(0.55, "rgba(92, 58, 24, 0.15)");
+                thumbWear.addColorStop(1, "rgba(0, 0, 0, 0)");
+                ctx.fillStyle = thumbWear;
+                ctx.fillRect(0, 0, size, size);
+
+                // Faint antique gauffered / fore-edge alchemical rule bands
+                ctx.strokeStyle = "rgba(138, 92, 34, 0.22)";
+                ctx.lineWidth = 8;
+                ctx.strokeRect(24, 90, size - 48, size - 180);
+            } else {
+                // Spine-to-fore-edge shadow gradient for top/bottom edges
+                const headGrad = ctx.createLinearGradient(0, 0, size, 0);
+                headGrad.addColorStop(0, "rgba(28, 16, 7, 0.58)");
+                headGrad.addColorStop(0.18, "rgba(75, 48, 22, 0.18)");
+                headGrad.addColorStop(0.82, "rgba(75, 48, 22, 0.15)");
+                headGrad.addColorStop(1, "rgba(38, 22, 10, 0.48)");
+                ctx.fillStyle = headGrad;
+                ctx.fillRect(0, 0, size, size);
+            }
+
+            // 4. Deep ambient occlusion where the page block tucks under the heavy leather & cedar boards
+            const boardShadow = ctx.createRadialGradient(size / 2, size / 2, size * 0.32, size / 2, size / 2, size * 0.54);
+            boardShadow.addColorStop(0, "rgba(0, 0, 0, 0)");
+            boardShadow.addColorStop(0.75, "rgba(35, 20, 8, 0.22)");
+            boardShadow.addColorStop(1, "rgba(18, 10, 4, 0.68)");
+            ctx.fillStyle = boardShadow;
+            ctx.fillRect(0, 0, size, size);
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.anisotropy = 4;
+            return tex;
+        }
+
+        function createScholarIndexTabTexture(tintHex = "#7c2d12", roman = "I", name = "") {
+            const canvas = document.createElement("canvas");
+            canvas.width = 512;
+            canvas.height = 256;
+            const ctx = canvas.getContext("2d");
+            const grad = ctx.createLinearGradient(0, 0, 512, 0);
+            grad.addColorStop(0, "#d6c29f");
+            grad.addColorStop(0.45, tintHex);
+            grad.addColorStop(1, "#3b1806");
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 256);
+            ctx.strokeStyle = "rgba(38, 22, 10, 0.7)";
+            ctx.lineWidth = 8;
+            ctx.strokeRect(10, 10, 492, 236);
+            ctx.fillStyle = "#f8f1de";
+            ctx.textAlign = "left";
+            ctx.font = "700 54px Cinzel, serif";
+            ctx.fillText(roman, 36, 96);
+            ctx.font = "600 42px Cinzel, serif";
+            ctx.fillText(name, 36, 168);
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.anisotropy = 4;
+            return tex;
+        }
+
+        function createPageFaceTexture(variantIndex) {
+            const canvas = document.createElement("canvas");
+            canvas.width = 512;
+            canvas.height = 680;
+            const ctx = canvas.getContext("2d");
+
+            // Earthy aged calfskin vellum with warm edge foxing
+            const grad = ctx.createRadialGradient(256, 340, 40, 256, 340, 410);
+            grad.addColorStop(0, "#f2e7d0");
+            grad.addColorStop(0.7, "#dfcda8");
+            grad.addColorStop(1, "#b89f74");
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 680);
+
+            // Organic parchment spots / water stains
+            for (let i = 0; i < 450; i++) {
+                ctx.fillStyle = Math.random() > 0.5 ? "rgba(130, 95, 50, 0.04)" : "rgba(255, 250, 235, 0.05)";
+                ctx.beginPath();
+                ctx.arc(Math.random() * 512, Math.random() * 680, 2 + Math.random() * 14, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Iron-gall & cinnabar double-ruled margin frame
+            ctx.strokeStyle = "rgba(92, 42, 22, 0.65)";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(34, 34, 444, 612);
+            ctx.strokeStyle = "rgba(138, 102, 42, 0.55)";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(40, 40, 432, 600);
+
+            // Illuminated Medieval Drop Cap Miniature
+            ctx.fillStyle = variantIndex % 2 === 0 ? "#6b1d1d" : "#1e2f4d";
+            ctx.fillRect(54, 58, 62, 62);
+            ctx.strokeStyle = "#b58938";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(54, 58, 62, 62);
+
+            // Celestial / Botanical woodcut diagram in center of page
+            ctx.save();
+            ctx.translate(256, 295);
+            ctx.strokeStyle = "rgba(88, 48, 20, 0.62)";
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.arc(0, 0, 86, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(0, 0, 62, 0, Math.PI * 2);
+            ctx.stroke();
+
+            for (let a = 0; a < 8; a++) {
+                const rad = (a * Math.PI) / 4 + variantIndex * 0.35;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(Math.cos(rad) * 86, Math.sin(rad) * 86);
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // Iron-gall calligraphy lines
+            ctx.fillStyle = "rgba(38, 26, 16, 0.68)";
+            for (let y = 64; y < 610; y += 15) {
+                if (y > 192 && y < 395) continue;
+                const startX = y < 128 ? 128 : 54;
+                const lineW = 330 + ((y * 19 + variantIndex * 37) % 70);
+                ctx.fillRect(startX, y, Math.min(lineW, 448 - startX), 2.8);
+            }
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function createCandlelightEnvMap(renderer) {
+            const pmremGenerator = new THREE.PMREMGenerator(renderer);
+            pmremGenerator.compileEquirectangularShader();
+
+            const envScene = new THREE.Scene();
+            envScene.background = new THREE.Color(0x0c0906);
+
+            // Warm hearth glow dome above, deep earthy shadow below
+            const warmLightSphere = new THREE.Mesh(
+                new THREE.SphereGeometry(18, 16, 16),
+                new THREE.MeshBasicMaterial({ color: 0x3d2814, side: THREE.BackSide })
+            );
+            envScene.add(warmLightSphere);
+
+            const keyBounce = new THREE.Mesh(
+                new THREE.SphereGeometry(4, 12, 12),
+                new THREE.MeshBasicMaterial({ color: 0xffc470 })
+            );
+            keyBounce.position.set(8, 10, 8);
+            envScene.add(keyBounce);
+
+            const rimBounce = new THREE.Mesh(
+                new THREE.SphereGeometry(3.5, 12, 12),
+                new THREE.MeshBasicMaterial({ color: 0x647d94 })
+            );
+            rimBounce.position.set(-9, 6, -8);
+            envScene.add(rimBounce);
+
+            const envMap = pmremGenerator.fromScene(envScene, 0.04).texture;
+            pmremGenerator.dispose();
+            return envMap;
+        }
+
+        // ============================================================================
+        // 3. STAGE 1: THE 3D SUSPENDED TOME & FLYING PAGE MANIFESTATION ENGINE
+        // ============================================================================
+        let coverScene, coverCamera, coverRenderer;
+        let bookRoot, frontCoverPivot, topClaspPivot, bottomClaspPivot, frontCoverBoardGroup;
+        let coverMedallionRing1, coverMedallionRing2, coverCoreCrystal, innerBookGlowLight, hearthCandleLight;
+        let bookmarkRibbon1, bookmarkRibbon2;
+        let hingedPages = [];
+        let flyingPages = [];
+        let pageBlockMesh, pageSheaves = [];
+        let leftStackGroup, rightStackGroup, leftLeafMesh, rightLeafMesh, gutterMesh;
+        let indexTabs = [];
+        let orbitalPlanetNodes = [];
+        let cssRenderer, cssScene, leftCssObj, rightCssObj;
+        let portraitLeaf = 1;
+        let pageTurnT = 1;
+        let emberParticles;
+        let cosmicMistGroup = null;
+        let cosmicMistPuffs = [];
+        let celestialGroup = null;
+        let celestialSun = null;
+        let celestialCorona = null;
+        let celestialRings = [];
+        let celestialPlanets = [];
+        let fallingArmillary = null;
+        let openHandoffStarted = false;
+        let closeCamFrom = null;
+        let closeBookFrom = null;
+
+        // Interactive Rotation & Camera Target State
+        let isDraggingBook = false;
+        let isDraggingArmillary = false;
+        let targetArmillaryRotX = 0.28;
+        let targetArmillaryRotY = 0;
+        let bookPointerDownPos = { x: 0, y: 0 };
+        let bookPrevPointer = { x: 0, y: 0 };
+        let targetBookRotX = 0.24;
+        let targetBookRotY = -0.44;
+        let targetBookRotZ = 0.03;
+        let targetCameraX = 0;
+        let targetCameraY = 0.85;
+        let targetCameraZ = 18.5;
+
+        // Mechanical Opening Animation State
+        let isBookOpening = false;
+        let isBookOpened = false;
+        let isBookClosing = false;
+        let openAnimStartTime = 0;
+        let closeAnimStartTime = 0;
+        const OPEN_DURATION = 6.7;
+        const CLOSE_DURATION = 3.8;
+        const READ_CAM = { pos: [0, 10.4, 4.2], look: [0, 0.05, 0.15] };
+        let camFollow = { x: 0, y: 0.85, z: 18.5, lx: 0, ly: 0.08, lz: 0 };
+        let camGoal = { x: 0, y: 0.85, z: 18.5, lx: 0, ly: 0.08, lz: 0 };
+
+        // Materialization: the tome condenses out of the void behind a burning edge.
+        const FORM_DURATION = 2800;
+        const FORM_DONE = 9.0;
+        const formUniform = { value: -0.05 };
+        let bookForming = false;
+        let bookFormStart = 0;
+        let formShadowCasters = [];
+
+        function patchMaterialization(mat) {
+            if (!mat || !mat.isMeshStandardMaterial || mat.userData.formPatched) return;
+            mat.userData.formPatched = true;
+            mat.onBeforeCompile = (shader) => {
+                shader.uniforms.uForm = formUniform;
+                shader.vertexShader = shader.vertexShader
+                    .replace("#include <common>", "#include <common>\nvarying vec3 vFormPos;")
+                    .replace("#include <begin_vertex>", "#include <begin_vertex>\nvFormPos = (modelMatrix * vec4(transformed, 1.0)).xyz;");
+                shader.fragmentShader = shader.fragmentShader
+                    .replace("#include <common>", `#include <common>
+uniform float uForm;
+varying vec3 vFormPos;
+float formHash(vec3 p) {
+    p = fract(p * 0.3183099 + 0.1);
+    p *= 17.0;
+    return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+}
+float formNoise(vec3 x) {
+    vec3 i = floor(x);
+    vec3 f = fract(x);
+    f = f * f * (3.0 - 2.0 * f);
+    return mix(
+        mix(mix(formHash(i), formHash(i + vec3(1.0, 0.0, 0.0)), f.x),
+            mix(formHash(i + vec3(0.0, 1.0, 0.0)), formHash(i + vec3(1.0, 1.0, 0.0)), f.x), f.y),
+        mix(mix(formHash(i + vec3(0.0, 0.0, 1.0)), formHash(i + vec3(1.0, 0.0, 1.0)), f.x),
+            mix(formHash(i + vec3(0.0, 1.0, 1.0)), formHash(i + vec3(1.0, 1.0, 1.0)), f.x), f.y),
+        f.z);
+}`)
+                    .replace("#include <clipping_planes_fragment>", `#include <clipping_planes_fragment>
+float formF = clamp(length(vFormPos.xy) / 2.9, 0.0, 1.0) * 0.62
+    + (formNoise(vFormPos * 2.6) * 0.6 + formNoise(vFormPos * 7.0) * 0.4) * 0.38;
+if (formF > uForm) discard;`)
+                    .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>
+float formEdge = 1.0 - smoothstep(0.0, 0.028, uForm - formF);
+float formEmber = 1.0 - smoothstep(0.0, 0.11, uForm - formF);
+totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.16, 0.02) * formEmber * 0.5;`);
+            };
+            mat.needsUpdate = true;
+        }
+
+        function prepareMaterialization() {
+            if (document.documentElement.classList.contains("tome-quiet")) {
+                formUniform.value = FORM_DONE;
+                bookForming = false;
+                return;
+            }
+            bookRoot.traverse((obj) => {
+                if (!obj.isMesh || !obj.visible) return;
+                (Array.isArray(obj.material) ? obj.material : [obj.material]).forEach(patchMaterialization);
+                if (obj.castShadow) {
+                    formShadowCasters.push(obj);
+                    obj.castShadow = false;
+                }
+            });
+            if (emberParticles) {
+                emberParticles.material.opacity = 0;
+                emberParticles.scale.setScalar(1.9);
+            }
+            bookRoot.rotation.y = targetBookRotY - 0.6;
+            bookRoot.rotation.x = targetBookRotX + 0.12;
+            coverCamera.position.z = 15.4;
+            formUniform.value = -0.05;
+            bookForming = true;
+            bookFormStart = 0;
+            try { coverRenderer.compile(coverScene, coverCamera); } catch (err) {}
+        }
+
+        function updateMaterialization(now) {
+            if (!bookFormStart) {
+                bookFormStart = now;
+                const stage = document.getElementById("frontCoverStage");
+                if (stage) stage.classList.add("forming");
+            }
+            const t = Math.min(1, (now - bookFormStart) / FORM_DURATION);
+            const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            formUniform.value = -0.05 + ease * 1.08;
+            if (emberParticles) {
+                const settle = 1 - Math.pow(1 - t, 3);
+                emberParticles.material.opacity = 0.62 * Math.min(1, t * 1.6);
+                emberParticles.scale.setScalar(1 + 0.9 * (1 - settle));
+            }
+            if (t >= 0.78 && formShadowCasters.length) {
+                formShadowCasters.forEach((m) => { m.castShadow = true; });
+                formShadowCasters = [];
+            }
+            if (t >= 1) {
+                formUniform.value = FORM_DONE;
+                if (emberParticles) emberParticles.scale.setScalar(1);
+                bookForming = false;
+            }
+        }
+
+        let bookRaycaster = new THREE.Raycaster();
+        let bookMouse = new THREE.Vector2();
+        let clickableCoverMeshes = [];
+
+        function init3DBookSanctuary() {
+            const container = document.getElementById("book3DViewport");
+            if (!container) return;
+
+            const width = window.innerWidth || container.clientWidth || 1024;
+            const height = window.innerHeight || container.clientHeight || 768;
+
+            coverScene = new THREE.Scene();
+            coverScene.fog = new THREE.FogExp2(0x040406, 0.02);
+
+            coverCamera = new THREE.PerspectiveCamera(46, width / height, 0.1, 140);
+            coverCamera.position.set(0, targetCameraY, targetCameraZ);
+
+            coverRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+            coverRenderer.setSize(width, height);
+            coverRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            coverRenderer.shadowMap.enabled = true;
+            coverRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            coverRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+            coverRenderer.toneMappingExposure = 1.08;
+            container.appendChild(coverRenderer.domElement);
+
+            const envMap = createCandlelightEnvMap(coverRenderer);
+            coverScene.environment = envMap;
+
+            // Grounded Chiaroscuro Lighting (low ambient so crevices & bump maps hold real shadow)
+            const ambient = new THREE.AmbientLight(0xf5dec4, 0.26);
+            coverScene.add(ambient);
+
+            const hemi = new THREE.HemisphereLight(0xd9a76a, 0x0c1017, 0.38);
+            coverScene.add(hemi);
+
+            // Shadow-casting Key Light (Warm Archival Lectern Lamp)
+            const keySpot = new THREE.DirectionalLight(0xffcf87, 2.1);
+            keySpot.position.set(4.5, 6.2, 6.5);
+            keySpot.castShadow = true;
+            keySpot.shadow.mapSize.width = 2048;
+            keySpot.shadow.mapSize.height = 2048;
+            keySpot.shadow.camera.near = 1;
+            keySpot.shadow.camera.far = 22;
+            const d = 4.2;
+            keySpot.shadow.camera.left = -d;
+            keySpot.shadow.camera.right = d;
+            keySpot.shadow.camera.top = d;
+            keySpot.shadow.camera.bottom = -d;
+            keySpot.shadow.bias = -0.0008;
+            coverScene.add(keySpot);
+
+            // Living Hearth/Candle Point Light (flickers organically in animation loop)
+            hearthCandleLight = new THREE.PointLight(0xe8832a, 1.65, 18);
+            hearthCandleLight.position.set(3.2, -1.2, 4.2);
+            coverScene.add(hearthCandleLight);
+
+            // Subtle Cool Forest/Moonlight Rim Light to separate leather spine from the void
+            const rimLight = new THREE.DirectionalLight(0x6e8ca6, 0.95);
+            rimLight.position.set(-6, 3.5, -4.5);
+            coverScene.add(rimLight);
+
+            // Generate High-Detail Procedural PBR Textures
+            const leatherTex = createLeatherTexture(false);
+            const frontCoverLeatherTex = createLeatherTexture(true);
+            const woodTex = createWoodTexture();
+            const ironTex = createMetalTexture("iron");
+            const bronzeTex = createMetalTexture("bronze");
+            const steelTex = createMetalTexture("steel");
+            const forePageEdgeTex = createPageEdgeTexture("fore");
+            const headTailPageEdgeTex = createPageEdgeTexture("headTail");
+            const pageFaces = [
+                createPageFaceTexture(0),
+                createPageFaceTexture(1),
+                createPageFaceTexture(2),
+                createPageFaceTexture(3)
+            ];
+
+            const leatherMat = new THREE.MeshStandardMaterial({
+                map: leatherTex,
+                bumpMap: leatherTex,
+                bumpScale: 0.048,
+                roughnessMap: leatherTex,
+                roughness: 0.78,
+                metalness: 0.06
+            });
+
+            const frontLeatherMat = new THREE.MeshStandardMaterial({
+                map: frontCoverLeatherTex,
+                bumpMap: frontCoverLeatherTex,
+                bumpScale: 0.048,
+                roughnessMap: frontCoverLeatherTex,
+                roughness: 0.74,
+                metalness: 0.09
+            });
+
+            const cedarWoodMat = new THREE.MeshStandardMaterial({
+                map: woodTex,
+                bumpMap: woodTex,
+                bumpScale: 0.032,
+                roughness: 0.68,
+                metalness: 0.04
+            });
+
+            const forgedIronMat = new THREE.MeshStandardMaterial({
+                map: ironTex,
+                bumpMap: ironTex,
+                bumpScale: 0.038,
+                color: 0x33373d,
+                roughness: 0.52,
+                metalness: 0.78
+            });
+
+            const castBronzeMat = new THREE.MeshStandardMaterial({
+                map: bronzeTex,
+                bumpMap: bronzeTex,
+                bumpScale: 0.03,
+                color: 0x9e7b42,
+                roughness: 0.38,
+                metalness: 0.82
+            });
+
+            const brushedSteelMat = new THREE.MeshStandardMaterial({
+                map: steelTex,
+                bumpMap: steelTex,
+                bumpScale: 0.022,
+                color: 0x9aa3ad,
+                roughness: 0.34,
+                metalness: 0.85
+            });
+
+            // High-roughness matte rag-vellum materials with authentic gilded fore-edge shimmer
+            const foreEdgeVellumMat = new THREE.MeshStandardMaterial({
+                map: forePageEdgeTex,
+                bumpMap: forePageEdgeTex,
+                bumpScale: 0.062,
+                roughnessMap: forePageEdgeTex,
+                roughness: 0.72,
+                metalness: 0.22,
+                color: 0xdfcb9b // gildedEdge antique gold leaf tone
+            });
+
+            const headTailEdgeVellumMat = new THREE.MeshStandardMaterial({
+                map: headTailPageEdgeTex,
+                bumpMap: headTailPageEdgeTex,
+                bumpScale: 0.058,
+                roughnessMap: headTailPageEdgeTex,
+                roughness: 0.96,
+                metalness: 0.0
+            });
+
+            bookRoot = new THREE.Group();
+            coverScene.add(bookRoot);
+
+            const bookW = 3.32;
+            const bookH = 4.44;
+            const bookT = 1.08;
+            const boardThick = 0.14;
+            const spineX = -bookW / 2;
+
+            // Warm internal ember glow when book unlatches
+            innerBookGlowLight = new THREE.PointLight(0xf59e0b, 0.08, 7);
+            innerBookGlowLight.position.set(0.2, 0, 0);
+            bookRoot.add(innerBookGlowLight);
+
+            // 1. BACK COVER BOARD (Beveled Leather Outer + Exposed Cedar Core + L-Corner Hardware)
+            const backCoverGroup = new THREE.Group();
+            backCoverGroup.position.set(0, 0, -bookT / 2);
+            bookRoot.add(backCoverGroup);
+
+            const backLeatherBoard = new THREE.Mesh(new THREE.BoxGeometry(bookW, bookH, boardThick * 0.64), leatherMat);
+            backLeatherBoard.position.z = -boardThick * 0.2;
+            backLeatherBoard.castShadow = true;
+            backLeatherBoard.receiveShadow = true;
+            backCoverGroup.add(backLeatherBoard);
+
+            const backCedarInner = new THREE.Mesh(new THREE.BoxGeometry(bookW - 0.07, bookH - 0.07, boardThick * 0.56), cedarWoodMat);
+            backCedarInner.position.z = boardThick * 0.22;
+            backCedarInner.receiveShadow = true;
+            backCoverGroup.add(backCedarInner);
+
+            addBeveledLeatherEdges(backCoverGroup, bookW, bookH, -boardThick * 0.2, boardThick * 0.32, leatherMat);
+            addCornerBossesToBoard(backCoverGroup, bookW, bookH, boardThick, castBronzeMat, forgedIronMat, brushedSteelMat);
+
+            // 2. SCULPTED DECKLED VELLUM PAGE BLOCK, PROTRUDING SHEAVES, INDEX TABS & SILK HEADBANDS
+            const pageBlockW = bookW - 0.19;
+            const pageBlockH = bookH - 0.22;
+            const pageBlockT = bookT - boardThick * 1.42;
+
+            // High-segment geometry so we can physically sculpt the concave fore-edge hollow and uneven deckled quires
+            const sculptedBlockGeo = new THREE.BoxGeometry(pageBlockW, pageBlockH, pageBlockT, 20, 48, 48);
+            const blockPos = sculptedBlockGeo.attributes.position;
+            for (let i = 0; i < blockPos.count; i++) {
+                let vx = blockPos.getX(i);
+                let vy = blockPos.getY(i);
+                let vz = blockPos.getZ(i);
+
+                const normX = (vx + pageBlockW / 2) / pageBlockW; // 0 at spine, 1 at fore-edge
+                const normY = vy / (pageBlockH / 2);              // -1 to 1 vertically
+                const normZ = vz / (pageBlockT / 2);              // -1 to 1 across page thickness
+
+                // Authentic sewn quire signature ridges & deckled paper unevenness along Z
+                const quireWave = Math.sin(normZ * Math.PI * 15) * 0.014
+                    + Math.cos(normZ * Math.PI * 37 + normY * 5.0) * 0.009
+                    + Math.sin(normY * 18.0 + normZ * 23.0) * 0.005;
+
+                // Fore-edge concave hollow (real rounded-spine books curve inward at the fore-edge) + deckled sheaves
+                if (normX > 0.25) {
+                    const foreFactor = Math.pow((normX - 0.25) / 0.75, 1.5);
+                    const concaveHollow = -Math.cos(normZ * Math.PI * 0.5) * 0.052 * foreFactor;
+                    vx += concaveHollow + quireWave * foreFactor * 1.35;
+                }
+
+                // Top (head) and bottom (tail) deckled edge organic undulations
+                if (Math.abs(normY) > 0.65) {
+                    const edgeFactor = (Math.abs(normY) - 0.65) / 0.35;
+                    const deckleY = (Math.sin(normZ * Math.PI * 16 + normX * 6.0) * 0.012
+                        + Math.cos(normZ * Math.PI * 29) * 0.007) * edgeFactor;
+                    vy += (normY > 0 ? deckleY : -deckleY);
+                }
+
+                blockPos.setXYZ(i, vx, vy, vz);
+            }
+            sculptedBlockGeo.computeVertexNormals();
+
+            pageBlockMesh = new THREE.Mesh(
+                sculptedBlockGeo,
+                [
+                    foreEdgeVellumMat,     // Right: Fore-edge (vertical strata)
+                    leatherMat,            // Left: Inner spine backing
+                    headTailEdgeVellumMat, // Top: Head-edge (horizontal strata)
+                    headTailEdgeVellumMat, // Bottom: Tail-edge (horizontal strata)
+                    new THREE.MeshStandardMaterial({ map: pageFaces[0], bumpMap: pageFaces[0], bumpScale: 0.018, roughness: 0.88 }),
+                    new THREE.MeshStandardMaterial({ map: pageFaces[1], bumpMap: pageFaces[1], bumpScale: 0.018, roughness: 0.88 })
+                ]
+            );
+            pageBlockMesh.position.set(-0.04, 0, 0);
+            pageBlockMesh.castShadow = true;
+            pageBlockMesh.receiveShadow = true;
+            bookRoot.add(pageBlockMesh);
+
+            // Physical Protruding Deckled Vellum Signature Sheaves (18 individual layered paper ledges catching real 3D shadows)
+            const sheafCount = 18;
+            pageSheaves = [];
+            for (let s = 0; s < sheafCount; s++) {
+                const tRatio = (s + 0.5) / sheafCount - 0.5; // -0.5 to 0.5
+                const zPos = tRatio * (pageBlockT - 0.07);
+                const sheafThick = 0.012 + (s % 3) * 0.005;
+                const sheafH = pageBlockH - 0.03 - ((s * 7) % 5) * 0.012;
+                const hollowDepth = -Math.cos(tRatio * Math.PI) * 0.045;
+                const deckleJut = ((s * 13) % 7) * 0.0055;
+
+                const sheafGeo = new THREE.BoxGeometry(0.14, sheafH, sheafThick, 2, 24, 1);
+                const sPos = sheafGeo.attributes.position;
+                for (let v = 0; v < sPos.count; v++) {
+                    const sy = sPos.getY(v);
+                    const waveX = Math.sin(sy * 3.8 + s * 1.7) * 0.009 + Math.cos(sy * 9.5 + s) * 0.004;
+                    sPos.setX(v, sPos.getX(v) + waveX);
+                }
+                sheafGeo.computeVertexNormals();
+
+                const sheafMesh = new THREE.Mesh(sheafGeo, foreEdgeVellumMat);
+                sheafMesh.position.set(
+                    pageBlockW / 2 - 0.085 + hollowDepth + deckleJut,
+                    ((s % 5) - 2) * 0.004,
+                    zPos
+                );
+                sheafMesh.castShadow = true;
+                sheafMesh.receiveShadow = true;
+                bookRoot.add(sheafMesh);
+                pageSheaves.push(sheafMesh);
+            }
+
+            rightStackGroup = new THREE.Group();
+            rightStackGroup.position.set(spineX + 0.08, 0, 0);
+            bookRoot.add(rightStackGroup);
+            leftStackGroup = new THREE.Group();
+            leftStackGroup.position.set(spineX + 0.08, 0, 0);
+            leftStackGroup.visible = false;
+            bookRoot.add(leftStackGroup);
+
+            function makeArchedLeaf(width, height, segs, archSign) {
+                const geo = new THREE.PlaneGeometry(width, height, segs, 10);
+                geo.translate(width / 2, 0, 0);
+                const pos = geo.attributes.position;
+                const base = new Float32Array(pos.array.length);
+                base.set(pos.array);
+                geo.userData.baseCoords = base;
+                for (let v = 0; v < pos.count; v++) {
+                    const bx = base[v * 3];
+                    const t = bx / width;
+                    const rise = Math.sin(t * Math.PI) * 0.22;
+                    const gutter = Math.pow(1 - t, 2.2) * 0.16 * archSign;
+                    pos.setZ(v, rise + gutter);
+                }
+                geo.computeVertexNormals();
+                return geo;
+            }
+
+            const leafW = pageBlockW - 0.04;
+            const leafH = pageBlockH - 0.06;
+            const leftLeafGeo = makeArchedLeaf(leafW, leafH, 28, 1);
+            const rightLeafGeo = makeArchedLeaf(leafW, leafH, 28, 1);
+            const leafMatL = new THREE.MeshStandardMaterial({
+                map: pageFaces[0], bumpMap: pageFaces[0], bumpScale: 0.02,
+                roughness: 0.84, metalness: 0.02, side: THREE.DoubleSide
+            });
+            const leafMatR = new THREE.MeshStandardMaterial({
+                map: pageFaces[1], bumpMap: pageFaces[1], bumpScale: 0.02,
+                roughness: 0.84, metalness: 0.02, side: THREE.DoubleSide
+            });
+            leftLeafMesh = new THREE.Mesh(leftLeafGeo, leafMatL);
+            leftLeafMesh.castShadow = true;
+            leftLeafMesh.receiveShadow = true;
+            leftLeafMesh.userData.leafW = leafW;
+            leftLeafMesh.userData.leafH = leafH;
+            leftStackGroup.add(leftLeafMesh);
+            rightLeafMesh = new THREE.Mesh(rightLeafGeo, leafMatR);
+            rightLeafMesh.castShadow = true;
+            rightLeafMesh.receiveShadow = true;
+            rightLeafMesh.userData.leafW = leafW;
+            rightLeafMesh.userData.leafH = leafH;
+            rightStackGroup.add(rightLeafMesh);
+
+            function makeStackBlock(thick, mats) {
+                const block = new THREE.Mesh(
+                    new THREE.BoxGeometry(leafW * 0.98, leafH * 0.98, Math.max(0.04, thick), 8, 8, 4),
+                    mats
+                );
+                block.position.set(leafW * 0.49, 0, -thick * 0.5 - 0.01);
+                block.castShadow = true;
+                block.receiveShadow = true;
+                return block;
+            }
+            const stackMats = [foreEdgeVellumMat, leatherMat, headTailEdgeVellumMat, headTailEdgeVellumMat, leafMatR, leafMatL];
+            const rightBlock = makeStackBlock(pageBlockT * 0.72, stackMats);
+            rightBlock.name = "rightStackBlock";
+            rightStackGroup.add(rightBlock);
+            const leftBlock = makeStackBlock(pageBlockT * 0.28, stackMats);
+            leftBlock.name = "leftStackBlock";
+            leftStackGroup.add(leftBlock);
+
+            const gutterGeo = new THREE.PlaneGeometry(0.72, leafH * 0.98, 18, 10);
+            const gutterPos = gutterGeo.attributes.position;
+            for (let v = 0; v < gutterPos.count; v++) {
+                const gx = gutterPos.getX(v);
+                const t = (gx + 0.36) / 0.72;
+                gutterPos.setZ(v, -Math.sin(Math.max(0, Math.min(1, t)) * Math.PI) * 0.2);
+            }
+            gutterGeo.computeVertexNormals();
+            const gutterCanvas = document.createElement("canvas");
+            gutterCanvas.width = 64;
+            gutterCanvas.height = 256;
+            const gctx = gutterCanvas.getContext("2d");
+            const ggrad = gctx.createLinearGradient(0, 0, 64, 0);
+            ggrad.addColorStop(0, "#4a3420");
+            ggrad.addColorStop(0.5, "#140a06");
+            ggrad.addColorStop(1, "#4a3420");
+            gctx.fillStyle = ggrad;
+            gctx.fillRect(0, 0, 64, 256);
+            gutterMesh = new THREE.Mesh(
+                gutterGeo,
+                new THREE.MeshStandardMaterial({
+                    map: new THREE.CanvasTexture(gutterCanvas),
+                    color: 0x3a2412,
+                    roughness: 1,
+                    metalness: 0
+                })
+            );
+            gutterMesh.rotation.y = Math.PI / 2;
+            gutterMesh.position.set(0.05, 0, -0.02);
+            gutterMesh.visible = false;
+            bookRoot.add(gutterMesh);
+
+            const tabConfigs = SIX_BOOKS.map((book, idx) => ({
+                y: 1.62 - idx * 0.64,
+                z: 0.04 - idx * 0.035,
+                rotZ: (idx % 2 === 0 ? 0.02 : -0.02),
+                tint: book.accentHex,
+                roman: book.roman.replace("LIBER ", ""),
+                name: book.shortTitle.replace(/^The /, ""),
+                bookIndex: idx
+            }));
+            indexTabs = [];
+            tabConfigs.forEach((tc) => {
+                const tabMat = new THREE.MeshStandardMaterial({
+                    map: createScholarIndexTabTexture(tc.tint, tc.roman, tc.name),
+                    bumpMap: forePageEdgeTex,
+                    bumpScale: 0.025,
+                    roughness: 0.88,
+                    metalness: 0.0
+                });
+                const tabMesh = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.5, 0.045), tabMat);
+                tabMesh.position.set(leafW + 0.16, tc.y, tc.z);
+                tabMesh.rotation.z = tc.rotZ;
+                tabMesh.castShadow = true;
+                tabMesh.receiveShadow = true;
+                tabMesh.userData.bookIndex = tc.bookIndex;
+                rightStackGroup.add(tabMesh);
+                indexTabs.push(tabMesh);
+            });
+
+            // Hand-Sewn Silk & Linen Spine Headbands (Endbands tucked at the top and bottom of the spine hollow)
+            const headbandMat = new THREE.MeshStandardMaterial({
+                color: 0x6b2118,
+                bumpMap: forePageEdgeTex,
+                bumpScale: 0.04,
+                roughness: 0.86
+            });
+            [pageBlockH / 2 + 0.005, -pageBlockH / 2 - 0.005].forEach((hbY) => {
+                const headband = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.038, 0.038, pageBlockT - 0.06, 16),
+                    headbandMat
+                );
+                headband.rotation.x = Math.PI / 2;
+                headband.position.set(spineX + 0.12, hbY, 0);
+                headband.castShadow = true;
+                bookRoot.add(headband);
+            });
+
+            // Two Worn Silk Bookmark Ribbons hanging from the lower foot of the tome
+            const ribbonMatCrimson = new THREE.MeshStandardMaterial({ color: 0x5c1616, roughness: 0.85, side: THREE.DoubleSide });
+            const ribbonMatGold = new THREE.MeshStandardMaterial({ color: 0x785621, roughness: 0.8, side: THREE.DoubleSide });
+            bookmarkRibbon1 = new THREE.Mesh(new THREE.PlaneGeometry(0.14, 0.75, 2, 8), ribbonMatCrimson);
+            bookmarkRibbon1.position.set(-0.25, -bookH / 2 - 0.22, 0.08);
+            bookmarkRibbon1.rotation.z = -0.06;
+            bookRoot.add(bookmarkRibbon1);
+
+            bookmarkRibbon2 = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 0.62, 2, 8), ribbonMatGold);
+            bookmarkRibbon2.position.set(0.15, -bookH / 2 - 0.16, -0.06);
+            bookmarkRibbon2.rotation.z = 0.08;
+            bookRoot.add(bookmarkRibbon2);
+
+            // 3. CURVED RIBBED LEATHER SPINE & FORGED IRON BINDING STRAPS
+            const spineGroup = new THREE.Group();
+            spineGroup.position.set(spineX, 0, 0);
+            bookRoot.add(spineGroup);
+
+            const spineRadius = bookT / 2 + 0.055;
+            const spineCyl = new THREE.Mesh(
+                new THREE.CylinderGeometry(spineRadius, spineRadius, bookH, 32, 1, false, Math.PI, Math.PI),
+                leatherMat
+            );
+            spineCyl.castShadow = true;
+            spineCyl.receiveShadow = true;
+            spineGroup.add(spineCyl);
+
+            const ribYPositions = [-1.72, -1.04, -0.35, 0.35, 1.04, 1.72];
+            ribYPositions.forEach(ry => {
+                // Raised double-corded leather spine hub
+                const ribTorus = new THREE.Mesh(
+                    new THREE.TorusGeometry(spineRadius + 0.022, 0.048, 14, 32, Math.PI),
+                    leatherMat
+                );
+                ribTorus.rotation.x = Math.PI / 2;
+                ribTorus.rotation.z = Math.PI / 2;
+                ribTorus.position.y = ry;
+                ribTorus.castShadow = true;
+                ribTorus.receiveShadow = true;
+                spineGroup.add(ribTorus);
+
+                // Hand-forged iron reinforcement strap & bronze rivet on spine
+                const ironBand = new THREE.Mesh(
+                    new THREE.TorusGeometry(spineRadius + 0.032, 0.018, 10, 32, Math.PI),
+                    forgedIronMat
+                );
+                ironBand.rotation.x = Math.PI / 2;
+                ironBand.rotation.z = Math.PI / 2;
+                ironBand.position.y = ry + 0.062;
+                ironBand.castShadow = true;
+                spineGroup.add(ironBand);
+
+                const spineStud = new THREE.Mesh(new THREE.SphereGeometry(0.036, 12, 12), castBronzeMat);
+                spineStud.position.set(-spineRadius - 0.035, ry, 0);
+                spineStud.castShadow = true;
+                spineGroup.add(spineStud);
+            });
+
+            // Forged Wrought Iron Head & Tail Spine Caps
+            [-bookH / 2 + 0.08, bookH / 2 - 0.08].forEach(capY => {
+                const cap = new THREE.Mesh(
+                    new THREE.CylinderGeometry(spineRadius + 0.028, spineRadius + 0.028, 0.16, 32, 1, false, Math.PI, Math.PI),
+                    forgedIronMat
+                );
+                cap.position.y = capY;
+                cap.castShadow = true;
+                spineGroup.add(cap);
+            });
+
+            // 4. ARTICULATED FRONT COVER PIVOT GROUP
+            frontCoverPivot = new THREE.Group();
+            frontCoverPivot.position.set(spineX, 0, bookT / 2);
+            bookRoot.add(frontCoverPivot);
+
+            frontCoverBoardGroup = new THREE.Group();
+            frontCoverBoardGroup.position.set(bookW / 2, 0, 0);
+            frontCoverPivot.add(frontCoverBoardGroup);
+
+            // Exposed Cedar & Oak Inner Board
+            const frontCedarCore = new THREE.Mesh(
+                new THREE.BoxGeometry(bookW - 0.05, bookH - 0.05, boardThick * 0.58),
+                cedarWoodMat
+            );
+            frontCedarCore.position.z = -boardThick * 0.2;
+            frontCedarCore.receiveShadow = true;
+            frontCoverBoardGroup.add(frontCedarCore);
+
+            // Inner Inscribed Vellum Paste-down Sheet
+            const innerPastedown = new THREE.Mesh(
+                new THREE.PlaneGeometry(bookW - 0.34, bookH - 0.34),
+                new THREE.MeshStandardMaterial({ map: pageFaces[2], bumpMap: pageFaces[2], bumpScale: 0.015, roughness: 0.8 })
+            );
+            innerPastedown.rotation.y = Math.PI;
+            innerPastedown.position.z = -boardThick * 0.5;
+            frontCoverBoardGroup.add(innerPastedown);
+
+            // Full-Grain Leather Exterior Board with Embossed Gold Leaf
+            const frontLeatherExterior = new THREE.Mesh(
+                new THREE.BoxGeometry(bookW, bookH, boardThick * 0.64),
+                frontLeatherMat
+            );
+            frontLeatherExterior.position.z = boardThick * 0.2;
+            frontLeatherExterior.castShadow = true;
+            frontLeatherExterior.receiveShadow = true;
+            frontCoverBoardGroup.add(frontLeatherExterior);
+            clickableCoverMeshes.push(frontLeatherExterior);
+
+            // Rounded leather board edge molding so the cover has organic chamfered edges
+            addBeveledLeatherEdges(frontCoverBoardGroup, bookW, bookH, boardThick * 0.2, boardThick * 0.32, leatherMat);
+
+            // Recessed Forged Wrought-Iron Binding Frame with Studded Rivets
+            const frameInset = 0.28;
+            const barThickness = 0.036;
+            const barZ = boardThick * 0.53;
+
+            const topIronBar = new THREE.Mesh(new THREE.BoxGeometry(bookW - frameInset * 2, 0.085, barThickness), forgedIronMat);
+            topIronBar.position.set(0, bookH / 2 - frameInset, barZ);
+            topIronBar.castShadow = true;
+            frontCoverBoardGroup.add(topIronBar);
+
+            const botIronBar = topIronBar.clone();
+            botIronBar.position.set(0, -bookH / 2 + frameInset, barZ);
+            frontCoverBoardGroup.add(botIronBar);
+
+            const leftIronBar = new THREE.Mesh(new THREE.BoxGeometry(0.085, bookH - frameInset * 2, barThickness), forgedIronMat);
+            leftIronBar.position.set(-bookW / 2 + frameInset, 0, barZ);
+            leftIronBar.castShadow = true;
+            frontCoverBoardGroup.add(leftIronBar);
+
+            const rightIronBar = leftIronBar.clone();
+            rightIronBar.position.set(bookW / 2 - frameInset, 0, barZ);
+            frontCoverBoardGroup.add(rightIronBar);
+
+            // Sculpted L-Shaped Pierced Bronze Corner Hardware & Rivets
+            addCornerBossesToBoard(frontCoverBoardGroup, bookW, bookH, boardThick, castBronzeMat, forgedIronMat, brushedSteelMat);
+
+            // Central Sunken Astrolabe Medallion Well on Front Cover
+            const wellCenterX = 0.04;
+            const wellCenterY = 0.05;
+            const medallionWell = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.94, 0.94, 0.035, 48),
+                forgedIronMat
+            );
+            medallionWell.rotation.x = Math.PI / 2;
+            medallionWell.position.set(wellCenterX, wellCenterY, boardThick * 0.51);
+            medallionWell.receiveShadow = true;
+            frontCoverBoardGroup.add(medallionWell);
+
+            // Stepped Antique Bronze Outer Bezel with 12 Horological Bosses
+            const outerBezel = new THREE.Mesh(
+                new THREE.TorusGeometry(0.95, 0.058, 18, 64),
+                castBronzeMat
+            );
+            outerBezel.position.set(wellCenterX, wellCenterY, boardThick * 0.56);
+            outerBezel.castShadow = true;
+            outerBezel.receiveShadow = true;
+            frontCoverBoardGroup.add(outerBezel);
+
+            for (let i = 0; i < 12; i++) {
+                const ang = (i / 12) * Math.PI * 2;
+                const bossStud = new THREE.Mesh(new THREE.SphereGeometry(0.026, 10, 10), brushedSteelMat);
+                bossStud.position.set(
+                    wellCenterX + Math.cos(ang) * 0.95,
+                    wellCenterY + Math.sin(ang) * 0.95,
+                    boardThick * 0.61
+                );
+                bossStud.castShadow = true;
+                frontCoverBoardGroup.add(bossStud);
+            }
+
+            // Counter-Rotating Astrolabe Rete Rings with Crosshair Bars
+            coverMedallionRing1 = new THREE.Group();
+            coverMedallionRing1.position.set(wellCenterX, wellCenterY, boardThick * 0.58);
+            const ring1Torus = new THREE.Mesh(new THREE.TorusGeometry(0.71, 0.028, 14, 48), castBronzeMat);
+            ring1Torus.castShadow = true;
+            coverMedallionRing1.add(ring1Torus);
+            const ring1Bar = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.025, 0.018), castBronzeMat);
+            coverMedallionRing1.add(ring1Bar);
+            frontCoverBoardGroup.add(coverMedallionRing1);
+
+            coverMedallionRing2 = new THREE.Group();
+            coverMedallionRing2.position.set(wellCenterX, wellCenterY, boardThick * 0.6);
+            const ring2Torus = new THREE.Mesh(new THREE.TorusGeometry(0.47, 0.022, 14, 48), brushedSteelMat);
+            ring2Torus.castShadow = true;
+            coverMedallionRing2.add(ring2Torus);
+            const ring2Bar = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.92, 0.015), brushedSteelMat);
+            coverMedallionRing2.add(ring2Bar);
+            frontCoverBoardGroup.add(coverMedallionRing2);
+
+            // Cabochon Amber Sunstone / Lodestone Core (Earthy mineral gem with bronze bezel)
+            const gemBezel = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.028, 14, 32), castBronzeMat);
+            gemBezel.position.set(wellCenterX, wellCenterY, boardThick * 0.61);
+            frontCoverBoardGroup.add(gemBezel);
+
+            coverCoreCrystal = new THREE.Mesh(
+                new THREE.SphereGeometry(0.19, 32, 24),
+                new THREE.MeshStandardMaterial({
+                    color: 0xb45309,
+                    emissive: 0x78350f,
+                    emissiveIntensity: 0.55,
+                    roughness: 0.14,
+                    metalness: 0.15
+                })
+            );
+            coverCoreCrystal.scale.set(1, 1, 0.55);
+            coverCoreCrystal.position.set(wellCenterX, wellCenterY, boardThick * 0.61);
+            coverCoreCrystal.castShadow = true;
+            frontCoverBoardGroup.add(coverCoreCrystal);
+            clickableCoverMeshes.push(coverCoreCrystal);
+
+            // 5. ARTICULATED FORE-EDGE LOCK CLASPS — on the cover so they travel with it
+            topClaspPivot = buildForeEdgeClasp(castBronzeMat, forgedIronMat, brushedSteelMat);
+            topClaspPivot.position.set(bookW / 2 - 0.04, 1.08, boardThick * 0.2);
+            frontCoverBoardGroup.add(topClaspPivot);
+
+            bottomClaspPivot = buildForeEdgeClasp(castBronzeMat, forgedIronMat, brushedSteelMat);
+            bottomClaspPivot.position.set(bookW / 2 - 0.04, -1.08, boardThick * 0.2);
+            frontCoverBoardGroup.add(bottomClaspPivot);
+
+            // 6. HINGED 3D VELLUM PAGES RIG (28 Segmented Pages)
+            hingedPages = [];
+            const numHingedPages = 28;
+            for (let i = 0; i < numHingedPages; i++) {
+                const pGeo = new THREE.PlaneGeometry(pageBlockW - 0.06, pageBlockH - 0.08, 16, 8);
+                pGeo.translate((pageBlockW - 0.06) / 2, 0, 0);
+
+                const posAttr = pGeo.attributes.position;
+                const baseCoords = new Float32Array(posAttr.array.length);
+                baseCoords.set(posAttr.array);
+                pGeo.userData.baseCoords = baseCoords;
+
+                const pMat = new THREE.MeshStandardMaterial({
+                    map: pageFaces[i % pageFaces.length],
+                    bumpMap: pageFaces[i % pageFaces.length],
+                    bumpScale: 0.012,
+                    side: THREE.DoubleSide,
+                    roughness: 0.78,
+                    metalness: 0.03
+                });
+
+                const pageMesh = new THREE.Mesh(pGeo, pMat);
+                const zOffset = -pageBlockT / 2 + 0.08 + (i / numHingedPages) * (pageBlockT - 0.16);
+                pageMesh.position.set(spineX + 0.08, 0, zOffset);
+                pageMesh.castShadow = true;
+                pageMesh.receiveShadow = true;
+                pageMesh.visible = false;
+                bookRoot.add(pageMesh);
+                hingedPages.push(pageMesh);
+            }
+
+            // 7. PAGES LEAVE THE GUTTER AND RISE. A fountain around the viewer, not a sideways ribbon.
+            const flyingPageCount = 84;
+            flyingPages = [];
+            for (let i = 0; i < flyingPageCount; i++) {
+                const nearLens = i % 7 === 0;
+                const width = nearLens ? 1.85 + (i % 3) * 0.28 : 0.78 + (i % 5) * 0.15;
+                const height = nearLens ? 2.45 + (i % 3) * 0.22 : 1.05 + (i % 4) * 0.18;
+                const fGeo = new THREE.PlaneGeometry(width, height, 4, 3);
+                const posAttr = fGeo.attributes.position;
+                const baseCoords = new Float32Array(posAttr.array.length);
+                baseCoords.set(posAttr.array);
+                fGeo.userData.baseCoords = baseCoords;
+
+                const fMat = new THREE.MeshStandardMaterial({
+                    map: pageFaces[i % pageFaces.length],
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0,
+                    roughness: 0.72,
+                    metalness: 0.04,
+                    emissive: 0x3d2412,
+                    emissiveIntensity: 0.12
+                });
+
+                const fMesh = new THREE.Mesh(fGeo, fMat);
+                fMesh.visible = false;
+                const az = Math.random() * Math.PI * 2;
+                const elev = -0.35 + Math.random() * 1.35;
+                const towardLens = i % 3 === 0;
+                const downward = i % 11 === 0;
+                fMesh.userData = {
+                    index: i,
+                    nearLens: nearLens,
+                    delay: (i / flyingPageCount) * 0.85,
+                    vx: Math.cos(elev) * Math.cos(az) * (1.6 + Math.random() * 3.4),
+                    vy: downward ? (-0.6 - Math.random() * 1.2) : (3.4 + Math.random() * 4.2),
+                    vz: towardLens ? (6.5 + Math.random() * 3.5) : (Math.cos(elev) * Math.sin(az) * (2.2 + Math.random() * 4.4)),
+                    grav: 1.9 + Math.random() * 0.8,
+                    swirl: (0.6 + Math.random() * 1.4) * (i % 2 === 0 ? 1 : -1),
+                    swirlR: 0.4 + Math.random() * 1.8,
+                    az: az,
+                    sx: (Math.random() - 0.5) * 3.4,
+                    sy: (Math.random() - 0.5) * 3.4,
+                    sz: (Math.random() - 0.5) * 2.6,
+                    flutter: 9 + (i % 5) * 2
+                };
+                coverScene.add(fMesh);
+                flyingPages.push(fMesh);
+            }
+
+            // 8. EARTHLY CANDLELIGHT DUST MOTES & SPORES (Soft radial glow texture, zero square pixels)
+            const emberCount = 340;
+            const emberGeo = new THREE.BufferGeometry();
+            const emberPos = new Float32Array(emberCount * 3);
+            const emberColors = new Float32Array(emberCount * 3);
+            for (let i = 0; i < emberCount; i++) {
+                emberPos[i * 3] = (Math.random() - 0.5) * 14;
+                emberPos[i * 3 + 1] = (Math.random() - 0.5) * 10;
+                emberPos[i * 3 + 2] = (Math.random() - 0.5) * 10;
+                // Warm candlelight amber dust motes transitioning to cool peripheral vellum spores
+                const isWarm = Math.random() < 0.72;
+                if (isWarm) {
+                    emberColors[i * 3] = 0.96 + Math.random() * 0.04;
+                    emberColors[i * 3 + 1] = 0.72 + Math.random() * 0.16;
+                    emberColors[i * 3 + 2] = 0.18 + Math.random() * 0.14;
+                } else {
+                    emberColors[i * 3] = 0.55 + Math.random() * 0.15;
+                    emberColors[i * 3 + 1] = 0.65 + Math.random() * 0.15;
+                    emberColors[i * 3 + 2] = 0.78 + Math.random() * 0.15;
+                }
+            }
+            emberGeo.setAttribute("position", new THREE.BufferAttribute(emberPos, 3));
+            emberGeo.setAttribute("color", new THREE.BufferAttribute(emberColors, 3));
+            const emberMat = new THREE.PointsMaterial({
+                map: createSoftParticleTexture(),
+                size: 0.15,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.62,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+            // candlelightDust / volumetric atmospheric dust motes
+            emberParticles = new THREE.Points(emberGeo, emberMat);
+            coverScene.add(emberParticles);
+
+            const mistMap = createSoftParticleTexture();
+            cosmicMistGroup = new THREE.Group();
+            cosmicMistGroup.position.set(0, 0, 3.4);
+            cosmicMistGroup.visible = false;
+            bookRoot.add(cosmicMistGroup);
+            cosmicMistPuffs = [];
+            const mistColors = [0xf59e0b, 0x8b5cf6, 0x38bdf8, 0xea580c, 0xd6bf96];
+            for (let m = 0; m < 36; m++) {
+                const puff = new THREE.Sprite(new THREE.SpriteMaterial({
+                    map: mistMap,
+                    color: mistColors[m % mistColors.length],
+                    transparent: true,
+                    opacity: 0,
+                    blending: THREE.AdditiveBlending,
+                    depthWrite: false
+                }));
+                const ang = (m / 36) * Math.PI * 2;
+                const rad = 1.4 + (m % 5) * 0.7;
+                puff.position.set(Math.cos(ang) * rad, (Math.random() - 0.35) * 2.2, Math.sin(ang) * rad * 0.75);
+                const sc = 1.6 + Math.random() * 2.2;
+                puff.scale.set(sc, sc, 1);
+                puff.userData.base = sc;
+                cosmicMistGroup.add(puff);
+                cosmicMistPuffs.push(puff);
+            }
+
+            celestialGroup = new THREE.Group();
+            celestialGroup.position.set(0, 0, 3.6);
+            celestialGroup.visible = false;
+            bookRoot.add(celestialGroup);
+            celestialSun = new THREE.Mesh(
+                new THREE.SphereGeometry(0.34, 24, 24),
+                new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xd97706, emissiveIntensity: 1.2, roughness: 0.25, metalness: 0.2 })
+            );
+            celestialGroup.add(celestialSun);
+            celestialCorona = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: mistMap, color: 0xfbbf24, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false
+            }));
+            celestialCorona.scale.set(2.1, 2.1, 1);
+            celestialSun.add(celestialCorona);
+            celestialRings = [];
+            [0.85, 1.25, 1.7, 2.15, 2.6].forEach((radius, idx) => {
+                const group = new THREE.Group();
+                group.rotation.x = (idx - 2) * 0.16;
+                group.rotation.z = (idx % 2 === 0 ? 1 : -1) * 0.12;
+                const ring = new THREE.Mesh(
+                    new THREE.TorusGeometry(radius, 0.012, 8, 48),
+                    new THREE.MeshStandardMaterial({
+                        color: mistColors[idx], emissive: mistColors[idx], emissiveIntensity: 0.55,
+                        roughness: 0.4, metalness: 0.6, transparent: true, opacity: 0.85
+                    })
+                );
+                group.add(ring);
+                celestialGroup.add(group);
+                celestialRings.push(group);
+            });
+            celestialPlanets = [];
+            const planetHex = [0xb45309, 0x7f1d1d, 0x1e3a8a, 0x581c87, 0x065f46, 0x9a3412];
+            planetHex.forEach((hex, idx) => {
+                const radius = 0.95 + idx * 0.32;
+                const body = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.11 + (idx % 3) * 0.02, 16, 16),
+                    new THREE.MeshStandardMaterial({ color: hex, emissive: hex, emissiveIntensity: 0.35, roughness: 0.4, metalness: 0.2 })
+                );
+                celestialGroup.add(body);
+                celestialPlanets.push({ mesh: body, radius: radius, angle: idx * 1.05, speed: 0.55 + idx * 0.08 });
+            });
+
+            fallingArmillary = new THREE.Group();
+            fallingArmillary.visible = false;
+            fallingArmillary.position.set(leafW * 0.52, 0.05, 0.62);
+            fallingArmillary.scale.set(0.26, 0.26, 0.26);
+            leftStackGroup.add(fallingArmillary);
+            const armMat = new THREE.MeshStandardMaterial({ color: 0xc4a574, emissive: 0x6b4a1e, emissiveIntensity: 0.25, roughness: 0.35, metalness: 0.72 });
+            const armCore = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), new THREE.MeshStandardMaterial({
+                color: 0xd97706, emissive: 0x92400e, emissiveIntensity: 0.7, roughness: 0.3, metalness: 0.3
+            }));
+            fallingArmillary.add(armCore);
+            [0.42, 0.62, 0.84, 1.05, 1.28].forEach((radius, idx) => {
+                const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.018, 8, 40), armMat);
+                ring.rotation.x = idx * 0.55;
+                ring.rotation.y = idx * 0.4;
+                fallingArmillary.add(ring);
+            });
+            orbitalPlanetNodes = [];
+            planetHex.forEach((hex, idx) => {
+                const gem = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.11, 14, 14),
+                    new THREE.MeshStandardMaterial({ color: hex, emissive: hex, emissiveIntensity: 0.4, roughness: 0.3, metalness: 0.25 })
+                );
+                const ang = idx * (Math.PI / 3);
+                gem.position.set(Math.cos(ang) * 1.05, Math.sin(ang * 2) * 0.18, Math.sin(ang) * 1.05);
+                gem.userData.bookIndex = idx;
+                gem.castShadow = true;
+                fallingArmillary.add(gem);
+                orbitalPlanetNodes.push(gem);
+            });
+
+            bookRoot.rotation.set(targetBookRotX, targetBookRotY, targetBookRotZ);
+            setupBookViewportInteractions(container);
+            initPageCSS3D(container, leafW, leafH);
+            setSpreadVisible(false);
+            prepareMaterialization();
+        }
+
+        function initPageCSS3D(container, leafW, leafH) {
+            if (!THREE.CSS3DRenderer) return;
+            cssRenderer = new THREE.CSS3DRenderer();
+            cssRenderer.setSize(window.innerWidth, window.innerHeight);
+            cssRenderer.domElement.style.position = "absolute";
+            cssRenderer.domElement.style.inset = "0";
+            cssRenderer.domElement.style.pointerEvents = "none";
+            const overlay = document.getElementById("css3dOverlay");
+            if (overlay) overlay.appendChild(cssRenderer.domElement);
+            cssScene = new THREE.Scene();
+            const leftEl = document.getElementById("leftFolioLeaf");
+            const rightEl = document.getElementById("rightFolioLeaf");
+            if (!leftEl || !rightEl) return;
+            leftCssObj = new THREE.CSS3DObject(leftEl);
+            rightCssObj = new THREE.CSS3DObject(rightEl);
+            const sx = leafW / 720;
+            const sy = leafH / 960;
+            leftCssObj.scale.set(sx, sy, sx);
+            rightCssObj.scale.set(sx, sy, sx);
+            leftCssObj.position.set(leafW / 2, 0, 0.04);
+            rightCssObj.position.set(leafW / 2, 0, 0.04);
+            leftCssObj.visible = false;
+            rightCssObj.visible = false;
+            cssScene.add(leftCssObj);
+            cssScene.add(rightCssObj);
+        }
+
+        const _cssFlipY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+        const _cssLeafQ = new THREE.Quaternion();
+        function syncCssPages() {
+            if (!leftCssObj || !rightCssObj || !leftLeafMesh || !rightLeafMesh) return;
+            const place = (cssObj, mesh, faceSign) => {
+                mesh.updateWorldMatrix(true, false);
+                mesh.getWorldPosition(cssObj.position);
+                mesh.getWorldQuaternion(_cssLeafQ);
+                cssObj.quaternion.copy(_cssLeafQ);
+                if (faceSign < 0) cssObj.quaternion.multiply(_cssFlipY);
+                const w = mesh.userData.leafW || 3.09;
+                const h = mesh.userData.leafH || 4.16;
+                const offset = new THREE.Vector3(w / 2, 0, 0.05 * faceSign);
+                offset.applyQuaternion(_cssLeafQ);
+                cssObj.position.add(offset);
+                cssObj.scale.set(w / 720, h / 960, w / 720);
+            };
+            place(leftCssObj, leftLeafMesh, -1);
+            place(rightCssObj, rightLeafMesh, 1);
+        }
+
+        function addBeveledLeatherEdges(boardGroup, bookW, bookH, zPos, radius, leatherMat) {
+            // Top & Bottom rounded leather board edges
+            [-bookH / 2, bookH / 2].forEach(yEdge => {
+                const hCyl = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, bookW, 14), leatherMat);
+                hCyl.rotation.z = Math.PI / 2;
+                hCyl.position.set(0, yEdge, zPos);
+                hCyl.receiveShadow = true;
+                boardGroup.add(hCyl);
+            });
+            // Right fore-edge rounded leather edge
+            const vCyl = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, bookH, 14), leatherMat);
+            vCyl.position.set(bookW / 2, 0, zPos);
+            vCyl.receiveShadow = true;
+            boardGroup.add(vCyl);
+        }
+
+        function addCornerBossesToBoard(boardGroup, bookW, bookH, boardThick, bronzeMat, ironMat, steelMat) {
+            const corners = [
+                { x: -bookW / 2 + 0.02, y: bookH / 2 - 0.02, sx: 1, sy: -1 },
+                { x: bookW / 2 - 0.02,  y: bookH / 2 - 0.02, sx: -1, sy: -1 },
+                { x: -bookW / 2 + 0.02, y: -bookH / 2 + 0.02, sx: 1, sy: 1 },
+                { x: bookW / 2 - 0.02,  y: -bookH / 2 + 0.02, sx: -1, sy: 1 }
+            ];
+            const armLen = 0.68;
+            const armWidth = 0.22;
+            const bossDepth = boardThick + 0.055;
+
+            corners.forEach(c => {
+                const cornerGroup = new THREE.Group();
+
+                // Horizontal L-arm
+                const armH = new THREE.Mesh(new THREE.BoxGeometry(armLen, armWidth, bossDepth), bronzeMat);
+                armH.position.set(c.x + c.sx * (armLen / 2), c.y + c.sy * (armWidth / 2), 0);
+                armH.castShadow = true;
+                armH.receiveShadow = true;
+                cornerGroup.add(armH);
+
+                // Vertical L-arm
+                const armV = new THREE.Mesh(new THREE.BoxGeometry(armWidth, armLen, bossDepth), bronzeMat);
+                armV.position.set(c.x + c.sx * (armWidth / 2), c.y + c.sy * (armLen / 2), 0);
+                armV.castShadow = true;
+                armV.receiveShadow = true;
+                cornerGroup.add(armV);
+
+                // Raised Forged Iron Corner Bumper Cap & 3 Steel Rivets
+                const cornerCap = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.26, bossDepth + 0.02), ironMat);
+                cornerCap.position.set(c.x + c.sx * 0.13, c.y + c.sy * 0.13, 0);
+                cornerCap.castShadow = true;
+                cornerGroup.add(cornerCap);
+
+                const rivetOffsets = [
+                    [0.14, 0.14],
+                    [0.52, 0.11],
+                    [0.11, 0.52]
+                ];
+                rivetOffsets.forEach(([rx, ry]) => {
+                    const rivet = new THREE.Mesh(new THREE.SphereGeometry(0.034, 12, 12), steelMat);
+                    rivet.position.set(c.x + c.sx * rx, c.y + c.sy * ry, bossDepth / 2 + 0.008);
+                    rivet.castShadow = true;
+                    cornerGroup.add(rivet);
+                });
+
+                boardGroup.add(cornerGroup);
+            });
+        }
+
+        function buildForeEdgeClasp(bronzeMat, ironMat, steelMat) {
+            const claspPivot = new THREE.Group();
+
+            // Hinged wrought-iron & bronze hasp strap spanning the fore-edge
+            const strapMesh = new THREE.Mesh(
+                new THREE.BoxGeometry(0.11, 0.34, 1.06),
+                bronzeMat
+            );
+            strapMesh.position.set(0.05, 0, 0.48);
+            strapMesh.castShadow = true;
+            strapMesh.receiveShadow = true;
+            claspPivot.add(strapMesh);
+
+            // Ribbed iron reinforcement ridges on clasp strap
+            [-0.1, 0.1].forEach(ry => {
+                const ridge = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.04, 1.08), ironMat);
+                ridge.position.set(0.05, ry, 0.48);
+                claspPivot.add(ridge);
+            });
+
+            // Forged Hook Latch that catches the front cover lock plate
+            const latchHook = new THREE.Mesh(
+                new THREE.BoxGeometry(0.32, 0.38, 0.1),
+                ironMat
+            );
+            latchHook.position.set(-0.06, 0, 1.01);
+            latchHook.castShadow = true;
+            claspPivot.add(latchHook);
+
+            // Domed Steel Locking Pin
+            const lockPin = new THREE.Mesh(
+                new THREE.SphereGeometry(0.052, 14, 14),
+                steelMat
+            );
+            lockPin.position.set(-0.1, 0, 1.06);
+            lockPin.castShadow = true;
+            claspPivot.add(lockPin);
+
+            clickableCoverMeshes.push(strapMesh, latchHook, lockPin);
+            return claspPivot;
+        }
+
+        function hitFromEvent(e, objects) {
+            const container = document.getElementById("book3DViewport");
+            if (!container || !coverCamera) return [];
+            const rect = container.getBoundingClientRect();
+            if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return [];
+            bookMouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            bookMouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            bookRaycaster.setFromCamera(bookMouse, coverCamera);
+            return bookRaycaster.intersectObjects(objects, true);
+        }
+
+        function setupBookViewportInteractions(container) {
+            container.addEventListener("pointerdown", (e) => {
+                if (isBookOpening || isBookClosing || bookForming) return;
+                isDraggingBook = true;
+                bookPointerDownPos = { x: e.clientX, y: e.clientY };
+                bookPrevPointer = { x: e.clientX, y: e.clientY };
+                if (isBookOpened && fallingArmillary) {
+                    const armHits = hitFromEvent(e, [fallingArmillary]);
+                    isDraggingArmillary = armHits.length > 0;
+                }
+            });
+
+            window.addEventListener("pointermove", (e) => {
+                if (isBookOpening || isBookClosing) return;
+                if (isDraggingBook && isBookOpened && isDraggingArmillary) {
+                    const dx = e.clientX - bookPrevPointer.x;
+                    const dy = e.clientY - bookPrevPointer.y;
+                    targetArmillaryRotY += dx * 0.01;
+                    targetArmillaryRotX = Math.max(-1.2, Math.min(1.2, targetArmillaryRotX + dy * 0.01));
+                    bookPrevPointer = { x: e.clientX, y: e.clientY };
+                    return;
+                }
+                if (isDraggingBook && isBookOpened) {
+                    const dx = e.clientX - bookPrevPointer.x;
+                    if (Math.abs(dx) > 8 && window.innerWidth < 900) {
+                        portraitLeaf = dx > 0 ? 0 : 1;
+                        fitReadCamera();
+                    }
+                    bookPrevPointer = { x: e.clientX, y: e.clientY };
+                    return;
+                }
+                if (isDraggingBook && !isBookOpened) {
+                    const dx = e.clientX - bookPrevPointer.x;
+                    const dy = e.clientY - bookPrevPointer.y;
+                    targetBookRotY += dx * 0.0085;
+                    targetBookRotX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, targetBookRotX + dy * 0.0085));
+                    bookPrevPointer = { x: e.clientX, y: e.clientY };
+                    return;
+                }
+                if (!bookRoot || !coverCamera) return;
+                const hits = hitFromEvent(e, bookRoot.children);
+                container.style.cursor = hits.length > 0 ? "pointer" : "grab";
+            });
+
+            window.addEventListener("pointerup", (e) => {
+                if (!isDraggingBook) return;
+                const moveDist = Math.hypot(e.clientX - bookPointerDownPos.x, e.clientY - bookPointerDownPos.y);
+                const wasArm = isDraggingArmillary;
+                isDraggingBook = false;
+                isDraggingArmillary = false;
+                if (moveDist >= 8) return;
+                if (isBookOpened) {
+                    const claspHits = hitFromEvent(e, [topClaspPivot, bottomClaspPivot].filter(Boolean));
+                    if (claspHits.length) {
+                        triggerMechanicalBookClosing();
+                        return;
+                    }
+                    const tabHits = hitFromEvent(e, indexTabs);
+                    if (tabHits.length) {
+                        const tab = tabHits[0].object;
+                        const idx = tab.userData.bookIndex ?? (tab.parent && tab.parent.userData.bookIndex);
+                        if (idx != null) selectBookFolio(idx);
+                        return;
+                    }
+                    if (wasArm) {
+                        const gemHits = hitFromEvent(e, orbitalPlanetNodes);
+                        if (gemHits.length && gemHits[0].object.userData.bookIndex != null) {
+                            selectBookFolio(gemHits[0].object.userData.bookIndex);
+                        }
+                    }
+                    return;
+                }
+                if (!isBookOpening && !isBookClosing && !bookForming) {
+                    const hits = hitFromEvent(e, bookRoot.children);
+                    if (hits.length > 0) triggerMechanicalBookOpening();
+                }
+            });
+
+            container.addEventListener("wheel", (e) => {
+                if (isBookOpening || isBookOpened || isBookClosing) return;
+                e.preventDefault();
+                targetCameraZ = Math.max(14, Math.min(24, targetCameraZ + e.deltaY * 0.004));
+            }, { passive: false });
+
+            window.addEventListener("keydown", (e) => {
+                const tag = document.activeElement && document.activeElement.tagName;
+                if (e.key === "Escape" && isBookOpened) {
+                    triggerMechanicalBookClosing();
+                    return;
+                }
+                if (isBookOpened && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+                    portraitLeaf = e.key === "ArrowLeft" ? 0 : 1;
+                    fitReadCamera();
+                    return;
+                }
+                if (isBookOpened && e.key >= "1" && e.key <= "6") {
+                    selectBookFolio(Number(e.key) - 1);
+                    return;
+                }
+                if (isBookOpening || isBookOpened || isBookClosing || bookForming) return;
+                if (e.key !== "Enter" && e.key !== " ") return;
+                if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON" || tag === "A") return;
+                triggerMechanicalBookOpening();
+            });
+        }
+
+        function setBookViewPreset(preset) {
+            if (isBookOpening) return;
+            if (preset === "front") {
+                targetBookRotX = 0.08;
+                targetBookRotY = 0.0;
+                targetBookRotZ = 0.0;
+                targetCameraZ = 18.5;
+            } else if (preset === "clasps") {
+                targetBookRotX = 0.12;
+                targetBookRotY = -1.25;
+                targetBookRotZ = 0.0;
+                targetCameraZ = 17.4;
+            } else if (preset === "spine") {
+                targetBookRotX = 0.1;
+                targetBookRotY = 1.45;
+                targetBookRotZ = 0.0;
+                targetCameraZ = 17.6;
+            } else if (preset === "back") {
+                targetBookRotX = 0.1;
+                targetBookRotY = Math.PI;
+                targetBookRotZ = 0.0;
+                targetCameraZ = 18.5;
+            } else {
+                // Isometric lectern tilt
+                targetBookRotX = 0.45;
+                targetBookRotY = -0.52;
+                targetBookRotZ = 0.08;
+                targetCameraZ = 18.8;
+            }
+        }
+
+        // ============================================================================
+        // 4. OPENING SHOT. Unlatch, two turns, flatten, pages rise all around,
+        //    the sky collapses into the armillary, then the camera lands on the page.
+        // ============================================================================
+        const _pageOrigin = new THREE.Vector3();
+        const _lookAt = new THREE.Vector3();
+
+        function smooth01(t) {
+            const x = Math.max(0, Math.min(1, t));
+            return x * x * (3 - 2 * x);
+        }
+
+        function wrapAngle(a) {
+            const turn = Math.PI * 2;
+            return ((a + Math.PI) % turn + turn) % turn - Math.PI;
+        }
+
+        function dampToward(cur, goal, dt, rate) {
+            const k = 1 - Math.exp(-rate * dt);
+            cur.x += (goal.x - cur.x) * k;
+            cur.y += (goal.y - cur.y) * k;
+            cur.z += (goal.z - cur.z) * k;
+            if (cur.lx != null) {
+                cur.lx += (goal.lx - cur.lx) * k;
+                cur.ly += (goal.ly - cur.ly) * k;
+                cur.lz += (goal.lz - cur.lz) * k;
+            }
+        }
+
+        function fitReadCamera() {
+            const portrait = window.innerWidth < 900;
+            const aspect = Math.max(0.45, (coverCamera && coverCamera.aspect) || window.innerWidth / window.innerHeight);
+            const baseY = 7.15 + Math.max(0, 1.15 - aspect) * 2.6;
+            const xOff = portrait ? (portraitLeaf === 0 ? -1.85 : 1.85) : 0;
+            const zOff = portrait ? 2.55 : 3.15;
+            camGoal.x = xOff;
+            camGoal.y = baseY;
+            camGoal.z = zOff;
+            camGoal.lx = xOff * 0.55;
+            camGoal.ly = 0.02;
+            camGoal.lz = 0.12;
+        }
+
+        function applyReadCamera() {
+            if (!coverCamera) return;
+            coverCamera.position.set(camFollow.x, camFollow.y, camFollow.z);
+            _lookAt.set(camFollow.lx, camFollow.ly, camFollow.lz);
+            coverCamera.lookAt(_lookAt);
+            coverCamera.rotation.z = 0;
+        }
+
+        function setSpreadVisible(open) {
+            if (pageBlockMesh) pageBlockMesh.visible = !open;
+            pageSheaves.forEach((s) => { s.visible = !open; });
+            if (leftStackGroup) leftStackGroup.visible = open;
+            if (rightStackGroup) rightStackGroup.visible = true;
+            if (leftLeafMesh) leftLeafMesh.visible = open;
+            if (rightLeafMesh) rightLeafMesh.visible = open;
+            const lb = leftStackGroup && leftStackGroup.getObjectByName("leftStackBlock");
+            const rb = rightStackGroup && rightStackGroup.getObjectByName("rightStackBlock");
+            if (lb) lb.visible = open;
+            if (rb) rb.visible = open;
+            if (gutterMesh) gutterMesh.visible = open;
+            if (leftCssObj) leftCssObj.visible = open;
+            if (rightCssObj) rightCssObj.visible = open;
+            if (cssRenderer) cssRenderer.domElement.style.pointerEvents = "none";
+        }
+
+        function poseOpenLeaves(turn01, section01) {
+            const turn = Math.max(0, Math.min(1, turn01));
+            const sect = Math.max(0, Math.min(1, section01 == null ? turn : section01));
+            if (leftStackGroup) leftStackGroup.rotation.y = -Math.PI * turn + 0.16 * turn;
+            if (rightStackGroup) rightStackGroup.rotation.y = 0.12 * turn;
+            const leftThick = 0.06 + sect * 0.22;
+            const rightThick = 0.42 - sect * 0.22;
+            const lb = leftStackGroup && leftStackGroup.getObjectByName("leftStackBlock");
+            const rb = rightStackGroup && rightStackGroup.getObjectByName("rightStackBlock");
+            if (lb) lb.scale.set(1, 1, Math.max(0.2, leftThick / 0.28));
+            if (rb) rb.scale.set(1, 1, Math.max(0.25, rightThick / 0.5));
+        }
+
+        function hideOpeningSpectacle() {
+            if (cosmicMistGroup) cosmicMistGroup.visible = false;
+            cosmicMistPuffs.forEach((puff) => { puff.material.opacity = 0; });
+            if (celestialGroup) {
+                celestialGroup.visible = false;
+                celestialGroup.scale.set(1, 1, 1);
+            }
+            if (celestialSun) celestialSun.visible = true;
+            celestialRings.forEach((ring) => { ring.visible = true; ring.scale.set(1, 1, 1); });
+            celestialPlanets.forEach((planet) => { planet.mesh.visible = true; planet.mesh.scale.set(1, 1, 1); });
+            if (fallingArmillary) {
+                fallingArmillary.visible = false;
+                fallingArmillary.scale.set(0.26, 0.26, 0.26);
+                fallingArmillary.position.set(1.55, 0.05, 0.62);
+            }
+            if (emberParticles) emberParticles.material.opacity = 0.62;
+        }
+
+        function beginCodexLanding() {
+            if (openHandoffStarted) return;
+            openHandoffStarted = true;
+            document.body.classList.add("codex-unlocked");
+            if (bookRoot) {
+                bookRoot.rotation.set(-1.18, 0, 0);
+                bookRoot.position.set(0, -0.12, 0.55);
+            }
+            setSpreadVisible(true);
+            poseOpenLeaves(1);
+            if (leftCssObj) leftCssObj.visible = true;
+            if (rightCssObj) rightCssObj.visible = true;
+            if (fallingArmillary) fallingArmillary.visible = true;
+            if (typeof selectBookFolio === "function") selectBookFolio(activeBookIndex || 0);
+            fitReadCamera();
+            camFollow.x = camGoal.x;
+            camFollow.y = camGoal.y;
+            camFollow.z = camGoal.z;
+            camFollow.lx = camGoal.lx;
+            camFollow.ly = camGoal.ly;
+            camFollow.lz = camGoal.lz;
+        }
+
+        function skipToOpenPose() {
+            if (frontCoverPivot) frontCoverPivot.rotation.y = -Math.PI;
+            if (topClaspPivot) topClaspPivot.rotation.y = 2.45;
+            if (bottomClaspPivot) bottomClaspPivot.rotation.y = 2.45;
+            if (bookRoot) {
+                bookRoot.rotation.set(-1.18, 0, 0);
+                bookRoot.position.set(0, -0.12, 0.55);
+            }
+            poseOpenLeaves(1, pageTurnT);
+            setSpreadVisible(true);
+            isBookOpening = false;
+            isBookOpened = true;
+            beginCodexLanding();
+        }
+
+        function triggerMechanicalBookOpening() {
+            if (isBookOpening || isBookOpened || isBookClosing || bookForming) return;
+            if (document.documentElement.classList.contains("tome-quiet")) {
+                skipToOpenPose();
+                return;
+            }
+            isBookOpening = true;
+            openHandoffStarted = false;
+            openAnimStartTime = performance.now();
+            camFollow = { x: coverCamera.position.x, y: coverCamera.position.y, z: coverCamera.position.z, lx: 0, ly: 0.08, lz: 0 };
+            hingedPages.forEach((page) => {
+                page.visible = true;
+                page.rotation.y = 0;
+            });
+            flyingPages.forEach((sheet) => {
+                sheet.visible = false;
+                sheet.material.opacity = 0;
+            });
+            hideOpeningSpectacle();
+            setSpreadVisible(false);
+        }
+
+        function updateBookOpeningTimeline(now) {
+            const elapsed = (now - openAnimStartTime) / 1000;
+            const progress = Math.min(1, elapsed / OPEN_DURATION);
+
+            const claspT = Math.min(1, elapsed / 0.7);
+            const claspSpring = 1 - Math.exp(-6.2 * claspT) * Math.cos(14 * claspT);
+            const clasp = Math.min(2.7, 2.45 * claspSpring);
+            if (topClaspPivot) topClaspPivot.rotation.y = clasp;
+            if (bottomClaspPivot) bottomClaspPivot.rotation.y = clasp;
+
+            const spinT = Math.max(0, Math.min(1, (elapsed - 0.22) / 1.33));
+            const easeSpin = spinT < 0.5 ? 4 * spinT * spinT * spinT : 1 - Math.pow(-2 * spinT + 2, 3) / 2;
+            if (elapsed < 1.55) {
+                bookRoot.rotation.y = targetBookRotY + easeSpin * Math.PI * 4;
+                bookRoot.rotation.x = targetBookRotX + Math.sin(easeSpin * Math.PI) * 0.34;
+                bookRoot.rotation.z = targetBookRotZ + Math.sin(easeSpin * Math.PI * 2) * 0.16;
+                bookRoot.position.y = Math.sin(easeSpin * Math.PI) * 0.42;
+            }
+
+            if (elapsed >= 1.55) {
+                const flattenT = Math.min(1, (elapsed - 1.55) / 1.0);
+                const easeFlat = smooth01(flattenT);
+                bookRoot.rotation.x = targetBookRotX + (-1.18 - targetBookRotX) * easeFlat;
+                bookRoot.rotation.y = targetBookRotY + (0 - targetBookRotY) * easeFlat;
+                bookRoot.rotation.z = targetBookRotZ * (1 - easeFlat);
+                bookRoot.position.y = 0.42 + (-0.12 - 0.42) * easeFlat;
+                bookRoot.position.z = 0.55 * easeFlat;
+                const coverT = Math.min(1, (elapsed - 1.7) / 1.35);
+                const gravity = coverT * coverT * (1.15 - 0.15 * coverT);
+                const bounce = coverT > 0.82 ? Math.sin(((coverT - 0.82) / 0.18) * Math.PI) * 0.08 : 0;
+                if (frontCoverPivot) frontCoverPivot.rotation.y = -Math.min(Math.PI + 0.04, gravity * Math.PI + bounce);
+                if (innerBookGlowLight) innerBookGlowLight.intensity = 0.2 + easeFlat * 3.6;
+                if (easeFlat > 0.35) {
+                    setSpreadVisible(true);
+                    poseOpenLeaves(Math.min(1, (easeFlat - 0.35) / 0.65));
+                }
+                const count = Math.max(1, hingedPages.length - 1);
+                hingedPages.forEach((pageMesh, idx) => {
+                    const lag = idx / count;
+                    const local = Math.max(0, Math.min(1, (easeFlat - lag * 0.35) / 0.55));
+                    const dest = -Math.PI * (idx < count * 0.42 ? 1 : 0);
+                    pageMesh.rotation.y = dest * (local * local * (3 - 2 * local));
+                    pageMesh.visible = local > 0 && local < 0.98;
+                    const arch = Math.sin(local * Math.PI) * 0.28;
+                    const posAttr = pageMesh.geometry.attributes.position;
+                    const base = pageMesh.geometry.userData.baseCoords;
+                    if (posAttr && base) {
+                        for (let v = 0; v < posAttr.count; v++) {
+                            const bx = base[v * 3];
+                            posAttr.setXYZ(v, bx, base[v * 3 + 1], Math.sin((bx / 3.1) * Math.PI) * arch);
+                        }
+                        posAttr.needsUpdate = true;
+                    }
+                });
+            }
+
+            if (elapsed >= 1.55) {
+                const flyElapsed = elapsed - 1.55;
+                flyingPages.forEach((sheet) => {
+                    const d = sheet.userData;
+                    const life = flyElapsed - d.delay;
+                    if (life <= 0) {
+                        sheet.visible = false;
+                        return;
+                    }
+                    sheet.visible = true;
+                    const hang = Math.min(life, 2.6);
+                    const rise = d.vy * hang - 0.5 * d.grav * hang * hang;
+                    const travel = Math.min(life, 2.15);
+                    const eddy = Math.min(1, life / 1.2);
+                    _pageOrigin.set(0, 0, 0.2);
+                    if (bookRoot) bookRoot.localToWorld(_pageOrigin);
+                    sheet.position.set(
+                        _pageOrigin.x + d.vx * travel * 0.95 + Math.sin(d.az + life * d.swirl) * d.swirlR * eddy,
+                        _pageOrigin.y + rise,
+                        _pageOrigin.z + d.vz * travel * 0.22 + Math.cos(d.az + life * d.swirl) * d.swirlR * 0.28 * eddy
+                    );
+                    sheet.rotation.set(life * d.sx, life * d.sy, life * d.sz);
+                    const fadeIn = Math.min(1, life * 3.2);
+                    const fadeOut = elapsed > 5.05 ? Math.max(0, 1 - (elapsed - 5.05) * 1.15) : 1;
+                    const blockingSky = elapsed > 2.7 && elapsed < 4.5 && Math.abs(sheet.position.x) < 1.6 && sheet.position.y > 2.4;
+                    sheet.material.opacity = fadeIn * fadeOut * (blockingSky ? 0.22 : 1);
+                    if (life < 2.4 && (d.index % 2 === 0)) {
+                        const posAttr = sheet.geometry.attributes.position;
+                        const base = sheet.geometry.userData.baseCoords;
+                        const amp = d.nearLens ? 0.05 : 0.09;
+                        for (let v = 0; v < posAttr.count; v++) {
+                            const bx = base[v * 3];
+                            const by = base[v * 3 + 1];
+                            const wave = Math.sin(life * d.flutter + bx * 3.1) * amp;
+                            const curl = (bx > 0.25 && by < -0.2) ? 0.1 : 0;
+                            posAttr.setXYZ(v, bx, by, wave + curl);
+                        }
+                        posAttr.needsUpdate = true;
+                    }
+                });
+
+                if (cosmicMistGroup) {
+                    cosmicMistGroup.visible = true;
+                    cosmicMistGroup.rotation.y = flyElapsed * 0.22;
+                    const mistIn = Math.min(1, Math.max(0, (flyElapsed - 0.15) / 0.8));
+                    const mistOut = elapsed > 4.7 ? Math.max(0, 1 - (elapsed - 4.7) * 1.4) : 1;
+                    cosmicMistPuffs.forEach((puff, idx) => {
+                        const pulse = 1 + Math.sin(flyElapsed * 2.2 + idx) * 0.12;
+                        const scale = puff.userData.base * mistIn * pulse;
+                        puff.scale.set(scale, scale, 1);
+                        puff.material.opacity = mistIn * mistOut * 0.22;
+                    });
+                }
+                if (emberParticles) {
+                    const glow = Math.min(1, Math.max(0, (elapsed - 1.55) / 0.6));
+                    const dim = elapsed > 5.1 ? Math.max(0.62, 0.95 - (elapsed - 5.1)) : 0.62 + glow * 0.28;
+                    emberParticles.material.opacity = dim;
+                }
+            }
+
+            if (elapsed >= 3.8 && !pageBlockMesh.visible) poseOpenLeaves(Math.min(1, (elapsed - 3.8) / 1.4));
+            if (elapsed >= 2.25 && celestialGroup) {
+                const sky = elapsed - 2.25;
+                celestialGroup.visible = true;
+                if (sky < 1.15) {
+                    const form = smooth01(sky / 1.0);
+                    celestialGroup.scale.set(form, form, form);
+                    celestialPlanets.forEach((planet) => {
+                        planet.angle += 0.012 * planet.speed;
+                        planet.mesh.position.set(
+                            Math.cos(planet.angle) * planet.radius,
+                            Math.sin(planet.angle * 2) * planet.radius * 0.12,
+                            Math.sin(planet.angle) * planet.radius
+                        );
+                    });
+                    celestialRings.forEach((ring, idx) => {
+                        ring.rotation.y += 0.004 + idx * 0.001;
+                    });
+                    if (celestialCorona) celestialCorona.material.opacity = 0.35 + form * 0.45;
+                } else if (sky < 1.9) {
+                    const col = smooth01((sky - 1.15) / 0.75);
+                    const shrink = Math.max(0.04, 1 - col);
+                    if (celestialSun) celestialSun.scale.set(shrink, shrink, shrink);
+                    celestialRings.forEach((ring) => ring.scale.set(shrink, shrink, shrink));
+                    celestialPlanets.forEach((planet) => planet.mesh.scale.set(shrink, shrink, shrink));
+                    if (celestialCorona) {
+                        celestialCorona.material.opacity = 0.8 * (1 - col) + Math.sin(col * Math.PI) * 0.35;
+                        celestialCorona.scale.set(2.1 + col * 2.4, 2.1 + col * 2.4, 1);
+                    }
+                    if (fallingArmillary) {
+                        fallingArmillary.visible = true;
+                        const grown = 0.15 + col * 0.85;
+                        fallingArmillary.scale.set(grown, grown, grown);
+                        fallingArmillary.position.set(0, 0, 3.6);
+                        fallingArmillary.rotation.y = col * Math.PI * 2;
+                    }
+                } else {
+                    if (celestialSun) celestialSun.visible = false;
+                    celestialRings.forEach((ring) => { ring.visible = false; });
+                    celestialPlanets.forEach((planet) => { planet.mesh.visible = false; });
+                }
+            }
+
+            if (elapsed >= 4.2 && fallingArmillary) {
+                fallingArmillary.visible = true;
+                const fallT = Math.min(1, (elapsed - 4.2) / 0.95);
+                const easeFall = fallT * fallT;
+                let landZ = 3.6 + (0.58 - 3.6) * easeFall;
+                if (fallT > 0.82) {
+                    const bounce = (fallT - 0.82) / 0.18;
+                    landZ += Math.sin(bounce * Math.PI) * 0.16 * Math.exp(-bounce * 3);
+                }
+                fallingArmillary.position.set(1.55 * Math.max(0.2, easeFall), 0.05, 0.62 + (1 - easeFall) * 2.4);
+                fallingArmillary.rotation.y += 0.012;
+                const sc = 0.26 + (1 - easeFall) * 0.7;
+                fallingArmillary.scale.set(sc, sc, sc);
+            }
+
+            if (elapsed < 2.6) {
+                camGoal.x = 0;
+                camGoal.y = 1.4 + elapsed * 0.55;
+                camGoal.z = 18.8 + Math.sin(Math.min(1, elapsed / 1.5) * Math.PI) * 1.6;
+                camGoal.lx = 0;
+                camGoal.ly = 0.15;
+                camGoal.lz = 0;
+            } else {
+                fitReadCamera();
+            }
+            dampToward(camFollow, camGoal, 1 / 60, elapsed > 4.4 ? 3.4 : 2.1);
+            applyReadCamera();
+
+            if (elapsed >= 6.2) beginCodexLanding();
+
+            if (progress >= 1) {
+                isBookOpening = false;
+                isBookOpened = true;
+                beginCodexLanding();
+                hingedPages.forEach((p) => { p.visible = false; });
+                resizeAll3DViewports();
+            }
+        }
+
+        function resetBookToClosed3DStage() {
+            isBookOpening = false;
+            isBookOpened = false;
+
+            if (topClaspPivot && bottomClaspPivot) {
+                topClaspPivot.rotation.y = 0;
+                bottomClaspPivot.rotation.y = 0;
+            }
+            if (frontCoverPivot) frontCoverPivot.rotation.y = 0;
+            if (innerBookGlowLight) innerBookGlowLight.intensity = 0.08;
+
+            hingedPages.forEach(p => {
+                p.visible = false;
+                p.rotation.y = 0;
+            });
+            flyingPages.forEach(fp => {
+                fp.visible = false;
+                fp.material.opacity = 0;
+            });
+            hideOpeningSpectacle();
+            setSpreadVisible(false);
+            poseOpenLeaves(0);
+            openHandoffStarted = false;
+            if (bookRoot) {
+                bookRoot.position.set(0, 0, 0);
+                bookRoot.rotation.set(0.24, -0.44, 0.03);
+            }
+            targetBookRotX = 0.24;
+            targetBookRotY = -0.44;
+            targetBookRotZ = 0.03;
+            targetCameraX = 0;
+            targetCameraY = 0.85;
+            targetCameraZ = 18.5;
+            camGoal = { x: 0, y: 0.85, z: 18.5, lx: 0, ly: 0.08, lz: 0 };
+            camFollow = { ...camGoal };
+            applyReadCamera();
+
+            document.body.classList.remove("codex-unlocked");
+            document.body.classList.remove("tome-closing");
+            const coverStage = document.getElementById("frontCoverStage");
+            if (coverStage) {
+                coverStage.classList.remove("stage-hidden", "stage-landing");
+                coverStage.style.transition = "";
+            }
+            resizeAll3DViewports();
+        }
+
+        function flattenHingedPage(pageMesh) {
+            const posAttr = pageMesh.geometry.attributes.position;
+            const baseCoords = pageMesh.geometry.userData.baseCoords;
+            if (!posAttr || !baseCoords) return;
+            for (let v = 0; v < posAttr.count; v++) {
+                posAttr.setXYZ(v, baseCoords[v * 3], baseCoords[v * 3 + 1], 0);
+            }
+            posAttr.needsUpdate = true;
+        }
+
+        function triggerMechanicalBookClosing() {
+            if (!isBookOpened || isBookClosing || isBookOpening || bookForming) return;
+            if (document.documentElement.classList.contains("tome-quiet")) {
+                resetBookToClosed3DStage();
+                return;
+            }
+            isBookClosing = true;
+            isBookOpened = false;
+            closeAnimStartTime = performance.now();
+            if (typeof finishInscription === "function") finishInscription();
+            document.body.classList.add("tome-closing");
+            document.body.classList.remove("codex-unlocked");
+            if (leftCssObj) leftCssObj.visible = false;
+            if (rightCssObj) rightCssObj.visible = false;
+            closeCamFrom = coverCamera ? coverCamera.position.clone() : new THREE.Vector3(0, 0.85, 18.5);
+            closeBookFrom = bookRoot ? {
+                x: bookRoot.rotation.x,
+                y: wrapAngle(bookRoot.rotation.y),
+                z: bookRoot.rotation.z,
+                py: bookRoot.position.y,
+                pz: bookRoot.position.z
+            } : { x: 0.24, y: -0.44, z: 0.03, py: 0, pz: 0 };
+            hideOpeningSpectacle();
+            flyingPages.forEach((fp) => {
+                fp.visible = false;
+                fp.material.opacity = 0;
+            });
+            window.scrollTo({ top: 0, behavior: "instant" });
+        }
+
+        function updateBookClosingTimeline(now) {
+            const elapsed = (now - closeAnimStartTime) / 1000;
+            const progress = Math.min(1, elapsed / CLOSE_DURATION);
+
+            targetBookRotX = 0.24;
+            targetBookRotY = -0.44;
+            targetBookRotZ = 0.03;
+            targetCameraX = 0;
+            targetCameraY = 0.85;
+            targetCameraZ = 18.5;
+
+            camGoal.x = 0;
+            camGoal.y = 0.85;
+            camGoal.z = 18.5;
+            camGoal.lx = 0;
+            camGoal.ly = 0.08;
+            camGoal.lz = 0;
+            dampToward(camFollow, camGoal, 1 / 60, elapsed > 1.4 ? 3.6 : 2.2);
+            applyReadCamera();
+            if (bookRoot && closeBookFrom) {
+                const settle = smooth01(Math.min(1, elapsed / 1.15));
+                bookRoot.rotation.x = closeBookFrom.x + (0.24 - closeBookFrom.x) * settle;
+                bookRoot.rotation.y = closeBookFrom.y + (-0.44 - closeBookFrom.y) * settle;
+                bookRoot.rotation.z = closeBookFrom.z * (1 - settle);
+                bookRoot.position.y = closeBookFrom.py * (1 - settle);
+                bookRoot.position.z = (closeBookFrom.pz || 0) * (1 - settle);
+            }
+
+            hingedPages.forEach((pageMesh) => { pageMesh.visible = false; });
+            poseOpenLeaves(1 - smooth01(Math.min(1, elapsed / 1.2)));
+            if (elapsed > 1.1) setSpreadVisible(false);
+
+            const coverLocal = Math.min(1, Math.max(0, (elapsed - 1.35) / 1.15));
+            const coverEased = 1 - Math.pow(1 - coverLocal, 3);
+            if (frontCoverPivot) frontCoverPivot.rotation.y = -Math.PI * (1 - coverEased);
+            if (innerBookGlowLight) innerBookGlowLight.intensity = 4.1 * (1 - coverEased) + 0.08 * coverEased;
+
+            const claspLocal = Math.min(1, Math.max(0, (elapsed - 2.55) / 0.7));
+            let claspAngle = 2.4 * (1 - Math.min(1, claspLocal / 0.82));
+            if (claspLocal > 0.82 && claspLocal < 1) {
+                claspAngle = -0.14 * Math.sin(((claspLocal - 0.82) / 0.18) * Math.PI);
+            }
+            if (claspLocal >= 1) claspAngle = 0;
+            if (topClaspPivot) topClaspPivot.rotation.y = claspAngle;
+            if (bottomClaspPivot) bottomClaspPivot.rotation.y = claspAngle;
+
+            if (progress >= 1) {
+                isBookClosing = false;
+                hingedPages.forEach(flattenHingedPage);
+                resetBookToClosed3DStage();
+            }
+        }
+
+        // ============================================================================
+        // 5. ARMILLARY lives on the left leaf of the same scene (see fallingArmillary).
+        // ============================================================================
+        let htmlOrbitalTags = [];
+
+        function frameArmillaryCamera() {}
+
+        function init3DOrbitalArmillary() {}
+        function updateOrbitalNodeHTMLTags() {}
+
+        // ============================================================================
+        // 6. UNIFIED ANIMATION LOOP & RESPONSIVE VIEWPORT RESIZER
+        // ============================================================================
+        let tomeStill = false;
+
+        function masterAnimationLoop(now) {
+            if (!tomeStill) requestAnimationFrame(masterAnimationLoop);
+
+            // The cover rests once the clasps have opened.
+            if (bookRoot && coverRenderer && coverScene && coverCamera) {
+                if (bookForming) updateMaterialization(now);
+                if (isBookOpening) {
+                    updateBookOpeningTimeline(now);
+                    if (leftCssObj && leftCssObj.visible) {
+                        syncCssPages();
+                        if (cssRenderer) cssRenderer.render(cssScene, coverCamera);
+                    }
+                } else if (isBookClosing) {
+                    updateBookClosingTimeline(now);
+                } else if (isBookOpened) {
+                    bookRoot.rotation.set(-1.18, 0, 0);
+                    bookRoot.position.set(0, -0.12, 0.55);
+                    if (fallingArmillary) {
+                        fallingArmillary.visible = true;
+                        fallingArmillary.rotation.x += (targetArmillaryRotX - fallingArmillary.rotation.x) * 0.08;
+                        fallingArmillary.rotation.y += (targetArmillaryRotY - fallingArmillary.rotation.y) * 0.08;
+                    }
+                    fitReadCamera();
+                    dampToward(camFollow, camGoal, 1 / 60, 4.2);
+                    applyReadCamera();
+                    syncCssPages();
+                    if (cssRenderer) cssRenderer.render(cssScene, coverCamera);
+                } else if (!isDraggingBook) {
+                    bookRoot.position.y = Math.sin(now * 0.0014) * 0.065;
+                }
+
+                // Organic hearth-fire / candle flicker for chiaroscuro realism
+                if (hearthCandleLight) {
+                    hearthCandleLight.intensity = 1.55 + Math.sin(now * 0.007) * 0.16 + Math.cos(now * 0.019) * 0.08;
+                    hearthCandleLight.position.x = 3.2 + Math.sin(now * 0.003) * 0.18;
+                    hearthCandleLight.position.y = -1.2 + Math.cos(now * 0.004) * 0.12;
+                }
+
+                // Gentle sway on the hanging silk bookmark ribbons
+                if (bookmarkRibbon1 && bookmarkRibbon2) {
+                    bookmarkRibbon1.rotation.z = -0.06 + Math.sin(now * 0.0022) * 0.04;
+                    bookmarkRibbon2.rotation.z = 0.08 + Math.cos(now * 0.0026) * 0.035;
+                }
+
+                if (!isBookOpening && !isBookClosing && !isBookOpened) {
+                    bookRoot.rotation.x += (targetBookRotX - bookRoot.rotation.x) * 0.075;
+                    bookRoot.rotation.y += (targetBookRotY - bookRoot.rotation.y) * 0.075;
+                    bookRoot.rotation.z += (targetBookRotZ - bookRoot.rotation.z) * 0.075;
+
+                    coverCamera.position.x += (targetCameraX - coverCamera.position.x) * 0.085;
+                    coverCamera.position.y += (targetCameraY - coverCamera.position.y) * 0.085;
+                    coverCamera.position.z += (targetCameraZ - coverCamera.position.z) * 0.085;
+                }
+
+                // Slow, mechanical horological rotation on cover medallion rings
+                if (coverMedallionRing1) coverMedallionRing1.rotation.z = now * 0.00035;
+                if (coverMedallionRing2) coverMedallionRing2.rotation.z = -now * 0.00055;
+
+                if (emberParticles) {
+                    emberParticles.rotation.y = now * 0.00014;
+                    emberParticles.position.y = Math.sin(now * 0.0008) * 0.15;
+                }
+
+                coverRenderer.render(coverScene, coverCamera);
+            }
+
+            if (isBookOpened && orbitalPlanetNodes) {
+                orbitalPlanetNodes.forEach((mesh, idx) => {
+                    const targetScale = idx === activeBookIndex ? 1.38 : 1.0;
+                    mesh.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.12);
+                });
+            }
+        }
+
+        function resizeAll3DViewports() {
+            const bookContainer = document.getElementById("book3DViewport");
+            if (bookContainer && coverRenderer && coverCamera) {
+                const bw = window.innerWidth || bookContainer.clientWidth || 1024;
+                const bh = window.innerHeight || bookContainer.clientHeight || 768;
+                coverCamera.aspect = bw / bh;
+                coverCamera.updateProjectionMatrix();
+                coverRenderer.setSize(bw, bh);
+            }
+
+            if (cssRenderer) cssRenderer.setSize(window.innerWidth || 1024, window.innerHeight || 768);
+            if (isBookOpened) fitReadCamera();
+        }
+
+        window.addEventListener("resize", resizeAll3DViewports);
+
+        // ============================================================================
+        // 7. RIGHT FOLIO & WHISPERING CONCORDANCE CONTROLLERS
+        // ============================================================================
+        let activeBookIndex = 0;
+        let isParchmentMode = false;
+
+        function manuscriptHost() {
+            if (document.documentElement.classList.contains("tome-still")) {
+                return document.getElementById("livingManuscriptContainer");
+            }
+            return document.getElementById("livingManuscriptContainer3d") || document.getElementById("livingManuscriptContainer");
+        }
+        function folioFooter() {
+            if (document.documentElement.classList.contains("tome-still")) {
+                return document.getElementById("rectoFooterPortal");
+            }
+            return document.getElementById("rectoFooterPortal3d") || document.getElementById("rectoFooterPortal");
+        }
+
+        function selectBookFolio(targetIndex) {
+            activeBookIndex = (targetIndex + SIX_BOOKS.length) % SIX_BOOKS.length;
+            const book = SIX_BOOKS[activeBookIndex];
+            targetArmillaryRotY = -(activeBookIndex * (Math.PI / 3));
+            targetArmillaryRotX = (activeBookIndex % 2 === 0) ? 0.22 : -0.18;
+            pageTurnT = activeBookIndex / Math.max(1, SIX_BOOKS.length - 1);
+            if (isBookOpened) poseOpenLeaves(1, pageTurnT);
+            const modeBadge = document.getElementById("concordanceModeBadge");
+            if (modeBadge) modeBadge.textContent = "Looking through the book";
+            renderRightFolioForBook(book);
+            renderBottomSixSealsBar();
+        }
+
+        function renderRightFolioForBook(book) {
+            const container = manuscriptHost();
+            if (!container) return;
+            const notes = book.marginalia.map(m => `
+                <button type="button" onclick="selectBookFolio(${m.targetIdx})" class="folio-note">
+                    <strong>${esc(m.book)}</strong> ${esc(m.note)}
+                </button>
+            `).join("");
+            inscribeManuscript(container, `
+                <div class="folio-kicker">${esc(book.latinSubtitle)} · ${esc(book.element)}</div>
+                <h3 class="folio-title">${esc(book.fullTitle)}</h3>
+                <blockquote class="folio-epigraph">${esc(book.epigraph)}</blockquote>
+                <p class="folio-body">${esc(book.manuscriptBody)}</p>
+                <div class="folio-notes">
+                    <div class="folio-notes-label">Marginalia</div>
+                    ${notes}
+                </div>
+            `);
+
+            const footer = folioFooter();
+            if (!footer) return;
+            if (book.liveUrl) {
+                footer.innerHTML = `
+                    <span>This volume is open.</span>
+                    <a href="${book.liveUrl}">Enter ${esc(book.shortTitle)}</a>
+                `;
+            } else {
+                footer.innerHTML = `
+                    <span>${esc(book.status)}</span>
+                    <button type="button" onclick="openFolioBlueprintModal(${activeBookIndex})">Inspect the blueprint</button>
+                `;
+            }
+        }
+
+        function triggerConcordanceSeed(seedKey) {
+            const key = seedKey.toLowerCase().trim();
+            const input = document.getElementById("concordanceInput");
+            if (input) input.value = key;
+            inscribeConcordanceQuery(key);
+        }
+
+        function esc(value) {
+            return String(value ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+        }
+
+        function findGlossaryEntry(rawQuery) {
+            const q = rawQuery.toLowerCase().trim();
+            if (!q) return null;
+            if (CONCORDANCE_GLOSSARY[q]) return CONCORDANCE_GLOSSARY[q];
+            const matchedKey = Object.keys(CONCORDANCE_GLOSSARY).find((k) => {
+                const item = CONCORDANCE_GLOSSARY[k];
+                if (q.includes(k) || k.includes(q)) return true;
+                return (item.synonyms || []).some((s) => q === s || q.includes(s) || s.includes(q));
+            });
+            return matchedKey ? CONCORDANCE_GLOSSARY[matchedKey] : null;
+        }
+
+        function inscribeConcordanceQuery(rawQuery) {
+            const q = rawQuery.toLowerCase().trim();
+            if (!q) return;
+            const entry = findGlossaryEntry(q);
+            const modeBadge = document.getElementById("concordanceModeBadge");
+            if (modeBadge) modeBadge.textContent = entry ? "Word found" : "Not in the codex yet";
+            const container = manuscriptHost();
+            if (!container) return;
+            if (!entry) {
+                inscribeManuscript(container, `
+                    <div class="folio-kicker">Concordance</div>
+                    <h3 class="folio-title">${esc(rawQuery)}</h3>
+                    <p class="folio-body">That word is not in the codex yet. Try witch, ghost, vampire, curse, spell, charm, psychic, or sacred place.</p>
+                `);
+                const miss = folioFooter();
+                if (miss) miss.innerHTML = `<button type="button" onclick="selectBookFolio(${activeBookIndex})">Return to the open volume</button>`;
+                return;
+            }
+            targetArmillaryRotY += Math.PI * 0.35;
+            const threads = entry.threads.map(t => `
+                <button type="button" onclick="selectBookFolio(${t.bookIdx})" class="folio-note">
+                    <strong>${esc(t.label)}</strong> ${esc(t.entry)}
+                </button>
+            `).join("");
+            inscribeManuscript(container, `
+                <div class="folio-kicker">Plain meaning</div>
+                <h3 class="folio-title">${esc(entry.title)}</h3>
+                <p class="folio-body">${esc(entry.definition)}</p>
+                <div class="folio-notes">
+                    <div class="folio-notes-label">Where to find it</div>
+                    ${threads}
+                </div>
+            `);
+            const footer = folioFooter();
+            if (footer) {
+                footer.innerHTML = `<button type="button" onclick="selectBookFolio(${activeBookIndex})">Return to ${esc(SIX_BOOKS[activeBookIndex].roman)}</button>`;
+            }
+        }
+
+        let inscribeToken = 0;
+        let pyroParticles = [];
+        let pyroDrawing = false;
+
+        function finishInscription() {
+            inscribeToken += 1;
+            document.querySelectorAll("#livingManuscriptContainer .pyro-word").forEach((el) => {
+                el.classList.remove("pending", "burning");
+                el.classList.add("settled");
+            });
+            pyroParticles = [];
+        }
+
+        function wrapScorchWords(root) {
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+                acceptNode(node) {
+                    if (!node.textContent || !node.textContent.trim()) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+            const nodes = [];
+            while (walker.nextNode()) nodes.push(walker.currentNode);
+            const words = [];
+            nodes.forEach((node) => {
+                const parts = node.textContent.split(/(\s+)/);
+                const frag = document.createDocumentFragment();
+                parts.forEach((part) => {
+                    if (!part) return;
+                    if (/^\s+$/.test(part)) {
+                        frag.appendChild(document.createTextNode(part));
+                        return;
+                    }
+                    const span = document.createElement("span");
+                    span.className = "pyro-word pending";
+                    span.textContent = part;
+                    frag.appendChild(span);
+                    words.push(span);
+                });
+                node.parentNode.replaceChild(frag, node);
+            });
+            return words;
+        }
+
+        function ensurePyroCanvas() {
+            const host = document.getElementById("rightFolioLeaf") || document.getElementById("folioRectoSection");
+            if (!host) return null;
+            let canvas = document.getElementById("pyroSmokeCanvas");
+            if (!canvas) {
+                canvas = document.createElement("canvas");
+                canvas.id = "pyroSmokeCanvas";
+                host.appendChild(canvas);
+            }
+            const rect = host.getBoundingClientRect();
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+            canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+            return canvas;
+        }
+
+        function spawnPaperScorch(word) {
+            const canvas = document.getElementById("pyroSmokeCanvas");
+            const host = document.getElementById("rightFolioLeaf") || document.getElementById("folioRectoSection");
+            if (!canvas || !host) return;
+            const wr = word.getBoundingClientRect();
+            const hr = host.getBoundingClientRect();
+            const x = wr.left - hr.left + wr.width * 0.4;
+            const y = wr.top - hr.top + wr.height * 0.72;
+            pyroParticles.push({
+                x, y,
+                vx: (Math.random() - 0.5) * 0.1,
+                vy: -0.16 - Math.random() * 0.14,
+                life: 1,
+                r: 1.5 + Math.random() * 0.9,
+                kind: "soot"
+            });
+            if (Math.random() < 0.22) {
+                pyroParticles.push({
+                    x: x + (Math.random() - 0.5) * 2,
+                    y,
+                    vx: (Math.random() - 0.5) * 0.18,
+                    vy: -0.26 - Math.random() * 0.12,
+                    life: 1,
+                    r: 0.65,
+                    kind: "ember"
+                });
+            }
+            if (pyroParticles.length > 16) pyroParticles.splice(0, pyroParticles.length - 16);
+            if (!pyroDrawing) {
+                pyroDrawing = true;
+                requestAnimationFrame(drawPaperScorch);
+            }
+        }
+
+        function drawPaperScorch() {
+            const canvas = document.getElementById("pyroSmokeCanvas");
+            if (!canvas) {
+                pyroDrawing = false;
+                return;
+            }
+            const ctx = canvas.getContext("2d");
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+            pyroParticles = pyroParticles.filter((p) => p.life > 0.05);
+            pyroParticles.forEach((p) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= p.kind === "ember" ? 0.05 : 0.03;
+                const alpha = Math.max(0, p.life);
+                ctx.beginPath();
+                if (p.kind === "ember") {
+                    ctx.fillStyle = `rgba(104, 30, 12, ${alpha * 0.5})`;
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                } else {
+                    ctx.fillStyle = `rgba(26, 14, 8, ${alpha * 0.2})`;
+                    ctx.ellipse(p.x, p.y, p.r * (1.3 + (1 - alpha) * 0.4), p.r * 0.65, 0, 0, Math.PI * 2);
+                }
+                ctx.fill();
+            });
+            if (pyroParticles.length) requestAnimationFrame(drawPaperScorch);
+            else pyroDrawing = false;
+        }
+
+        function inscribeManuscript(container, html) {
+            const token = ++inscribeToken;
+            pyroParticles = [];
+            container.innerHTML = html;
+            const words = wrapScorchWords(container);
+            const still = document.documentElement.classList.contains("tome-still")
+                || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            if (still || !words.length) {
+                words.forEach((word) => {
+                    word.classList.remove("pending");
+                    word.classList.add("settled");
+                });
+                return;
+            }
+            ensurePyroCanvas();
+            let index = 0;
+            const tick = () => {
+                if (token !== inscribeToken) return;
+                for (let n = 0; n < 2 && index < words.length; n += 1, index += 1) {
+                    words[index].classList.remove("pending");
+                    words[index].classList.add("burning");
+                    spawnPaperScorch(words[index]);
+                }
+                if (index < words.length) window.setTimeout(tick, 36);
+            };
+            tick();
+        }
+
+        function renderBottomSixSealsBar() {
+            const bar = document.getElementById("tabA11y");
+            if (!bar) return;
+            bar.innerHTML = SIX_BOOKS.map((book, idx) => {
+                const isActive = idx === activeBookIndex;
+                return `<button type="button" onclick="selectBookFolio(${idx})" ${isActive ? 'aria-current="page"' : ""}>${esc(book.roman)} ${esc(book.shortTitle)}</button>`;
+            }).join("");
+        }
+
+        function openFolioBlueprintModal(idx) {
+            const book = SIX_BOOKS[idx];
+            document.getElementById("modalFolioRoman").textContent = book.roman;
+            document.getElementById("modalFolioStatus").textContent = book.status;
+            document.getElementById("modalFolioTitle").textContent = book.fullTitle;
+            document.getElementById("modalFolioDesc").textContent = book.manuscriptBody;
+            document.getElementById("modalFolioBlueprint").textContent = book.blueprint;
+
+            const modal = document.getElementById("folioPreviewModal");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+        }
+
+        function attachUIListeners() {
+            const recto = document.getElementById("rightFolioLeaf") || document.getElementById("folioRectoSection");
+            if (recto) {
+                recto.addEventListener("click", (event) => {
+                    if (event.target.closest("button, a")) return;
+                    finishInscription();
+                });
+            }
+
+            const rotPrev = document.getElementById("rotatePrevBtn");
+            const rotNext = document.getElementById("rotateNextBtn");
+            const resetArm = document.getElementById("resetArmillaryBtn");
+            if (rotPrev) rotPrev.addEventListener("click", () => selectBookFolio(activeBookIndex - 1));
+            if (rotNext) rotNext.addEventListener("click", () => selectBookFolio(activeBookIndex + 1));
+            if (resetArm) {
+                resetArm.addEventListener("click", () => {
+                    targetArmillaryRotX = 0.25;
+                    targetArmillaryRotY = -(activeBookIndex * (Math.PI / 3));
+                });
+            }
+
+            const confForm = document.getElementById("concordanceForm");
+            if (confForm) {
+                confForm.addEventListener("submit", (e) => {
+                    e.preventDefault();
+                    const val = document.getElementById("concordanceInput").value;
+                    inscribeConcordanceQuery(val);
+                });
+            }
+
+            const closeMod = document.getElementById("closePreviewModalBtn");
+            if (closeMod) {
+                closeMod.addEventListener("click", () => {
+                    const modal = document.getElementById("folioPreviewModal");
+                    modal.classList.add("hidden");
+                    modal.classList.remove("flex");
+                });
+            }
+
+            window.addEventListener("keydown", (e) => {
+                if (e.key !== "Escape") return;
+                const modal = document.getElementById("folioPreviewModal");
+                if (modal && !modal.classList.contains("hidden")) {
+                    modal.classList.add("hidden");
+                    modal.classList.remove("flex");
+                }
+            });
+
+            const themeBtn = document.getElementById("themeToggleBtn");
+            if (themeBtn) {
+                themeBtn.addEventListener("click", () => {
+                    isParchmentMode = !isParchmentMode;
+                    document.body.classList.toggle("registry-parchment", isParchmentMode);
+                    try { localStorage.setItem("chronomythos_theme", isParchmentMode ? "parchment" : "night"); } catch (err) {}
+                    const label = document.getElementById("themeToggleLabel");
+                    const icon = document.getElementById("themeToggleIcon");
+                    if (isParchmentMode) {
+                        if (label) label.textContent = "Obsidian Folio";
+                        if (icon) icon.className = "ph-fill ph-moon-stars text-amber-600";
+                    } else {
+                        if (label) label.textContent = "Parchment Folio";
+                        if (icon) icon.className = "ph-fill ph-scroll text-amber-400";
+                    }
+                });
+            }
+        }
+
+        // Track cursor for candlelight ambient halo
+        window.addEventListener("mousemove", (e) => {
+            const x = ((e.clientX / window.innerWidth) * 100).toFixed(1);
+            const y = ((e.clientY / window.innerHeight) * 100).toFixed(1);
+            document.documentElement.style.setProperty("--candle-x", `${x}%`);
+            document.documentElement.style.setProperty("--candle-y", `${y}%`);
+        });
+
+        function revealCodex() {
+            document.body.classList.add("codex-unlocked");
+            const stillMount = document.getElementById("stillConcordanceMount");
+            const left = document.getElementById("leftFolioLeaf");
+            if (stillMount && left && !stillMount.contains(left)) stillMount.appendChild(left);
+        }
+
+        window.onload = function () {
+            tomeStill = document.documentElement.classList.contains("tome-still");
+            try {
+                if (localStorage.getItem("chronomythos_theme") === "parchment") {
+                    isParchmentMode = true;
+                    document.body.classList.add("registry-parchment");
+                    const label = document.getElementById("themeToggleLabel");
+                    const icon = document.getElementById("themeToggleIcon");
+                    if (label) label.textContent = "Obsidian Folio";
+                    if (icon) icon.className = "ph-fill ph-moon-stars text-amber-600";
+                }
+            } catch (err) {}
+
+            const start = () => {
+                targetCameraZ = 18.5;
+                targetCameraY = 0.0;
+                const stillPage = document.documentElement.classList.contains("tome-still");
+                if (!stillPage && window.THREE) {
+                    try {
+                        init3DBookSanctuary();
+                    } catch (err) {
+                        document.documentElement.classList.add("tome-still");
+                    }
+                }
+                renderBottomSixSealsBar();
+                selectBookFolio(0);
+                attachUIListeners();
+                if (document.documentElement.classList.contains("tome-still")) {
+                    revealCodex();
+                    return;
+                }
+                resizeAll3DViewports();
+                requestAnimationFrame(masterAnimationLoop);
+                if (document.documentElement.classList.contains("tome-quiet")) {
+                    bookForming = false;
+                    formUniform.value = FORM_DONE;
+                    skipToOpenPose();
+                }
+            };
+
+            const fonts = document.fonts;
+            if (!document.documentElement.classList.contains("tome-still") && fonts && fonts.load) {
+                Promise.all([
+                    fonts.load("700 62px Cinzel"),
+                    fonts.load("600 24px 'IM Fell English SC'"),
+                ]).then(start, start);
+            } else {
+                start();
+            }
+        };
+    </script>
+</body>
+</html>

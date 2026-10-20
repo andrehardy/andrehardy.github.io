@@ -31,50 +31,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ph.ph-arrow-clockwise:before {
-  content: "\e036";
-}
-.ph.ph-arrow-counter-clockwise:before {
-  content: "\e038";
-}
-.ph.ph-arrow-elbow-right:before {
-  content: "\e04e";
-}
-.ph.ph-arrow-up-right:before {
-  content: "\e092";
-}
-.ph.ph-book-open-text:before {
-  content: "\e8f2";
-}
-.ph.ph-compass:before {
-  content: "\e1c8";
-}
 .ph.ph-compass-tool:before {
   content: "\ea0e";
-}
-.ph.ph-cube-focus:before {
-  content: "\ed0a";
 }
 .ph.ph-eye:before {
   content: "\e220";
 }
-.ph.ph-feather:before {
-  content: "\e9c0";
-}
 .ph.ph-flask:before {
   content: "\e79e";
-}
-.ph.ph-git-branch:before {
-  content: "\e278";
 }
 .ph.ph-globe-hemisphere-east:before {
   content: "\e28a";
 }
 .ph.ph-moon-stars:before {
   content: "\e58e";
-}
-.ph.ph-planet:before {
-  content: "\e652";
 }
 .ph.ph-scroll:before {
   content: "\eb7a";
@@ -84,9 +54,6 @@
 }
 .ph.ph-skull:before {
   content: "\e916";
-}
-.ph.ph-sparkle:before {
-  content: "\e6a2";
 }
 .ph.ph-x:before {
   content: "\e4f6";
@@ -125,50 +92,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ph-bold.ph-arrow-clockwise:before {
-  content: "\e036";
-}
-.ph-bold.ph-arrow-counter-clockwise:before {
-  content: "\e038";
-}
-.ph-bold.ph-arrow-elbow-right:before {
-  content: "\e04e";
-}
-.ph-bold.ph-arrow-up-right:before {
-  content: "\e092";
-}
-.ph-bold.ph-book-open-text:before {
-  content: "\e8f2";
-}
-.ph-bold.ph-compass:before {
-  content: "\e1c8";
-}
 .ph-bold.ph-compass-tool:before {
   content: "\ea0e";
-}
-.ph-bold.ph-cube-focus:before {
-  content: "\ed0a";
 }
 .ph-bold.ph-eye:before {
   content: "\e220";
 }
-.ph-bold.ph-feather:before {
-  content: "\e9c0";
-}
 .ph-bold.ph-flask:before {
   content: "\e79e";
-}
-.ph-bold.ph-git-branch:before {
-  content: "\e278";
 }
 .ph-bold.ph-globe-hemisphere-east:before {
   content: "\e28a";
 }
 .ph-bold.ph-moon-stars:before {
   content: "\e58e";
-}
-.ph-bold.ph-planet:before {
-  content: "\e652";
 }
 .ph-bold.ph-scroll:before {
   content: "\eb7a";
@@ -178,9 +115,6 @@
 }
 .ph-bold.ph-skull:before {
   content: "\e916";
-}
-.ph-bold.ph-sparkle:before {
-  content: "\e6a2";
 }
 .ph-bold.ph-x:before {
   content: "\e4f6";
@@ -219,50 +153,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ph-fill.ph-arrow-clockwise:before {
-  content: "\e036";
-}
-.ph-fill.ph-arrow-counter-clockwise:before {
-  content: "\e038";
-}
-.ph-fill.ph-arrow-elbow-right:before {
-  content: "\e04e";
-}
-.ph-fill.ph-arrow-up-right:before {
-  content: "\e092";
-}
-.ph-fill.ph-book-open-text:before {
-  content: "\e8f2";
-}
-.ph-fill.ph-compass:before {
-  content: "\e1c8";
-}
 .ph-fill.ph-compass-tool:before {
   content: "\ea0e";
-}
-.ph-fill.ph-cube-focus:before {
-  content: "\ed0a";
 }
 .ph-fill.ph-eye:before {
   content: "\e220";
 }
-.ph-fill.ph-feather:before {
-  content: "\e9c0";
-}
 .ph-fill.ph-flask:before {
   content: "\e79e";
-}
-.ph-fill.ph-git-branch:before {
-  content: "\e278";
 }
 .ph-fill.ph-globe-hemisphere-east:before {
   content: "\e28a";
 }
 .ph-fill.ph-moon-stars:before {
   content: "\e58e";
-}
-.ph-fill.ph-planet:before {
-  content: "\e652";
 }
 .ph-fill.ph-scroll:before {
   content: "\eb7a";
@@ -272,9 +176,6 @@
 }
 .ph-fill.ph-skull:before {
   content: "\e916";
-}
-.ph-fill.ph-sparkle:before {
-  content: "\e6a2";
 }
 .ph-fill.ph-x:before {
   content: "\e4f6";
