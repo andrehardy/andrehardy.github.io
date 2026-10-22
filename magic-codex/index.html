@@ -634,7 +634,7 @@
         }
         .pyro-word.burning {
             color: #23150b;
-            animation: paper-scorch 0.72s ease forwards;
+            animation: paper-scorch 0.9s ease forwards;
         }
         .pyro-word.settled {
             color: #23150b;
@@ -661,8 +661,8 @@
             color: #8a5a12;
         }
         @keyframes paper-scorch {
-            0% { color: #1a0906; text-shadow: 0 0 0 transparent; }
-            20% { color: #4a1c10; text-shadow: 0 0 5px rgba(92, 28, 10, 0.42); }
+            0% { color: transparent; text-shadow: 0 0 0 transparent; }
+            28% { color: #6b2a14; text-shadow: 0 0 8px rgba(120, 42, 12, 0.55); }
             100% { color: #23150b; text-shadow: none; }
         }
 
@@ -2496,23 +2496,19 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             }
 
             // 7. PAGES LEAVE THE GUTTER AND RISE. A fountain around the viewer, not a sideways ribbon.
-            const flyingPageCount = 84;
+            const flyingPageCount = 36;
             flyingPages = [];
             for (let i = 0; i < flyingPageCount; i++) {
-                const nearLens = i % 7 === 0;
-                const width = nearLens ? 1.85 + (i % 3) * 0.28 : 0.78 + (i % 5) * 0.15;
-                const height = nearLens ? 2.45 + (i % 3) * 0.22 : 1.05 + (i % 4) * 0.18;
-                const fGeo = new THREE.PlaneGeometry(width, height, 4, 3);
-                const posAttr = fGeo.attributes.position;
-                const baseCoords = new Float32Array(posAttr.array.length);
-                baseCoords.set(posAttr.array);
-                fGeo.userData.baseCoords = baseCoords;
-
+                const nearLens = i % 5 === 0;
+                const width = nearLens ? 1.55 + (i % 3) * 0.22 : 0.72 + (i % 4) * 0.16;
+                const height = nearLens ? 2.15 + (i % 3) * 0.18 : 1.02 + (i % 4) * 0.16;
+                const fGeo = new THREE.PlaneGeometry(width, height, 1, 1);
                 const fMat = new THREE.MeshStandardMaterial({
                     map: pageFaces[i % pageFaces.length],
                     side: THREE.DoubleSide,
                     transparent: true,
                     opacity: 0,
+                    depthWrite: false,
                     roughness: 0.72,
                     metalness: 0.04,
                     emissive: 0x3d2412,
@@ -2521,23 +2517,28 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
                 const fMesh = new THREE.Mesh(fGeo, fMat);
                 fMesh.visible = false;
-                const az = Math.random() * Math.PI * 2;
-                const elev = 0.15 + Math.random() * 0.85;
+                fMesh.frustumCulled = false;
+                const side = i % 2 === 0 ? -1 : 1;
                 fMesh.userData = {
                     index: i,
                     nearLens: nearLens,
-                    delay: (i / flyingPageCount) * 0.42,
-                    vx: Math.cos(elev) * Math.cos(az) * (2.8 + Math.random() * 3.6),
-                    vy: 3.1 + Math.random() * 3.4,
-                    vz: Math.cos(elev) * Math.sin(az) * (1.6 + Math.random() * 2.4),
-                    grav: 2.2 + Math.random() * 0.6,
-                    swirl: (0.5 + Math.random() * 1.1) * (i % 2 === 0 ? 1 : -1),
-                    swirlR: 0.35 + Math.random() * 1.1,
-                    az: az,
-                    sx: (Math.random() - 0.5) * 2.4,
-                    sy: (Math.random() - 0.5) * 2.4,
-                    sz: (Math.random() - 0.5) * 1.8,
-                    flutter: 8 + (i % 5) * 2
+                    delay: (i % 9) * 0.062 + (i % 3) * 0.02,
+                    ox: side * (0.35 + (i % 5) * 0.22),
+                    oy: ((i % 7) - 3) * 0.28,
+                    oz: 0.15 + (i % 4) * 0.04,
+                    out: side * (3.4 + (i % 6) * 1.25 + (nearLens ? 0.8 : 0)),
+                    lift: (nearLens ? 5.2 : 1.35) + (i % 5) * 0.85,
+                    along: ((i % 5) - 2) * 0.85,
+                    vy: 2.4 + (i % 7) * 0.5,
+                    grav: 0.85 + (i % 4) * 0.28,
+                    rx0: (i % 5) * 0.4 - 0.8,
+                    ry0: side * (0.4 + (i % 4) * 0.35),
+                    rz0: ((i % 6) - 2.5) * 0.45,
+                    sx: side * (1.1 + (i % 5) * 0.55),
+                    sy: (i % 2 === 0 ? 1 : -1) * (1.4 + (i % 4) * 0.7),
+                    sz: side * (0.8 + (i % 3) * 0.9),
+                    flutter: 6 + (i % 5) * 1.7,
+                    flutterAmp: 0.28 + (i % 4) * 0.12
                 };
                 coverScene.add(fMesh);
                 flyingPages.push(fMesh);
@@ -3247,8 +3248,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             { id: "fall", dur: 0.98, after: "hold", at: 0.36 },
             { id: "land", dur: 0.46, after: "fall", at: 0.82 },
             { id: "pulse", dur: 0.36, after: "land", at: 0.40 },
-            { id: "pageFade", dur: 0.42, after: "pulse", at: 0.25 },
-            { id: "write", dur: 0.04, after: "pageFade", at: 1 }
+            { id: "pageFade", dur: 0.55, after: "pulse", at: 0.2 },
+            { id: "write", dur: 0.04, after: "pageFade", at: 0.42 }
         ];
         const ARMILLARY_HOVER = 2.45;
         const ARMILLARY_NATIVE = 5.15;
@@ -3344,13 +3345,24 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const y = Math.max(0, wellMetrics.localY + pad);
             const w = Math.max(8, astro.offsetWidth - pad * 2);
             const h = Math.max(8, astro.offsetHeight - pad * 2);
-            const svg = "<svg xmlns='http://www.w3.org/2000/svg' width='" + W + "' height='" + H + "'>"
-                + "<rect width='100%' height='100%' fill='white'/>"
-                + "<rect x='" + x + "' y='" + y + "' width='" + w + "' height='" + h + "' rx='16' fill='black'/>"
+            const r = Math.min(16, w / 2, h / 2);
+            const hole = "M" + (x + r) + " " + y
+                + "H" + (x + w - r)
+                + "A" + r + " " + r + " 0 0 1 " + (x + w) + " " + (y + r)
+                + "V" + (y + h - r)
+                + "A" + r + " " + r + " 0 0 1 " + (x + w - r) + " " + (y + h)
+                + "H" + (x + r)
+                + "A" + r + " " + r + " 0 0 1 " + x + " " + (y + h - r)
+                + "V" + (y + r)
+                + "A" + r + " " + r + " 0 0 1 " + (x + r) + " " + y + "Z";
+            const svg = "<svg xmlns='http://www.w3.org/2000/svg' width='" + W + "' height='" + H + "' viewBox='0 0 " + W + " " + H + "'>"
+                + "<path fill='white' fill-rule='evenodd' d='M0 0H" + W + "V" + H + "H0Z " + hole + "'/>"
                 + "</svg>";
             const url = "url(\"data:image/svg+xml," + encodeURIComponent(svg) + "\")";
             vellum.style.webkitMaskImage = url;
             vellum.style.maskImage = url;
+            vellum.style.webkitMaskMode = "alpha";
+            vellum.style.maskMode = "alpha";
             vellum.style.webkitMaskSize = "100% 100%";
             vellum.style.maskSize = "100% 100%";
             vellum.style.webkitMaskRepeat = "no-repeat";
@@ -3644,9 +3656,13 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             settleArmillaryRest();
             revealPagesImmediate();
             document.body.classList.add("codex-unlocked");
-            snapReadCamera();
+            camGoal.x = camFollow.x;
+            camGoal.y = camFollow.y;
+            camGoal.z = camFollow.z;
+            camGoal.lx = camFollow.lx;
+            camGoal.ly = camFollow.ly;
+            camGoal.lz = camFollow.lz;
             if (typeof releaseInscription === "function") releaseInscription();
-            resizeAll3DViewports();
         }
 
         function skipToOpenPose() {
@@ -3820,31 +3836,35 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
             const burst = openPlan.byId.burst;
             const burstAge = clock - burst.start;
-            const burstFade = burstT <= 0 ? 0 : 1 - smoother01(clamp01((burstT - 0.56) / 0.44));
+            const burstFade = burstT <= 0 ? 0 : 1 - smoother01(clamp01((burstT - 0.62) / 0.38));
+            if (bookRoot) {
+                _poseA.set(1, 0, 0).applyQuaternion(bookRoot.quaternion);
+                _poseB.set(0, 1, 0).applyQuaternion(bookRoot.quaternion);
+                _lookB.set(0, 0, 1).applyQuaternion(bookRoot.quaternion);
+            }
             flyingPages.forEach((sheet) => {
                 const data = sheet.userData;
                 const life = burstAge - data.delay;
-                if (burstT <= 0 || life <= 0 || burstFade <= 0) {
+                if (burstT <= 0 || life <= 0 || burstFade <= 0 || !bookRoot) {
                     sheet.visible = false;
                     return;
                 }
                 sheet.visible = true;
-                const hang = life;
-                const rise = data.vy * hang - 0.5 * data.grav * hang * hang;
-                const travel = life;
-                const eddy = Math.min(1, life / 0.8);
-                const clear = smoother01(clamp01((life - 0.35) / 0.7));
-                _pageOrigin.set(bookDims ? bookDims.spineX + 0.08 : -1.58, 0.1, 0.25);
-                if (bookRoot) bookRoot.localToWorld(_pageOrigin);
-                const ox = _pageOrigin.x + data.vx * travel + Math.sin(data.az + life * data.swirl) * data.swirlR * eddy;
-                const oy = _pageOrigin.y + rise;
-                const oz = _pageOrigin.z + data.vz * travel + Math.cos(data.az + life * data.swirl) * data.swirlR * 0.25 * eddy;
-                const radial = clear * (1.8 + data.index % 5 * 0.15);
-                const len = Math.hypot(ox, oy) || 1;
-                sheet.position.set(ox + (ox / len) * radial, oy + radial * 0.35, oz);
-                const flutter = Math.sin(life * data.flutter) * 0.18;
-                sheet.rotation.set(life * data.sx + flutter, life * data.sy, life * data.sz + flutter * 0.4);
-                const fadeIn = Math.min(1, life * 4);
+                const depart = 1 - Math.exp(-4.4 * life);
+                const rise = data.vy * life - 0.5 * data.grav * life * life;
+                _pageOrigin.set(data.ox, data.oy, data.oz);
+                bookRoot.localToWorld(_pageOrigin);
+                sheet.position.copy(_pageOrigin)
+                    .addScaledVector(_poseA, data.out * depart)
+                    .addScaledVector(_poseB, rise + data.along * depart)
+                    .addScaledVector(_lookB, data.lift * depart);
+                const flutter = Math.sin(life * data.flutter);
+                sheet.rotation.set(
+                    data.rx0 + life * data.sx + flutter * data.flutterAmp,
+                    data.ry0 + life * data.sy + Math.sin(life * data.flutter * 0.6) * 0.35,
+                    data.rz0 + life * data.sz + flutter * data.flutterAmp * 0.8
+                );
+                const fadeIn = Math.min(1, life * 5);
                 sheet.material.opacity = fadeIn * burstFade;
             });
 
@@ -3867,6 +3887,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
             if (notePhase("pageFade")) {
                 if (typeof prepareFrontispieceWriting === "function") prepareFrontispieceWriting();
+                measureWell();
                 setLeafOpacity(0);
                 syncCssPages();
             }
@@ -4704,6 +4725,16 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             };
         }
 
+        function wordLayoutPoint(word) {
+            const leaf = word.closest(".page-leaf");
+            if (!leaf) return { x: 0, y: 0 };
+            const local = offsetWithin(word, leaf);
+            const x = local.x + word.offsetWidth * 0.5;
+            const y = local.y + word.offsetHeight * 0.5;
+            if (leaf.id === "rightFolioLeaf") return { x: x + leaf.offsetWidth + 48, y: y };
+            return { x: x, y: y };
+        }
+
         function releaseInscription() {
             if (inscriptionPlaying) return;
             inscriptionHeld = false;
@@ -4715,16 +4746,24 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             }
             inscriptionPlaying = true;
             ensurePyroCanvas();
-            const origin = armillaryScreenPoint();
-            const ranked = pending.map((word) => {
-                const rect = word.getBoundingClientRect();
+            measureWell();
+            const origin = wellMetrics
+                ? {
+                    x: wellMetrics.localX + wellMetrics.wellW * 0.5,
+                    y: wellMetrics.localY + wellMetrics.wellH * 0.5
+                }
+                : { x: 320, y: 430 };
+            const ranked = pending.map((word, index) => {
+                const at = wordLayoutPoint(word);
                 return {
                     word: word,
-                    dist: Math.hypot(rect.left + rect.width * 0.5 - origin.x, rect.top + rect.height * 0.5 - origin.y)
+                    dist: Math.hypot(at.x - origin.x, at.y - origin.y),
+                    index: index
                 };
-            }).sort((a, b) => a.dist - b.dist);
-            const maxDist = Math.max(1, ranked[ranked.length - 1].dist);
-            const spread = 1.45;
+            }).sort((a, b) => a.dist - b.dist || a.index - b.index);
+            const minDist = ranked[0].dist;
+            const span = Math.max(1, ranked[ranked.length - 1].dist - minDist);
+            const spread = 2.2;
             const start = performance.now();
             const token = inscribeToken;
             const step = (now) => {
@@ -4732,12 +4771,15 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 const elapsed = (now - start) / 1000;
                 ranked.forEach((item) => {
                     if (!item.word.classList.contains("pending")) return;
-                    if (elapsed < (item.dist / maxDist) * spread) return;
+                    const when = span < 12
+                        ? (item.index / ranked.length) * spread
+                        : ((item.dist - minDist) / span) * spread;
+                    if (elapsed < when) return;
                     item.word.classList.remove("pending");
                     item.word.classList.add("burning");
                     spawnPaperScorch(item.word);
                 });
-                if (elapsed < spread + 0.04) requestAnimationFrame(step);
+                if (elapsed < spread + 0.05) requestAnimationFrame(step);
             };
             requestAnimationFrame(step);
         }
@@ -4871,6 +4913,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     total: openPlan ? openPlan.total : 0,
                     armillary: !!(armillaryAnchor && armillaryAnchor.visible),
                     armillaryPos: armillaryAnchor ? armillaryAnchor.position.toArray().map((n) => Math.round(n * 100) / 100) : null,
+                    cam: coverCamera ? [coverCamera.position.x, coverCamera.position.y, coverCamera.position.z].map((n) => Math.round(n * 100) / 100) : null,
+                    mask: (document.getElementById("leftLeafVellum") || {}).style ? (document.getElementById("leftLeafVellum").style.maskMode || document.getElementById("leftLeafVellum").style.webkitMaskMode || "") : "",
                     well: wellMetrics,
                     quiet: document.documentElement.classList.contains("tome-quiet"),
                     frames: openFrameLog.slice(-8),
