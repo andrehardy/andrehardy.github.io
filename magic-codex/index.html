@@ -133,12 +133,13 @@
             transition: none;
         }
         .page-leaf.left-leaf {
-            border-radius: 3px 0 0 3px;
-            padding: 1.75rem 2.5rem 1.5rem;
+            border-radius: 0;
+            /* Fore-edge is the element's left after the leaf's verso turn. */
+            padding: 1.7rem 2.1rem 1.45rem 2.4rem;
         }
         .page-leaf.right-leaf {
-            border-radius: 0 10px 10px 0;
-            padding: 2.5rem 3rem 2rem;
+            border-radius: 0;
+            padding: 1.7rem 2.4rem 1.45rem 2.1rem;
         }
         html.tome-still .page-leaf {
             opacity: 1;
@@ -322,11 +323,17 @@
             cursor: wait;
         }
 
-        /* The two leaves share one parchment: the spread gradient split at the gutter.
-           The left leaf's paint lives on #leftLeafVellum so the astrolabe well can be
-           a real hole: the same WebGL instrument that fell shows through it. */
-        .page-leaf.left-leaf {
+        /* The reading surface is the 3D leaf. HTML is a transparent text layer
+           registered to that leaf, so the armillary — a child of the leaf — sits
+           on the same parchment the words are laid around. #leftLeafVellum only
+           paints the no-WebGL fallback. */
+        html:not(.tome-still) .page-leaf.left-leaf,
+        html:not(.tome-still) .page-leaf.right-leaf {
             background: transparent;
+            background-image: none;
+        }
+        html:not(.tome-still) #leftLeafVellum {
+            display: none;
         }
         #leftLeafVellum {
             position: absolute;
@@ -342,23 +349,15 @@
             position: relative;
             z-index: 1;
         }
-        .page-leaf.right-leaf {
+        html.tome-still .page-leaf.right-leaf,
+        html.tome-still #leftLeafVellum {
             background-color: #e8d5b0;
-            background-image:
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='vellumNoiseR'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.038' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.55  0 0 0 0 0.38  0 0 0 0 0.18  0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23vellumNoiseR)'/%3E%3C/svg%3E"),
-                linear-gradient(90deg, #c4a574 0%, #d8c09a 6%, #f4e6c8 24%, #ead9b6 68%, #f5ebd6 100%);
         }
         body.registry-parchment #leftLeafVellum {
             background-color: #f5eedf;
             background-image:
                 url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='parchmentFiberL'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.65  0 0 0 0 0.45  0 0 0 0 0.25  0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23parchmentFiberL)'/%3E%3C/svg%3E"),
                 linear-gradient(90deg, #e6dac2 0%, #f0e7d3 32%, #faf5e8 80%, #d8c6a5 96%, #9b7f58 100%);
-        }
-        body.registry-parchment .page-leaf.right-leaf {
-            background-color: #f5eedf;
-            background-image:
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='parchmentFiberR'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.65  0 0 0 0 0.45  0 0 0 0 0.25  0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23parchmentFiberR)'/%3E%3C/svg%3E"),
-                linear-gradient(90deg, #9b7f58 0%, #d8c6a5 4%, #faf5e8 20%, #f0e7d3 68%, #e6dac2 100%);
         }
 
         /* Authentic Medieval Margin Ruling & Pricking Guides (marginRuling / prickingGuide) */
@@ -1623,6 +1622,58 @@
             return new THREE.CanvasTexture(canvas);
         }
 
+        // Clean calfskin for the open reading leaves. The same map is on both pages
+        // (U = 0 at the gutter) so the spread is one surface. Writing is HTML, not painted script.
+        function createReadingVellumTexture(light) {
+            const canvas = document.createElement("canvas");
+            canvas.width = 512;
+            canvas.height = 680;
+            const ctx = canvas.getContext("2d");
+            const gutter = light ? "#c9b48c" : "#9a784f";
+            const edge = light ? "#e7d7b8" : "#d2b88e";
+            const center = light ? "#f8f3e7" : "#f1e2c6";
+            const fore = light ? "#b08958" : "#7d5a34";
+            const grad = ctx.createLinearGradient(0, 0, 512, 0);
+            grad.addColorStop(0, gutter);
+            grad.addColorStop(0.07, edge);
+            grad.addColorStop(0.42, center);
+            grad.addColorStop(0.78, edge);
+            grad.addColorStop(1, fore);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 680);
+            const vgrad = ctx.createLinearGradient(0, 0, 0, 680);
+            vgrad.addColorStop(0, "rgba(80, 50, 24, 0.22)");
+            vgrad.addColorStop(0.07, "rgba(80, 50, 24, 0)");
+            vgrad.addColorStop(0.93, "rgba(80, 50, 24, 0)");
+            vgrad.addColorStop(1, "rgba(80, 50, 24, 0.24)");
+            ctx.fillStyle = vgrad;
+            ctx.fillRect(0, 0, 512, 680);
+            for (let i = 0; i < 640; i++) {
+                const n = (i * 97 + (light ? 13 : 29)) % 1000;
+                ctx.fillStyle = n % 2 === 0 ? "rgba(110, 74, 36, 0.045)" : "rgba(255, 248, 230, 0.05)";
+                ctx.beginPath();
+                ctx.arc((n * 17) % 512, (n * 29) % 680, 1 + (n % 11), 0, Math.PI * 2);
+                ctx.fill();
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.anisotropy = 4;
+            return tex;
+        }
+
+        function createContactShadowTexture() {
+            const canvas = document.createElement("canvas");
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext("2d");
+            const grad = ctx.createRadialGradient(64, 64, 6, 64, 64, 64);
+            grad.addColorStop(0, "rgba(18, 10, 6, 0.62)");
+            grad.addColorStop(0.42, "rgba(18, 10, 6, 0.28)");
+            grad.addColorStop(1, "rgba(18, 10, 6, 0)");
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 128, 128);
+            return new THREE.CanvasTexture(canvas);
+        }
+
         function createCandlelightEnvMap(renderer) {
             const pmremGenerator = new THREE.PMREMGenerator(renderer);
             pmremGenerator.compileEquirectangularShader();
@@ -1674,6 +1725,12 @@
         let indexTabs = [];
         let orbitalPlanetNodes = [];
         let cssRenderer, cssScene, leftCssObj, rightCssObj;
+        let leftFolioAnchor = null;
+        let rightFolioAnchor = null;
+        let leafMatL = null;
+        let leafMatR = null;
+        let leafVellumNight = null;
+        let leafVellumParchment = null;
         let portraitLeaf = 1;
         let pageTurnT = 1;
         let emberParticles;
@@ -2128,25 +2185,32 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 const geo = new THREE.PlaneGeometry(width, height, segs, 10);
                 geo.translate(width / 2, 0, 0);
                 const pos = geo.attributes.position;
+                const baseZ = new Float32Array(pos.count);
                 for (let v = 0; v < pos.count; v++) {
                     const t = pos.getX(v) / width;
                     const shoulder = 0.15 * Math.sin(Math.min(1, t / 0.32) * Math.PI / 2) * (1 - 0.45 * t);
                     const valley = -0.16 * Math.pow(1 - t, 8);
-                    pos.setZ(v, (shoulder + valley) * zSign);
+                    baseZ[v] = (shoulder + valley) * zSign;
+                    pos.setZ(v, baseZ[v]);
                 }
+                geo.userData.baseZ = baseZ;
+                geo.userData.curl = 1;
                 geo.computeVertexNormals();
                 return geo;
             }
 
             const leafW = pageBlockW - 0.04;
             const leafH = pageBlockH - 0.06;
-            const leafMatL = new THREE.MeshStandardMaterial({
-                map: pageFaces[0], bumpMap: pageFaces[0], bumpScale: 0.02,
-                roughness: 0.84, metalness: 0.02, side: THREE.DoubleSide
+            leafVellumNight = createReadingVellumTexture(false);
+            leafVellumParchment = createReadingVellumTexture(true);
+            const readingMap = isParchmentMode ? leafVellumParchment : leafVellumNight;
+            leafMatL = new THREE.MeshStandardMaterial({
+                map: readingMap, bumpMap: readingMap, bumpScale: 0.012,
+                color: 0xffffff, roughness: 0.94, metalness: 0.0, side: THREE.DoubleSide
             });
-            const leafMatR = new THREE.MeshStandardMaterial({
-                map: pageFaces[1], bumpMap: pageFaces[1], bumpScale: 0.02,
-                roughness: 0.84, metalness: 0.02, side: THREE.DoubleSide
+            leafMatR = new THREE.MeshStandardMaterial({
+                map: readingMap, bumpMap: readingMap, bumpScale: 0.012,
+                color: 0xffffff, roughness: 0.94, metalness: 0.0, side: THREE.DoubleSide
             });
             leftLeafMesh = new THREE.Mesh(makeArchedLeaf(leafW, leafH, 32, -1), leafMatL);
             leftLeafMesh.castShadow = true;
@@ -2158,6 +2222,21 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             rightLeafMesh.receiveShadow = true;
             rightLeafMesh.userData = { leafW, leafH, faceSign: 1 };
             rightStackGroup.add(rightLeafMesh);
+
+            // The folio anchors ARE the leaf rectangles. CSS3D copies their world
+            // matrices, so the HTML quad is the projected page, not a separate layout.
+            function makeFolioAnchor(mesh, verso) {
+                const anchor = new THREE.Group();
+                const w = mesh.userData.leafW;
+                const h = mesh.userData.leafH;
+                anchor.position.set(w / 2, 0, 0);
+                anchor.scale.set(w / 640, h / 860, w / 640);
+                if (verso) anchor.rotation.y = Math.PI;
+                mesh.add(anchor);
+                return anchor;
+            }
+            leftFolioAnchor = makeFolioAnchor(leftLeafMesh, true);
+            rightFolioAnchor = makeFolioAnchor(rightLeafMesh, false);
 
             // Unit-depth blocks anchored at the board; scale.z is the stack's thickness.
             function makeStackBlock(zSign) {
@@ -2661,8 +2740,16 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             armillaryAnchor.add(armillaryGlow);
             armillaryShadow = new THREE.Mesh(
                 new THREE.CircleGeometry(1.15, 28),
-                new THREE.MeshBasicMaterial({ color: 0x140c07, transparent: true, opacity: 0, depthWrite: false })
+                new THREE.MeshBasicMaterial({
+                    map: createContactShadowTexture(),
+                    transparent: true,
+                    opacity: 0,
+                    depthWrite: false,
+                    side: THREE.DoubleSide
+                })
             );
+            armillaryShadow.castShadow = false;
+            armillaryShadow.receiveShadow = false;
             armillaryShadow.renderOrder = 2;
             armillaryShadow.visible = false;
             leftLeafMesh.add(armillaryShadow);
@@ -2678,6 +2765,36 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             headbandMeshes.forEach((mesh) => markTomePickMeshes(mesh));
             prepareMaterialization();
             prewarmOpeningRender();
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(() => {
+                    if (!leftCssObj || !rightCssObj) return;
+                    const opened = isBookOpened || isBookOpening;
+                    if (!opened) {
+                        const leftEl = document.getElementById("leftFolioLeaf");
+                        const rightEl = document.getElementById("rightFolioLeaf");
+                        if (leftEl) leftEl.style.opacity = "0";
+                        if (rightEl) rightEl.style.opacity = "0";
+                        leftCssObj.visible = true;
+                        rightCssObj.visible = true;
+                    }
+                    syncCssPages();
+                    if (cssRenderer && cssScene && coverCamera) cssRenderer.render(cssScene, coverCamera);
+                    measureWell();
+                    placeArmillaryRest();
+                    if (!opened) {
+                        leftCssObj.visible = false;
+                        rightCssObj.visible = false;
+                        const leftEl = document.getElementById("leftFolioLeaf");
+                        const rightEl = document.getElementById("rightFolioLeaf");
+                        if (leftEl) leftEl.style.opacity = "";
+                        if (rightEl) rightEl.style.opacity = "";
+                        if (armillaryAnchor && !isBookOpening) armillaryAnchor.visible = false;
+                        if (armillaryShadow) armillaryShadow.visible = false;
+                    } else if (isBookOpened) {
+                        settleArmillaryRest();
+                    }
+                });
+            }
         }
 
         function markTomePickMeshes() {
@@ -2720,25 +2837,20 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             cssScene.add(rightCssObj);
         }
 
-        const _cssFlipY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
-        const _cssLeafQ = new THREE.Quaternion();
+        const _cssPos = new THREE.Vector3();
+        const _cssQuat = new THREE.Quaternion();
+        const _cssScale = new THREE.Vector3();
         function syncCssPages() {
-            if (!leftCssObj || !rightCssObj || !leftLeafMesh || !rightLeafMesh) return;
-            const place = (cssObj, mesh, faceSign) => {
-                mesh.updateWorldMatrix(true, false);
-                mesh.getWorldPosition(cssObj.position);
-                mesh.getWorldQuaternion(_cssLeafQ);
-                cssObj.quaternion.copy(_cssLeafQ);
-                if (faceSign < 0) cssObj.quaternion.multiply(_cssFlipY);
-                const w = mesh.userData.leafW || 3.09;
-                const h = mesh.userData.leafH || 4.16;
-                const offset = new THREE.Vector3(w / 2, 0, 0.1 * faceSign);
-                offset.applyQuaternion(_cssLeafQ);
-                cssObj.position.add(offset);
-                cssObj.scale.set(w / 640, h / 860, w / 640);
+            if (!leftCssObj || !rightCssObj || !leftFolioAnchor || !rightFolioAnchor) return;
+            const place = (cssObj, anchor) => {
+                anchor.updateWorldMatrix(true, false);
+                anchor.matrixWorld.decompose(_cssPos, _cssQuat, _cssScale);
+                cssObj.position.copy(_cssPos);
+                cssObj.quaternion.copy(_cssQuat);
+                cssObj.scale.copy(_cssScale);
             };
-            place(leftCssObj, leftLeafMesh, -1);
-            place(rightCssObj, rightLeafMesh, 1);
+            place(leftCssObj, leftFolioAnchor);
+            place(rightCssObj, rightFolioAnchor);
         }
 
         function addBeveledLeatherEdges(boardGroup, bookW, bookH, zPos, radius, leatherMat) {
@@ -3056,7 +3168,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const halfH = leafH / 2 + 0.34;
             const halfW = portrait ? leafW / 2 + 0.28 : leafW + 1.45;
             const dist = Math.max(halfH / tanV, halfW / (tanV * aspect)) * 1.1;
-            const xOff = portrait ? (portraitLeaf === 0 ? -leafW / 2 : leafW / 2) : 0.62;
+            const xOff = portrait ? (portraitLeaf === 0 ? -leafW / 2 : leafW / 2) : 0;
             // The page surface sits a little above the board plane; its normal is the reading direction.
             const nY = Math.sin(-OPEN_ROT_X);
             const nZ = Math.cos(-OPEN_ROT_X);
@@ -3128,38 +3240,69 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             if (gutterMesh) gutterMesh.visible = open;
         }
 
-        // turn01: 0 = left half of the block still on the right stack, 1 = lying on the open cover.
-        // arch01: how far the top leaves have relaxed into their sewn curve.
-        function poseOpenLeaves(turn01, section01, arch01) {
+        // Curl lives in the vertices. Scaling the mesh would squash the armillary, which is a child of the left leaf.
+        function setLeafCurl(mesh, curl) {
+            if (!mesh || !mesh.geometry) return;
+            const geo = mesh.geometry;
+            const baseZ = geo.userData.baseZ;
+            if (!baseZ || Math.abs((geo.userData.curl == null ? 1 : geo.userData.curl) - curl) < 0.0008) return;
+            const pos = geo.attributes.position;
+            for (let v = 0; v < pos.count; v++) pos.setZ(v, baseZ[v] * curl);
+            pos.needsUpdate = true;
+            geo.computeVertexNormals();
+            geo.userData.curl = curl;
+        }
+
+        function applyLeafVellum() {
+            const map = isParchmentMode ? leafVellumParchment : leafVellumNight;
+            if (!map || !leafMatL || !leafMatR) return;
+            leafMatL.map = map;
+            leafMatL.bumpMap = map;
+            leafMatR.map = map;
+            leafMatR.bumpMap = map;
+            leafMatL.needsUpdate = true;
+            leafMatR.needsUpdate = true;
+        }
+
+        // turn01: 0 = left half of the block still on the right stack, 1 = lying open.
+        // flat01: 0 = sewn curve, 1 = both reading surfaces planar, equal, and coplanar.
+        function poseOpenLeaves(turn01, section01, flat01) {
             if (!openStackDims || !leftStackGroup || !rightStackGroup) return;
             const turn = Math.max(0, Math.min(1, turn01));
-            const sect = Math.max(0, Math.min(1, section01 == null ? pageTurnT : section01));
-            const arch = Math.max(0.001, Math.min(1, arch01 == null ? smooth01((turn - 0.6) / 0.4) : arch01));
+            const flat = Math.max(0, Math.min(1, flat01 == null ? smooth01((turn - 0.55) / 0.45) : flat01));
+            const curl = 1 - flat;
             const { boardTopZ, total } = openStackDims;
-            const share = 0.3 + 0.4 * sect;
+            // The open spread is always half and half, so the two pages are the same size.
+            // section01 still selects a volume; it does not skew the reading plane.
+            void section01;
+            const lay = smooth01(turn);
+            const share = 0.06 + (0.5 - 0.06) * lay;
             const leftThick = total * share;
             const rightThick = total * (1 - share);
+            const rightTop = boardTopZ + rightThick;
+            const leftTop = boardTopZ + leftThick;
 
-            // The left half hinges on the split line, then rides down onto the cover board.
-            const lay = smooth01(turn);
             leftStackGroup.rotation.y = -Math.PI * turn;
-            leftStackGroup.position.z = (boardTopZ + rightThick) + ((boardTopZ + leftThick) - (boardTopZ + rightThick)) * lay;
+            leftStackGroup.position.z = rightTop + (leftTop - rightTop) * lay;
 
             const lb = leftStackGroup.getObjectByName("leftStackBlock");
             const rb = rightStackGroup.getObjectByName("rightStackBlock");
-            if (lb) lb.scale.set(1, 1, leftThick);
-            if (rb) rb.scale.set(1, 1, rightThick);
+            if (lb) lb.scale.set(1, 1, Math.max(0.001, leftThick));
+            if (rb) rb.scale.set(1, 1, Math.max(0.001, rightThick));
             if (rightLeafMesh) {
-                rightLeafMesh.position.z = boardTopZ + rightThick + 0.004;
-                rightLeafMesh.scale.z = arch;
+                rightLeafMesh.position.z = rightTop + 0.004;
+                rightLeafMesh.scale.set(1, 1, 1);
+                setLeafCurl(rightLeafMesh, curl);
             }
             if (leftLeafMesh) {
                 leftLeafMesh.position.z = -0.004;
-                leftLeafMesh.scale.z = arch;
+                leftLeafMesh.scale.set(1, 1, 1);
+                setLeafCurl(leftLeafMesh, curl);
             }
             if (gutterMesh) {
-                gutterMesh.position.z = boardTopZ + Math.min(leftThick, rightThick) - 0.14 * arch;
-                gutterMesh.scale.z = arch;
+                gutterMesh.position.z = boardTopZ + Math.min(leftThick, rightThick) - 0.06 - 0.08 * curl;
+                gutterMesh.scale.set(1, 1, 1);
+                gutterMesh.visible = flat < 0.92 && !!(leftStackGroup && leftStackGroup.visible);
             }
             const tuck = smooth01(turn / 0.4);
             indexTabs.forEach((tab, idx) => {
@@ -3253,6 +3396,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
         ];
         const ARMILLARY_HOVER = 2.45;
         const ARMILLARY_NATIVE = 5.15;
+        // At rest the sphere settles into the leaf: a relief in the page, not a ball hovering over it.
+        const ARMILLARY_PAGE_DEPTH = 0.2;
         const _hover = new THREE.Vector3();
         const _camPos = new THREE.Vector3();
         const _camLook = new THREE.Vector3();
@@ -3329,44 +3474,14 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 localX: local.x,
                 localY: local.y
             };
-            punchAstrolabeWell();
             return wellMetrics;
         }
 
         function punchAstrolabeWell() {
             const vellum = document.getElementById("leftLeafVellum");
-            const astro = document.getElementById("astrolabe3DViewport");
-            const leaf = document.getElementById("leftFolioLeaf");
-            if (!vellum || !astro || !leaf || !leaf.offsetWidth || !wellMetrics) return;
-            const W = leaf.offsetWidth;
-            const H = leaf.offsetHeight;
-            const pad = 6;
-            const x = Math.max(0, wellMetrics.localX + pad);
-            const y = Math.max(0, wellMetrics.localY + pad);
-            const w = Math.max(8, astro.offsetWidth - pad * 2);
-            const h = Math.max(8, astro.offsetHeight - pad * 2);
-            const r = Math.min(16, w / 2, h / 2);
-            const hole = "M" + (x + r) + " " + y
-                + "H" + (x + w - r)
-                + "A" + r + " " + r + " 0 0 1 " + (x + w) + " " + (y + r)
-                + "V" + (y + h - r)
-                + "A" + r + " " + r + " 0 0 1 " + (x + w - r) + " " + (y + h)
-                + "H" + (x + r)
-                + "A" + r + " " + r + " 0 0 1 " + x + " " + (y + h - r)
-                + "V" + (y + r)
-                + "A" + r + " " + r + " 0 0 1 " + (x + r) + " " + y + "Z";
-            const svg = "<svg xmlns='http://www.w3.org/2000/svg' width='" + W + "' height='" + H + "' viewBox='0 0 " + W + " " + H + "'>"
-                + "<path fill='white' fill-rule='evenodd' d='M0 0H" + W + "V" + H + "H0Z " + hole + "'/>"
-                + "</svg>";
-            const url = "url(\"data:image/svg+xml," + encodeURIComponent(svg) + "\")";
-            vellum.style.webkitMaskImage = url;
-            vellum.style.maskImage = url;
-            vellum.style.webkitMaskMode = "alpha";
-            vellum.style.maskMode = "alpha";
-            vellum.style.webkitMaskSize = "100% 100%";
-            vellum.style.maskSize = "100% 100%";
-            vellum.style.webkitMaskRepeat = "no-repeat";
-            vellum.style.maskRepeat = "no-repeat";
+            if (!vellum) return;
+            vellum.style.webkitMaskImage = "none";
+            vellum.style.maskImage = "none";
         }
 
         function placeArmillaryRest() {
@@ -3383,18 +3498,74 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const sy = leafH / 860;
             const dx = wellMetrics.dxPx * sx;
             const dy = wellMetrics.dyPx * sy;
-            const rest = new THREE.Vector3(leafW / 2 - dx, -dy, -0.16);
+            const rest = new THREE.Vector3(leafW / 2 - dx, -dy, 0);
             const quat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
-            const fit = Math.min(wellMetrics.wellW * sx, wellMetrics.wellH * sy) * 0.84;
+            const fit = Math.min(wellMetrics.wellW * sx, wellMetrics.wellH * sy) * 0.9;
             const scale = fit / ARMILLARY_NATIVE;
-            const gutter = new THREE.Vector3(0.08, 0.04, rest.z);
-            armillaryRest = { position: rest, quaternion: quat, scale: scale, gutter: gutter };
+            armillaryRest = {
+                position: rest,
+                quaternion: quat,
+                scale: scale,
+                gutter: new THREE.Vector3(0.08, 0.04, 0),
+                shadowScale: { x: 1, y: 1 }
+            };
             armillaryAnchor.quaternion.copy(quat);
             armillaryAnchor.scale.setScalar(scale);
             armillaryAnchor.position.copy(rest);
-            if (armillaryRoot) armillaryRoot.rotation.set(0.22, 0, 0);
+            if (armillaryRoot) {
+                armillaryRoot.rotation.set(targetArmillaryRotX, targetArmillaryRotY, 0);
+                armillaryRoot.scale.set(1, 1, ARMILLARY_PAGE_DEPTH);
+            }
             armillaryRings.forEach((ring) => ring.scale.setScalar(1));
             if (solarCoreMesh) solarCoreMesh.scale.setScalar(1);
+            seatArmillaryOnPage();
+        }
+
+        // Drop the instrument until its lowest point rests on the leaf. The page normal
+        // on the verso is local -Z (toward the reader), so that point sits just off z = 0.
+        function seatArmillaryOnPage() {
+            if (!armillaryAnchor || !leftLeafMesh || !armillaryRest) return;
+            armillaryAnchor.position.z = 0;
+            armillaryAnchor.updateWorldMatrix(true, true);
+            const v = new THREE.Vector3();
+            let maxZ = -Infinity;
+            let minX = Infinity;
+            let maxX = -Infinity;
+            let minY = Infinity;
+            let maxY = -Infinity;
+            armillaryAnchor.traverse((obj) => {
+                if (!obj.isMesh || !obj.geometry || !obj.geometry.attributes || !obj.geometry.attributes.position) return;
+                const pos = obj.geometry.attributes.position;
+                for (let i = 0; i < pos.count; i++) {
+                    v.fromBufferAttribute(pos, i);
+                    obj.localToWorld(v);
+                    leftLeafMesh.worldToLocal(v);
+                    if (v.z > maxZ) maxZ = v.z;
+                    if (v.x < minX) minX = v.x;
+                    if (v.x > maxX) maxX = v.x;
+                    if (v.y < minY) minY = v.y;
+                    if (v.y > maxY) maxY = v.y;
+                }
+            });
+            if (!isFinite(maxX)) return;
+            // The equatorial ring lives in the anchor plane. Park that plane on the
+            // leaf (camera side is -Z) so the instrument is in the page, not above it.
+            armillaryAnchor.position.z = -0.02;
+            armillaryRest.position.copy(armillaryAnchor.position);
+            armillaryRest.gutter.z = armillaryRest.position.z;
+            const rx = Math.max(0.2, (maxX - minX) / 2);
+            const ry = Math.max(0.2, (maxY - minY) / 2);
+            armillaryRest.shadowScale = { x: rx / 1.15, y: ry / 1.15 };
+            layoutArmillaryShadow(armillaryShadow && armillaryShadow.material.opacity > 0.02 ? armillaryShadow.material.opacity : 0);
+        }
+
+        function layoutArmillaryShadow(opacity) {
+            if (!armillaryShadow || !armillaryRest) return;
+            const base = armillaryRest.shadowScale || { x: 1, y: 1 };
+            armillaryShadow.visible = opacity > 0.02;
+            armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y, -0.006);
+            armillaryShadow.scale.set(base.x, base.y, 1);
+            armillaryShadow.material.opacity = opacity;
         }
 
         function armillaryHover(distance, target) {
@@ -3409,15 +3580,14 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             armillaryAnchor.quaternion.copy(armillaryRest.quaternion);
             armillaryAnchor.scale.setScalar(armillaryRest.scale);
             armillaryAnchor.visible = true;
-            if (armillaryRoot) armillaryRoot.rotation.set(0.22, 0, 0);
+            if (armillaryRoot) {
+                armillaryRoot.rotation.set(targetArmillaryRotX, targetArmillaryRotY, 0);
+                armillaryRoot.scale.set(1, 1, ARMILLARY_PAGE_DEPTH);
+            }
             armillaryRings.forEach((ring) => ring.scale.setScalar(1));
             if (solarCoreMesh) solarCoreMesh.scale.setScalar(1);
-            if (armillaryShadow && armillaryRest) {
-                armillaryShadow.visible = true;
-                armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y, armillaryRest.position.z + 0.12);
-                armillaryShadow.scale.setScalar(1);
-                armillaryShadow.material.opacity = 0.42;
-            }
+            seatArmillaryOnPage();
+            layoutArmillaryShadow(0.72);
             if (armillaryGlow) armillaryGlow.intensity = 0.65;
             if (solarCoreMat) solarCoreMat.emissiveIntensity = 0.75;
         }
@@ -3470,11 +3640,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 armillaryRings.forEach((ring) => ring.scale.setScalar(1));
                 if (solarCoreMesh) solarCoreMesh.scale.setScalar(1);
             }
-            if (armillaryShadow && armillaryRest) {
-                armillaryShadow.visible = true;
-                armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y, armillaryRest.position.z + 0.12);
-                armillaryShadow.material.opacity = 0.4;
-            }
+            layoutArmillaryShadow(0.9);
             snapReadCamera();
             try { coverRenderer.compile(coverScene, coverCamera); } catch (err) {}
             try { coverRenderer.render(coverScene, coverCamera); } catch (err) {}
@@ -3601,10 +3767,12 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 yaw = lerp(astroLatched.yaw, 0, smoother01(fallT));
             }
             if (armillaryRoot) {
-                const tilt = lerp(0.42, 0.22, smoother01(fallT));
+                const tilt = lerp(0.42, targetArmillaryRotX, smoother01(fallT));
                 armillaryRoot.rotation.x = tilt;
                 armillaryRoot.rotation.y = yaw;
                 armillaryRoot.rotation.z = Math.sin(appearT * Math.PI) * 0.06 * (1 - fallT);
+                const depthT = fallT <= 0 ? 0 : smoother01(clamp01(fallT / 0.62));
+                armillaryRoot.scale.set(1, 1, lerp(1, ARMILLARY_PAGE_DEPTH, depthT));
             }
             armillaryHover(ARMILLARY_HOVER, _hover);
             const appearPos = _poseA.copy(armillaryRest.gutter).add(_hover);
@@ -3631,11 +3799,13 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             }
             if (armillaryShadow && armillaryRest) {
                 const grounded = smoother01(fallT);
-                armillaryShadow.visible = grounded > 0.02;
-                armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y, armillaryRest.position.z + 0.12);
                 const lift = 1 - grounded;
-                armillaryShadow.scale.setScalar(1 + lift * 0.55);
-                armillaryShadow.material.opacity = grounded * 0.5 * (1 - Math.sin(clamp01(landT) * Math.PI) * 0.28);
+                const base = armillaryRest.shadowScale || { x: 1, y: 1 };
+                const spread = 1 + lift * 0.55;
+                armillaryShadow.visible = grounded > 0.02;
+                armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y, -0.006);
+                armillaryShadow.scale.set(base.x * spread, base.y * spread, 1);
+                armillaryShadow.material.opacity = grounded * 0.72 * (1 - Math.sin(clamp01(landT) * Math.PI) * 0.22);
             }
             if (innerBookGlowLight && pulseT > 0) {
                 innerBookGlowLight.intensity = 2.2 + pulseEnv * 4.8;
@@ -3653,8 +3823,10 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 sheet.material.opacity = 0;
             });
             if (cosmicMistGroup) cosmicMistGroup.visible = false;
-            settleArmillaryRest();
             revealPagesImmediate();
+            measureWell();
+            placeArmillaryRest();
+            settleArmillaryRest();
             document.body.classList.add("codex-unlocked");
             camGoal.x = camFollow.x;
             camGoal.y = camFollow.y;
@@ -3674,11 +3846,12 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             isBookOpening = false;
             isBookOpened = true;
             armillaryUserControl = true;
-            if (!armillaryRest) placeArmillaryRest();
-            settleArmillaryRest();
             if (cosmicMistGroup) cosmicMistGroup.visible = false;
             if (celestialGroup) celestialGroup.visible = false;
             revealPagesImmediate();
+            measureWell();
+            placeArmillaryRest();
+            settleArmillaryRest();
             document.body.classList.add("codex-unlocked");
             snapReadCamera();
             inscriptionHeld = false;
@@ -3882,12 +4055,17 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 });
             }
 
-            if (notePhase("appear") && !armillaryRest) placeArmillaryRest();
+            if (notePhase("appear")) {
+                measureWell();
+                placeArmillaryRest();
+            }
             poseArmillary(clock);
 
             if (notePhase("pageFade")) {
                 if (typeof prepareFrontispieceWriting === "function") prepareFrontispieceWriting();
                 measureWell();
+                placeArmillaryRest();
+                if (phase01("fall") >= 1) settleArmillaryRest();
                 setLeafOpacity(0);
                 syncCssPages();
             }
@@ -4292,6 +4470,10 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                         const hits = hitFromEvent(e, orbitalPlanetNodes);
                         if (hits.length) selectBookFolio(hits[0].object.userData.bookIndex);
                     }
+                    if (isBookOpened && armillaryRest) {
+                        seatArmillaryOnPage();
+                        layoutArmillaryShadow(0.72);
+                    }
                 });
             }
         }
@@ -4451,9 +4633,21 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             activeBookIndex = (targetIndex + SIX_BOOKS.length) % SIX_BOOKS.length;
             const book = SIX_BOOKS[activeBookIndex];
             targetArmillaryRotY = -(activeBookIndex * (Math.PI / 3));
-            targetArmillaryRotX = (activeBookIndex % 2 === 0) ? 0.22 : -0.18;
+            targetArmillaryRotX = 0.06;
             pageTurnT = activeBookIndex / Math.max(1, SIX_BOOKS.length - 1);
-            if (isBookOpened) poseOpenLeaves(1, pageTurnT);
+            if (isBookOpened) poseOpenLeaves(1, pageTurnT, 1);
+            if (armillaryRest && armillaryAnchor && armillaryRoot) {
+                armillaryRoot.rotation.set(targetArmillaryRotX, targetArmillaryRotY, 0);
+                armillaryRoot.scale.set(1, 1, ARMILLARY_PAGE_DEPTH);
+                armillaryAnchor.quaternion.copy(armillaryRest.quaternion);
+                armillaryAnchor.scale.setScalar(armillaryRest.scale);
+                armillaryAnchor.position.copy(armillaryRest.position);
+                seatArmillaryOnPage();
+                if (isBookOpened) {
+                    armillaryAnchor.visible = true;
+                    layoutArmillaryShadow(0.72);
+                }
+            }
 
             const degreeReadout = document.getElementById("astrolabeDegreeReadout");
             const modeBadge = document.getElementById("concordanceModeBadge");
@@ -4873,6 +5067,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 themeBtn.addEventListener("click", () => {
                     isParchmentMode = !isParchmentMode;
                     document.body.classList.toggle("registry-parchment", isParchmentMode);
+                    applyLeafVellum();
                     try { localStorage.setItem("chronomythos_theme", isParchmentMode ? "parchment" : "night"); } catch (err) {}
                     const label = document.getElementById("themeToggleLabel");
                     const icon = document.getElementById("themeToggleIcon");
@@ -4920,6 +5115,69 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     frames: openFrameLog.slice(-8),
                     spans: frameSpans.slice(-12),
                     phases: openPlan ? openPlan.byId : null
+                };
+            },
+            register: function () {
+                if (!leftLeafMesh || !rightLeafMesh || !coverCamera) return null;
+                const projectBox = (mesh) => {
+                    const w = mesh.userData.leafW;
+                    const h = mesh.userData.leafH;
+                    const pts = [[0, h / 2, 0], [w, h / 2, 0], [w, -h / 2, 0], [0, -h / 2, 0]].map(([x, y, z]) => {
+                        const v = new THREE.Vector3(x, y, z);
+                        mesh.updateWorldMatrix(true, false);
+                        mesh.localToWorld(v);
+                        v.project(coverCamera);
+                        return {
+                            x: (v.x * 0.5 + 0.5) * window.innerWidth,
+                            y: (-v.y * 0.5 + 0.5) * window.innerHeight
+                        };
+                    });
+                    const xs = pts.map((p) => p.x);
+                    const ys = pts.map((p) => p.y);
+                    return {
+                        minX: Math.min.apply(null, xs),
+                        maxX: Math.max.apply(null, xs),
+                        minY: Math.min.apply(null, ys),
+                        maxY: Math.max.apply(null, ys)
+                    };
+                };
+                const domBox = (id) => {
+                    const el = document.getElementById(id);
+                    if (!el) return null;
+                    const r = el.getBoundingClientRect();
+                    return { minX: r.left, maxX: r.right, minY: r.top, maxY: r.bottom, w: r.width, h: r.height };
+                };
+                const err = (a, b) => Math.max(
+                    Math.abs(a.minX - b.minX), Math.abs(a.maxX - b.maxX),
+                    Math.abs(a.minY - b.minY), Math.abs(a.maxY - b.maxY)
+                );
+                const leafL = projectBox(leftLeafMesh);
+                const leafR = projectBox(rightLeafMesh);
+                const domL = domBox("leftFolioLeaf");
+                const domR = domBox("rightFolioLeaf");
+                const astro = domBox("astrolabe3DViewport");
+                let arm = null;
+                if (armillaryAnchor) {
+                    const v = armillaryAnchor.getWorldPosition(new THREE.Vector3()).project(coverCamera);
+                    arm = {
+                        x: (v.x * 0.5 + 0.5) * window.innerWidth,
+                        y: (-v.y * 0.5 + 0.5) * window.innerHeight,
+                        z: Math.round(armillaryAnchor.position.z * 1000) / 1000
+                    };
+                }
+                return {
+                    leftErr: domL ? Math.round(err(leafL, domL) * 10) / 10 : null,
+                    rightErr: domR ? Math.round(err(leafR, domR) * 10) / 10 : null,
+                    leafW: Math.round((leafL.maxX - leafL.minX) * 10) / 10,
+                    leafH: Math.round((leafL.maxY - leafL.minY) * 10) / 10,
+                    rightW: Math.round((leafR.maxX - leafR.minX) * 10) / 10,
+                    rightH: Math.round((leafR.maxY - leafR.minY) * 10) / 10,
+                    gutterGap: Math.round((leafR.minX - leafL.maxX) * 10) / 10,
+                    arm: arm,
+                    astro: astro,
+                    mask: (document.getElementById("leftLeafVellum") || {}).style
+                        ? (document.getElementById("leftLeafVellum").style.maskImage || "")
+                        : ""
                 };
             }
         };
