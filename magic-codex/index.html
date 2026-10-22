@@ -393,25 +393,26 @@
             flex-direction: column;
             min-height: 0;
         }
-        /* Heading at the head, the reading in the middle, notes on the foot.
-           The footer itself is the next flex sibling, so both pages share a baseline. */
+        /* The reading stays with the heading. The notes sit on the foot, and the
+           footer is the next sibling, so both pages share one baseline. */
         #livingManuscriptContainer3d .folio-prose {
             flex: 1 1 auto;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            gap: 1.15rem;
             min-height: 0;
         }
+        #livingManuscriptContainer3d .folio-reading {
+            margin-top: 1.15rem;
+        }
         #livingManuscriptContainer3d .folio-reading .folio-epigraph {
-            margin-top: 0;
+            margin: 0 0 0.75rem;
         }
         #livingManuscriptContainer3d .folio-body {
-            line-height: 1.65;
+            line-height: 1.72;
         }
         #livingManuscriptContainer3d .folio-notes {
-            margin-top: 0;
-            padding-top: 0;
+            margin-top: auto;
+            padding-top: 1.15rem;
         }
         /* Both feet sit on the page's bottom padding. */
         .folio-concordance,
