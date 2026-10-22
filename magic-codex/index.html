@@ -123,11 +123,14 @@
             flex-direction: column;
             justify-content: space-between;
             opacity: 0;
-            transition: opacity 0.7s ease;
+            transition: opacity 0.45s ease;
             box-shadow: inset 0 0 48px rgba(120, 78, 28, 0.14);
         }
         .page-leaf.page-shown {
             opacity: 1;
+        }
+        .page-leaf.page-driven {
+            transition: none;
         }
         .page-leaf.left-leaf {
             border-radius: 3px 0 0 3px;
@@ -161,15 +164,7 @@
             padding: 0.15rem 0 1.4rem;
         }
         .astrolabe-hanger::after {
-            content: "";
-            position: absolute;
-            left: 16%;
-            right: 16%;
-            bottom: 6%;
-            height: 58px;
-            background: radial-gradient(ellipse at center, rgba(42, 24, 10, 0.32), transparent 74%);
-            pointer-events: none;
-            z-index: 0;
+            content: none;
         }
         #astrolabe3DViewport:active {
             cursor: grabbing;
@@ -327,12 +322,25 @@
             cursor: wait;
         }
 
-        /* The two leaves share one parchment: the spread gradient split at the gutter. */
+        /* The two leaves share one parchment: the spread gradient split at the gutter.
+           The left leaf's paint lives on #leftLeafVellum so the astrolabe well can be
+           a real hole: the same WebGL instrument that fell shows through it. */
         .page-leaf.left-leaf {
+            background: transparent;
+        }
+        #leftLeafVellum {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
             background-color: #e8d5b0;
             background-image:
                 url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='vellumNoiseL'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.038' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.55  0 0 0 0 0.38  0 0 0 0 0.18  0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23vellumNoiseL)'/%3E%3C/svg%3E"),
                 linear-gradient(90deg, #f5ebd6 0%, #ead9b6 32%, #f4e6c8 76%, #d8c09a 94%, #c4a574 100%);
+        }
+        .page-leaf.left-leaf > :not(#leftLeafVellum) {
+            position: relative;
+            z-index: 1;
         }
         .page-leaf.right-leaf {
             background-color: #e8d5b0;
@@ -340,7 +348,7 @@
                 url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='vellumNoiseR'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.038' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.55  0 0 0 0 0.38  0 0 0 0 0.18  0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23vellumNoiseR)'/%3E%3C/svg%3E"),
                 linear-gradient(90deg, #c4a574 0%, #d8c09a 6%, #f4e6c8 24%, #ead9b6 68%, #f5ebd6 100%);
         }
-        body.registry-parchment .page-leaf.left-leaf {
+        body.registry-parchment #leftLeafVellum {
             background-color: #f5eedf;
             background-image:
                 url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='parchmentFiberL'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.65  0 0 0 0 0.45  0 0 0 0 0.25  0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23parchmentFiberL)'/%3E%3C/svg%3E"),
@@ -795,6 +803,7 @@
     <div id="pageLeafTemplates" hidden>
         <!-- LEFT FOLIO: FRONTISPIECE, FREE ASTROLABE, WHISPERING CONCORDANCE -->
         <section id="leftFolioLeaf" class="page-leaf left-leaf parchment-folio folioVerso">
+            <div id="leftLeafVellum" aria-hidden="true"></div>
             <div class="margin-ruling-overlay"></div>
             <div class="foxing-spot w-8 h-8 top-10 right-14"></div>
             <div class="foxing-spot w-12 h-10 bottom-28 left-6"></div>
@@ -1676,6 +1685,29 @@
         let celestialRings = [];
         let celestialPlanets = [];
         let fallingArmillary = null;
+        let armillaryAnchor = null;
+        let armillaryGlow = null;
+        let armillaryShadow = null;
+        let armillaryRings = [];
+        let solarCoreMat = null;
+        let wellMetrics = null;
+        let armillaryRest = null;
+        let openClock = 0;
+        let openPlan = null;
+        let openSpin = null;
+        let flatLatched = false;
+        let flatFrom = null;
+        let astroLatched = null;
+        let camStartPos = null;
+        let camStartLook = null;
+        let openFrameLog = [];
+        let frameSpans = [];
+        let openPhaseEntered = {};
+        let inscriptionHeld = true;
+        let armillaryUserControl = false;
+        let bookVelX = 0;
+        let bookVelY = 0;
+        let bookPointerId = null;
         let openHandoffStarted = false;
         let closeCamFrom = null;
         let closeBookFrom = null;
@@ -2490,24 +2522,22 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 const fMesh = new THREE.Mesh(fGeo, fMat);
                 fMesh.visible = false;
                 const az = Math.random() * Math.PI * 2;
-                const elev = -0.35 + Math.random() * 1.35;
-                const towardLens = i % 3 === 0;
-                const downward = i % 11 === 0;
+                const elev = 0.15 + Math.random() * 0.85;
                 fMesh.userData = {
                     index: i,
                     nearLens: nearLens,
-                    delay: (i / flyingPageCount) * 0.85,
-                    vx: Math.cos(elev) * Math.cos(az) * (1.6 + Math.random() * 3.4),
-                    vy: downward ? (-0.6 - Math.random() * 1.2) : (3.4 + Math.random() * 4.2),
-                    vz: towardLens ? (6.5 + Math.random() * 3.5) : (Math.cos(elev) * Math.sin(az) * (2.2 + Math.random() * 4.4)),
-                    grav: 1.9 + Math.random() * 0.8,
-                    swirl: (0.6 + Math.random() * 1.4) * (i % 2 === 0 ? 1 : -1),
-                    swirlR: 0.4 + Math.random() * 1.8,
+                    delay: (i / flyingPageCount) * 0.42,
+                    vx: Math.cos(elev) * Math.cos(az) * (2.8 + Math.random() * 3.6),
+                    vy: 3.1 + Math.random() * 3.4,
+                    vz: Math.cos(elev) * Math.sin(az) * (1.6 + Math.random() * 2.4),
+                    grav: 2.2 + Math.random() * 0.6,
+                    swirl: (0.5 + Math.random() * 1.1) * (i % 2 === 0 ? 1 : -1),
+                    swirlR: 0.35 + Math.random() * 1.1,
                     az: az,
-                    sx: (Math.random() - 0.5) * 3.4,
-                    sy: (Math.random() - 0.5) * 3.4,
-                    sz: (Math.random() - 0.5) * 2.6,
-                    flutter: 9 + (i % 5) * 2
+                    sx: (Math.random() - 0.5) * 2.4,
+                    sy: (Math.random() - 0.5) * 2.4,
+                    sz: (Math.random() - 0.5) * 1.8,
+                    flutter: 8 + (i % 5) * 2
                 };
                 coverScene.add(fMesh);
                 flyingPages.push(fMesh);
@@ -2617,37 +2647,49 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 celestialPlanets.push({ mesh: body, radius: radius, angle: idx * 1.05, speed: 0.55 + idx * 0.08 });
             });
 
-            fallingArmillary = new THREE.Group();
-            fallingArmillary.visible = false;
-            fallingArmillary.position.set(0, 0, 3.6);
-            bookRoot.add(fallingArmillary);
-            const armMat = new THREE.MeshStandardMaterial({ color: 0xc4a574, emissive: 0x6b4a1e, emissiveIntensity: 0.25, roughness: 0.35, metalness: 0.72 });
-            const armCore = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), new THREE.MeshStandardMaterial({
-                color: 0xd97706, emissive: 0x92400e, emissiveIntensity: 0.7, roughness: 0.3, metalness: 0.3
-            }));
-            fallingArmillary.add(armCore);
-            [0.42, 0.62, 0.84, 1.05, 1.28].forEach((radius, idx) => {
-                const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.018, 8, 40), armMat);
-                ring.rotation.x = idx * 0.55;
-                ring.rotation.y = idx * 0.4;
-                fallingArmillary.add(ring);
-            });
-            planetHex.forEach((hex, idx) => {
-                const gem = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.07, 12, 12),
-                    new THREE.MeshStandardMaterial({ color: hex, emissive: hex, emissiveIntensity: 0.4, roughness: 0.3, metalness: 0.25 })
-                );
-                const ang = idx * (Math.PI / 3);
-                gem.position.set(Math.cos(ang) * 1.05, Math.sin(ang * 2) * 0.18, Math.sin(ang) * 1.05);
-                fallingArmillary.add(gem);
-            });
+            // One armillary. It is born here, materialises above the gutter, and lands
+            // in the left-leaf well. Nothing else is swapped in for it.
+            armillaryAnchor = new THREE.Group();
+            armillaryAnchor.name = "armillaryAnchor";
+            armillaryAnchor.visible = false;
+            armillaryAnchor.frustumCulled = false;
+            leftLeafMesh.add(armillaryAnchor);
+            fallingArmillary = armillaryAnchor;
+            buildOrbitalArmillary(armillaryAnchor, { bronzeTex, ironTex, steelTex });
+            armillaryGlow = new THREE.PointLight(0xffb15a, 0, 7, 2);
+            armillaryAnchor.add(armillaryGlow);
+            armillaryShadow = new THREE.Mesh(
+                new THREE.CircleGeometry(1.15, 28),
+                new THREE.MeshBasicMaterial({ color: 0x140c07, transparent: true, opacity: 0, depthWrite: false })
+            );
+            armillaryShadow.renderOrder = 2;
+            armillaryShadow.visible = false;
+            leftLeafMesh.add(armillaryShadow);
 
             bookRoot.rotation.set(targetBookRotX, targetBookRotY, targetBookRotZ);
             setupBookViewportInteractions(container);
             initPageCSS3D(container, leafW, leafH);
             setSpreadVisible(false);
             poseOpenLeaves(0, pageTurnT, 0);
+            markTomePickMeshes(backCoverGroup, frontCoverBoardGroup, spineGroup, pageBlockMesh);
+            pageSheaves.forEach((mesh) => markTomePickMeshes(mesh));
+            markTomePickMeshes(topClaspPivot, bottomClaspPivot, bookmarkRibbon1, bookmarkRibbon2);
+            headbandMeshes.forEach((mesh) => markTomePickMeshes(mesh));
             prepareMaterialization();
+            prewarmOpeningRender();
+        }
+
+        function markTomePickMeshes() {
+            for (let i = 0; i < arguments.length; i++) {
+                const root = arguments[i];
+                if (!root) continue;
+                if (root.isMesh) root.userData.opensTome = true;
+                if (root.traverse) {
+                    root.traverse((obj) => {
+                        if (obj.isMesh) obj.userData.opensTome = true;
+                    });
+                }
+            }
         }
 
         function initPageCSS3D(container, leafW, leafH) {
@@ -2817,12 +2859,22 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             return bookRaycaster.intersectObjects(objects, true);
         }
 
+        function tomePickHits(e) {
+            return hitFromEvent(e, bookRoot ? bookRoot.children : []).filter((hit) => hit.object.visible && hit.object.userData.opensTome);
+        }
+
         function setupBookViewportInteractions(container) {
             container.addEventListener("pointerdown", (e) => {
-                if (isBookOpening || isBookClosing || bookForming) return;
+                if (isBookOpening || isBookClosing || bookForming || isBookOpened) return;
+                const hits = tomePickHits(e);
+                if (!hits.length) return;
                 isDraggingBook = true;
+                bookPointerId = e.pointerId;
+                try { container.setPointerCapture(e.pointerId); } catch (err) {}
                 bookPointerDownPos = { x: e.clientX, y: e.clientY };
-                bookPrevPointer = { x: e.clientX, y: e.clientY };
+                bookPrevPointer = { x: e.clientX, y: e.clientY, t: performance.now() };
+                bookVelX = 0;
+                bookVelY = 0;
             });
 
             window.addEventListener("pointermove", (e) => {
@@ -2833,27 +2885,36 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                         portraitLeaf = dx > 0 ? 0 : 1;
                         fitReadCamera();
                     }
-                    bookPrevPointer = { x: e.clientX, y: e.clientY };
+                    bookPrevPointer = { x: e.clientX, y: e.clientY, t: performance.now() };
                     return;
                 }
                 if (isDraggingBook && !isBookOpened) {
+                    const now = performance.now();
+                    const dt = Math.max(0.008, (now - (bookPrevPointer.t || now)) / 1000);
                     const dx = e.clientX - bookPrevPointer.x;
                     const dy = e.clientY - bookPrevPointer.y;
+                    bookVelY = bookVelY * 0.35 + (dx * 0.0085) / dt * 0.65;
+                    bookVelX = bookVelX * 0.35 + (dy * 0.0085) / dt * 0.65;
                     targetBookRotY += dx * 0.0085;
                     targetBookRotX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, targetBookRotX + dy * 0.0085));
-                    bookPrevPointer = { x: e.clientX, y: e.clientY };
+                    bookPrevPointer = { x: e.clientX, y: e.clientY, t: now };
                     return;
                 }
                 if (!bookRoot || !coverCamera) return;
-                const hits = hitFromEvent(e, bookRoot.children);
-                container.style.cursor = hits.length > 0 ? "pointer" : "grab";
+                container.style.cursor = tomePickHits(e).length > 0 ? "pointer" : "grab";
             });
 
             window.addEventListener("pointerup", (e) => {
+                if (bookPointerId != null && e.pointerId === bookPointerId) {
+                    try { container.releasePointerCapture(bookPointerId); } catch (err) {}
+                    bookPointerId = null;
+                }
                 if (!isDraggingBook) return;
                 const moveDist = Math.hypot(e.clientX - bookPointerDownPos.x, e.clientY - bookPointerDownPos.y);
                 isDraggingBook = false;
                 if (moveDist >= 8) return;
+                bookVelX = 0;
+                bookVelY = 0;
                 if (isBookOpened) {
                     const claspHits = hitFromEvent(e, [topClaspPivot, bottomClaspPivot].filter(Boolean));
                     if (claspHits.length) {
@@ -2868,9 +2929,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     }
                     return;
                 }
-                if (!isBookOpening && !isBookClosing && !bookForming) {
-                    const hits = hitFromEvent(e, bookRoot.children);
-                    if (hits.length > 0) triggerMechanicalBookOpening();
+                if (!isBookOpening && !isBookClosing && !bookForming && tomePickHits(e).length) {
+                    triggerMechanicalBookOpening();
                 }
             });
 
@@ -2940,9 +3000,22 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
         const _pageOrigin = new THREE.Vector3();
         const _lookAt = new THREE.Vector3();
 
+        function clamp01(t) {
+            return Math.max(0, Math.min(1, t));
+        }
+
         function smooth01(t) {
-            const x = Math.max(0, Math.min(1, t));
+            const x = clamp01(t);
             return x * x * (3 - 2 * x);
+        }
+
+        function smoother01(t) {
+            const x = clamp01(t);
+            return x * x * x * (x * (x * 6 - 15) + 10);
+        }
+
+        function lerp(a, b, t) {
+            return a + (b - a) * t;
         }
 
         function wrapAngle(a) {
@@ -3100,26 +3173,49 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const leftEl = document.getElementById("leftFolioLeaf");
             const rightEl = document.getElementById("rightFolioLeaf");
             if (!show) {
-                if (leftEl) leftEl.classList.remove("page-shown");
-                if (rightEl) rightEl.classList.remove("page-shown");
+                if (leftEl) {
+                    leftEl.classList.remove("page-shown", "page-driven");
+                    leftEl.style.opacity = "";
+                }
+                if (rightEl) {
+                    rightEl.classList.remove("page-shown", "page-driven");
+                    rightEl.style.opacity = "";
+                }
                 if (leftCssObj) leftCssObj.visible = false;
                 if (rightCssObj) rightCssObj.visible = false;
                 if (cssRenderer && cssScene && coverCamera) cssRenderer.render(cssScene, coverCamera);
                 return;
             }
-            if (!leftCssObj || !rightCssObj) return;
-            leftCssObj.visible = true;
-            rightCssObj.visible = true;
-            syncCssPages();
-            if (cssRenderer) cssRenderer.render(cssScene, coverCamera);
-            if (!astrolabeRenderer) {
-                try { init3DOrbitalArmillary(); } catch (err) {}
-            }
-            resizeAll3DViewports();
-            requestAnimationFrame(() => {
-                if (leftEl) leftEl.classList.add("page-shown");
-                if (rightEl) rightEl.classList.add("page-shown");
+            revealPagesImmediate();
+        }
+
+        function revealPagesImmediate() {
+            const leftEl = document.getElementById("leftFolioLeaf");
+            const rightEl = document.getElementById("rightFolioLeaf");
+            [leftEl, rightEl].forEach((el) => {
+                if (!el) return;
+                el.classList.remove("page-driven");
+                el.classList.add("page-shown");
+                el.style.opacity = "";
             });
+            if (leftCssObj) leftCssObj.visible = true;
+            if (rightCssObj) rightCssObj.visible = true;
+            syncCssPages();
+            if (cssRenderer && cssScene && coverCamera) cssRenderer.render(cssScene, coverCamera);
+        }
+
+        function setLeafOpacity(value) {
+            const v = Math.max(0, Math.min(1, value));
+            const leftEl = document.getElementById("leftFolioLeaf");
+            const rightEl = document.getElementById("rightFolioLeaf");
+            [leftEl, rightEl].forEach((el) => {
+                if (!el) return;
+                el.classList.add("page-driven");
+                el.classList.remove("page-shown");
+                el.style.opacity = String(v);
+            });
+            if (leftCssObj) leftCssObj.visible = v > 0.001;
+            if (rightCssObj) rightCssObj.visible = v > 0.001;
         }
 
         function hideOpeningSpectacle() {
@@ -3135,44 +3231,422 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             }
             celestialRings.forEach((ring) => { ring.visible = true; ring.scale.set(1, 1, 1); });
             celestialPlanets.forEach((planet) => { planet.mesh.visible = true; planet.mesh.scale.set(1, 1, 1); });
-            if (fallingArmillary) {
-                fallingArmillary.visible = false;
-                fallingArmillary.scale.set(1, 1, 1);
-                fallingArmillary.position.set(0, 0, 3.6);
-            }
             if (emberParticles) emberParticles.material.opacity = 0.62;
         }
 
-        // Where the falling armillary comes to rest: over the astrolabe hanger on the left leaf.
-        function armillaryLandingPoint() {
-            const leafW = openStackDims ? openStackDims.leafW : 3.09;
-            const leafH = openStackDims ? openStackDims.leafH : 4.16;
-            const hingeX = bookDims ? bookDims.spineX + 0.08 : -1.58;
-            let v = 0.46;
-            const leaf = document.getElementById("leftFolioLeaf");
-            const astro = document.getElementById("astrolabe3DViewport");
-            if (leaf && astro && leaf.offsetHeight) {
-                v = (astro.offsetTop + astro.offsetHeight / 2) / leaf.offsetHeight;
-            }
-            return { x: hingeX - leafW / 2, y: leafH / 2 - v * leafH, z: 0.58 };
+        const OPEN_PHASE_DEFS = [
+            { id: "anticipate", dur: 0.46 },
+            { id: "clasps", dur: 0.55, after: "anticipate", at: 0.15 },
+            { id: "spin", dur: 1.34, after: "anticipate", at: 1 },
+            { id: "flatten", dur: 0.94, after: "spin", at: 0.60 },
+            { id: "cover", dur: 0.98, after: "flatten", at: 0.32 },
+            { id: "leaves", dur: 0.90, after: "cover", at: 0.18 },
+            { id: "burst", dur: 1.50, after: "cover", at: 0.05 },
+            { id: "appear", dur: 0.64, after: "burst", at: 1 },
+            { id: "hold", dur: 0.44, after: "appear", at: 0.70 },
+            { id: "fall", dur: 0.98, after: "hold", at: 0.36 },
+            { id: "land", dur: 0.46, after: "fall", at: 0.82 },
+            { id: "pulse", dur: 0.36, after: "land", at: 0.40 },
+            { id: "pageFade", dur: 0.42, after: "pulse", at: 0.25 },
+            { id: "write", dur: 0.04, after: "pageFade", at: 1 }
+        ];
+        const ARMILLARY_HOVER = 2.45;
+        const ARMILLARY_NATIVE = 5.15;
+        const _hover = new THREE.Vector3();
+        const _camPos = new THREE.Vector3();
+        const _camLook = new THREE.Vector3();
+        const _poseA = new THREE.Vector3();
+        const _poseB = new THREE.Vector3();
+        const _lookA = new THREE.Vector3();
+        const _lookB = new THREE.Vector3();
+        const _astroW = new THREE.Vector3();
+        const _bookW = new THREE.Vector3();
+        const HERO_POS = new THREE.Vector3(0, 1.75, 20.4);
+        const LAY_POS = new THREE.Vector3(0.15, 8.7, 10.4);
+        const RISE_POS = new THREE.Vector3(0.05, 4.9, 14.6);
+
+        function compileOpening(defs) {
+            const byId = {};
+            defs.forEach((def) => {
+                const prev = def.after ? byId[def.after] : null;
+                const start = prev ? prev.start + prev.dur * def.at : 0;
+                byId[def.id] = { id: def.id, dur: def.dur, start: start, end: start + def.dur };
+            });
+            let total = 0;
+            Object.keys(byId).forEach((id) => { total = Math.max(total, byId[id].end); });
+            return { byId: byId, total: total };
         }
 
-        function beginCodexLanding() {
-            if (openHandoffStarted) return;
-            openHandoffStarted = true;
-            document.body.classList.add("codex-unlocked");
+        function phase01(id) {
+            const phase = openPlan && openPlan.byId[id];
+            if (!phase || openClock <= phase.start) return 0;
+            if (openClock >= phase.end) return 1;
+            return (openClock - phase.start) / phase.dur;
+        }
+
+        function notePhase(id) {
+            const phase = openPlan && openPlan.byId[id];
+            if (!phase || openPhaseEntered[id] || openClock < phase.start) return false;
+            openPhaseEntered[id] = openClock;
+            return true;
+        }
+
+        function planTwirl(fromYaw, dir) {
+            const ideal = dir * 1.5 * Math.PI * 2;
+            const want = -wrapAngle(fromYaw);
+            const k = Math.round((ideal - want) / (Math.PI * 2));
+            let delta = want + k * Math.PI * 2;
+            if (dir > 0 && delta < Math.PI * 2.2) delta += Math.PI * 2;
+            if (dir < 0 && delta > -Math.PI * 2.2) delta -= Math.PI * 2;
+            return delta;
+        }
+
+        function offsetWithin(el, ancestor) {
+            let x = 0;
+            let y = 0;
+            let node = el;
+            while (node && node !== ancestor) {
+                x += node.offsetLeft;
+                y += node.offsetTop;
+                node = node.offsetParent;
+            }
+            return { x: x, y: y };
+        }
+
+        function measureWell() {
+            const leaf = document.getElementById("leftFolioLeaf");
+            const astro = document.getElementById("astrolabe3DViewport");
+            if (!leaf || !astro || !leaf.offsetWidth || !astro.offsetHeight) return null;
+            const local = offsetWithin(astro, leaf);
+            wellMetrics = {
+                dxPx: (local.x + astro.offsetWidth / 2) - leaf.offsetWidth / 2,
+                dyPx: (local.y + astro.offsetHeight / 2) - leaf.offsetHeight / 2,
+                wellW: astro.offsetWidth,
+                wellH: astro.offsetHeight,
+                leafW: leaf.offsetWidth,
+                leafH: leaf.offsetHeight,
+                localX: local.x,
+                localY: local.y
+            };
+            punchAstrolabeWell();
+            return wellMetrics;
+        }
+
+        function punchAstrolabeWell() {
+            const vellum = document.getElementById("leftLeafVellum");
+            const astro = document.getElementById("astrolabe3DViewport");
+            const leaf = document.getElementById("leftFolioLeaf");
+            if (!vellum || !astro || !leaf || !leaf.offsetWidth || !wellMetrics) return;
+            const W = leaf.offsetWidth;
+            const H = leaf.offsetHeight;
+            const pad = 6;
+            const x = Math.max(0, wellMetrics.localX + pad);
+            const y = Math.max(0, wellMetrics.localY + pad);
+            const w = Math.max(8, astro.offsetWidth - pad * 2);
+            const h = Math.max(8, astro.offsetHeight - pad * 2);
+            const svg = "<svg xmlns='http://www.w3.org/2000/svg' width='" + W + "' height='" + H + "'>"
+                + "<rect width='100%' height='100%' fill='white'/>"
+                + "<rect x='" + x + "' y='" + y + "' width='" + w + "' height='" + h + "' rx='16' fill='black'/>"
+                + "</svg>";
+            const url = "url(\"data:image/svg+xml," + encodeURIComponent(svg) + "\")";
+            vellum.style.webkitMaskImage = url;
+            vellum.style.maskImage = url;
+            vellum.style.webkitMaskSize = "100% 100%";
+            vellum.style.maskSize = "100% 100%";
+            vellum.style.webkitMaskRepeat = "no-repeat";
+            vellum.style.maskRepeat = "no-repeat";
+        }
+
+        function placeArmillaryRest() {
+            if (!armillaryAnchor || !openStackDims || !armillaryRest && !wellMetrics) {
+                if (!wellMetrics) measureWell();
+            }
+            if (!wellMetrics) {
+                wellMetrics = { dxPx: 0, dyPx: 36, wellW: 520, wellH: 430, leafW: 640, leafH: 860 };
+            }
+            if (!armillaryAnchor || !openStackDims || !wellMetrics) return;
+            const leafW = openStackDims.leafW;
+            const leafH = openStackDims.leafH;
+            const sx = leafW / 640;
+            const sy = leafH / 860;
+            const dx = wellMetrics.dxPx * sx;
+            const dy = wellMetrics.dyPx * sy;
+            const rest = new THREE.Vector3(leafW / 2 - dx, -dy, -0.16);
+            const quat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+            const fit = Math.min(wellMetrics.wellW * sx, wellMetrics.wellH * sy) * 0.84;
+            const scale = fit / ARMILLARY_NATIVE;
+            const gutter = new THREE.Vector3(0.08, 0.04, rest.z);
+            armillaryRest = { position: rest, quaternion: quat, scale: scale, gutter: gutter };
+            armillaryAnchor.quaternion.copy(quat);
+            armillaryAnchor.scale.setScalar(scale);
+            armillaryAnchor.position.copy(rest);
+            if (armillaryRoot) armillaryRoot.rotation.set(0.22, 0, 0);
+            armillaryRings.forEach((ring) => ring.scale.setScalar(1));
+            if (solarCoreMesh) solarCoreMesh.scale.setScalar(1);
+        }
+
+        function armillaryHover(distance, target) {
+            target.set(0, 0, distance);
+            if (armillaryRest) target.applyQuaternion(armillaryRest.quaternion);
+            return target;
+        }
+
+        function settleArmillaryRest() {
+            if (!armillaryRest || !armillaryAnchor) return;
+            armillaryAnchor.position.copy(armillaryRest.position);
+            armillaryAnchor.quaternion.copy(armillaryRest.quaternion);
+            armillaryAnchor.scale.setScalar(armillaryRest.scale);
+            armillaryAnchor.visible = true;
+            if (armillaryRoot) armillaryRoot.rotation.set(0.22, 0, 0);
+            armillaryRings.forEach((ring) => ring.scale.setScalar(1));
+            if (solarCoreMesh) solarCoreMesh.scale.setScalar(1);
+            if (armillaryShadow && armillaryRest) {
+                armillaryShadow.visible = true;
+                armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y, armillaryRest.position.z + 0.12);
+                armillaryShadow.scale.setScalar(1);
+                armillaryShadow.material.opacity = 0.42;
+            }
+            if (armillaryGlow) armillaryGlow.intensity = 0.65;
+            if (solarCoreMat) solarCoreMat.emissiveIntensity = 0.75;
+        }
+
+        function prewarmOpeningRender() {
+            if (!coverRenderer || !coverScene || !coverCamera || !bookRoot) return;
+            const savedPos = bookRoot.position.clone();
+            const savedRot = bookRoot.rotation.clone();
+            const savedCamPos = coverCamera.position.clone();
+            const savedCamQuat = coverCamera.quaternion.clone();
+            const savedForm = formUniform.value;
+            const shadowRestore = [];
+            bookRoot.traverse((obj) => {
+                if (obj.isMesh && obj.castShadow === false && obj.userData && obj.userData.opensTome) {
+                    shadowRestore.push(obj);
+                    obj.castShadow = true;
+                }
+            });
+            formUniform.value = FORM_DONE;
             applyOpenBookPose();
-            setCoverAngle(Math.PI);
-            setClaspAngle(CLASP_OPEN);
             setSpreadVisible(true);
-            poseOpenLeaves(1, pageTurnT, 1);
-            hingedPages.forEach((p) => { p.visible = false; });
+            poseOpenLeaves(1, 1, 1);
+            hingedPages.forEach((page) => { page.visible = true; });
+            flyingPages.forEach((sheet) => {
+                sheet.visible = true;
+                sheet.material.opacity = 0.35;
+            });
+            if (leftCssObj && rightCssObj && cssRenderer) {
+                const leftEl = document.getElementById("leftFolioLeaf");
+                const rightEl = document.getElementById("rightFolioLeaf");
+                if (leftEl) leftEl.style.opacity = "0";
+                if (rightEl) rightEl.style.opacity = "0";
+                leftCssObj.visible = true;
+                rightCssObj.visible = true;
+                syncCssPages();
+                cssRenderer.render(cssScene, coverCamera);
+                measureWell();
+                placeArmillaryRest();
+                leftCssObj.visible = false;
+                rightCssObj.visible = false;
+                if (leftEl) leftEl.style.opacity = "";
+                if (rightEl) rightEl.style.opacity = "";
+            }
+            if (!armillaryRest) placeArmillaryRest();
+            if (armillaryAnchor && armillaryRest) {
+                armillaryAnchor.visible = true;
+                armillaryAnchor.position.copy(armillaryRest.position);
+                armillaryAnchor.quaternion.copy(armillaryRest.quaternion);
+                armillaryAnchor.scale.setScalar(armillaryRest.scale);
+                armillaryRings.forEach((ring) => ring.scale.setScalar(1));
+                if (solarCoreMesh) solarCoreMesh.scale.setScalar(1);
+            }
+            if (armillaryShadow && armillaryRest) {
+                armillaryShadow.visible = true;
+                armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y, armillaryRest.position.z + 0.12);
+                armillaryShadow.material.opacity = 0.4;
+            }
+            snapReadCamera();
+            try { coverRenderer.compile(coverScene, coverCamera); } catch (err) {}
+            try { coverRenderer.render(coverScene, coverCamera); } catch (err) {}
+            coverCamera.position.set(0, 1.75, 20.4);
+            coverCamera.lookAt(0, 0.2, 0);
+            try { coverRenderer.render(coverScene, coverCamera); } catch (err) {}
+
+            shadowRestore.forEach((obj) => { obj.castShadow = false; });
+            formUniform.value = savedForm;
+            hingedPages.forEach((page) => { page.visible = false; page.rotation.y = 0; });
+            flyingPages.forEach((sheet) => {
+                sheet.visible = false;
+                sheet.material.opacity = 0;
+            });
+            setSpreadVisible(false);
+            poseOpenLeaves(0, pageTurnT, 0);
+            if (armillaryAnchor) armillaryAnchor.visible = false;
+            if (armillaryShadow) {
+                armillaryShadow.visible = false;
+                armillaryShadow.material.opacity = 0;
+            }
+            bookRoot.position.copy(savedPos);
+            bookRoot.rotation.copy(savedRot);
+            coverCamera.position.copy(savedCamPos);
+            coverCamera.quaternion.copy(savedCamQuat);
+            try { coverRenderer.render(coverScene, coverCamera); } catch (err) {}
+        }
+
+        function authoredCamera(clock) {
+            if (!coverCamera || !openPlan) return;
             fitReadCamera();
-            setFolioPagesShown(true);
-            if (typeof selectBookFolio === "function") selectBookFolio(activeBookIndex || 0);
-            window.setTimeout(() => {
-                if (fallingArmillary && (isBookOpened || isBookOpening)) fallingArmillary.visible = false;
-            }, 420);
+            const readPos = _poseB.set(camGoal.x, camGoal.y, camGoal.z);
+            const readLook = _lookB.set(camGoal.lx, camGoal.ly, camGoal.lz);
+            const plan = openPlan.byId;
+            const approachT = plan.appear.start + plan.appear.dur * 0.45;
+            const readT = plan.fall.start + plan.fall.dur * 0.78;
+            const keys = [
+                { t: 0, pos: camStartPos || HERO_POS, look: "book" },
+                { t: plan.anticipate.end, pos: HERO_POS, look: "book" },
+                { t: plan.flatten.start + plan.flatten.dur * 0.42, pos: LAY_POS, look: "book" },
+                { t: plan.burst.start + plan.burst.dur * 0.32, pos: RISE_POS, look: "book" },
+                { t: approachT, pos: "approach", look: "astro" },
+                { t: readT, pos: "read", look: "read" },
+                { t: openPlan.total, pos: "read", look: "read" }
+            ];
+            let i = 0;
+            while (i < keys.length - 2 && clock > keys[i + 1].t) i += 1;
+            const a = keys[i];
+            const b = keys[i + 1];
+            const span = Math.max(0.0001, b.t - a.t);
+            const u = smoother01((clock - a.t) / span);
+            const book = bookRoot ? bookRoot.getWorldPosition(_bookW) : _bookW.set(0, 0, 0);
+            const astro = armillaryAnchor ? armillaryAnchor.getWorldPosition(_astroW) : book;
+            function resolvePos(key) {
+                if (key.pos === "approach") return _tmpApproach(readPos);
+                if (key.pos === "read") return readPos;
+                return key.pos;
+            }
+            function resolveLook(key) {
+                if (key.look === "book") return book;
+                if (key.look === "astro") return astro;
+                return readLook;
+            }
+            const pa = resolvePos(a);
+            const pb = resolvePos(b);
+            _camPos.copy(pa).lerp(pb, u);
+            const la = resolveLook(a);
+            const lb = resolveLook(b);
+            _camLook.copy(la).lerp(lb, u);
+            const landT = phase01("land");
+            if (landT > 0 && landT < 1) {
+                const dip = Math.sin(landT * Math.PI) * 0.18 * (1 - landT * 0.35);
+                _poseA.copy(_camLook).sub(_camPos);
+                const len = _poseA.length() || 1;
+                _camPos.addScaledVector(_poseA, dip / len);
+            }
+            camFollow.x = _camPos.x;
+            camFollow.y = _camPos.y;
+            camFollow.z = _camPos.z;
+            camFollow.lx = _camLook.x;
+            camFollow.ly = _camLook.y;
+            camFollow.lz = _camLook.z;
+            camGoal.x = _camPos.x;
+            camGoal.y = _camPos.y;
+            camGoal.z = _camPos.z;
+            camGoal.lx = _camLook.x;
+            camGoal.ly = _camLook.y;
+            camGoal.lz = _camLook.z;
+            applyReadCamera();
+        }
+
+        function _tmpApproach(readPos) {
+            return _poseA.copy(RISE_POS).lerp(readPos, 0.32);
+        }
+
+        function poseArmillary(clock) {
+            if (!armillaryAnchor || !armillaryRest) return;
+            const appearT = phase01("appear");
+            const holdT = phase01("hold");
+            const fallT = phase01("fall");
+            const landT = phase01("land");
+            const pulseT = phase01("pulse");
+            if (appearT <= 0) {
+                armillaryAnchor.visible = false;
+                return;
+            }
+            armillaryAnchor.visible = true;
+            armillaryRings.forEach((ring, index) => {
+                const u = appearT >= 1 ? 1 : smoother01(clamp01((appearT - index * 0.07) / 0.7));
+                ring.scale.setScalar(Math.max(0.001, u));
+            });
+            if (solarCoreMesh) {
+                const core = appearT >= 1 ? 1 : Math.max(0.001, smoother01(appearT / 0.42));
+                solarCoreMesh.scale.setScalar(core);
+            }
+            if (!astroLatched && fallT > 0) {
+                astroLatched = {
+                    yaw: armillaryRoot ? armillaryRoot.rotation.y : 0.16
+                };
+            }
+            const yawIn = appearT * 0.7 + holdT * 0.28;
+            let yaw = yawIn;
+            if (astroLatched && fallT > 0) {
+                yaw = lerp(astroLatched.yaw, 0, smoother01(fallT));
+            }
+            if (armillaryRoot) {
+                const tilt = lerp(0.42, 0.22, smoother01(fallT));
+                armillaryRoot.rotation.x = tilt;
+                armillaryRoot.rotation.y = yaw;
+                armillaryRoot.rotation.z = Math.sin(appearT * Math.PI) * 0.06 * (1 - fallT);
+            }
+            armillaryHover(ARMILLARY_HOVER, _hover);
+            const appearPos = _poseA.copy(armillaryRest.gutter).add(_hover);
+            const restPos = armillaryRest.position;
+            let descent = 0;
+            if (fallT > 0) {
+                const knee = 0.7;
+                if (fallT < knee) descent = (fallT / knee) * (fallT / knee) * 0.8;
+                else descent = 0.8 + 0.2 * smoother01((fallT - knee) / (1 - knee));
+            }
+            const pos = _lookA.copy(fallT <= 0 ? appearPos : appearPos.clone().lerp(restPos, descent));
+            if (landT > 0) {
+                const bounce = Math.sin(landT * Math.PI) * Math.exp(-landT * 2.2) * 0.14;
+                armillaryHover(bounce, _hover);
+                pos.add(_hover);
+            }
+            armillaryAnchor.position.copy(pos);
+            const pulseEnv = Math.sin(clamp01(pulseT) * Math.PI);
+            if (solarCoreMat) {
+                solarCoreMat.emissiveIntensity = 0.7 + (1 - Math.min(1, appearT)) * 1.1 + Math.sin(holdT * Math.PI) * 0.35 + pulseEnv * 1.8;
+            }
+            if (armillaryGlow) {
+                armillaryGlow.intensity = 0.45 + smoother01(appearT) * 0.7 + Math.sin(holdT * Math.PI) * 0.45 + pulseEnv * 6.2;
+            }
+            if (armillaryShadow && armillaryRest) {
+                const grounded = smoother01(fallT);
+                armillaryShadow.visible = grounded > 0.02;
+                armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y, armillaryRest.position.z + 0.12);
+                const lift = 1 - grounded;
+                armillaryShadow.scale.setScalar(1 + lift * 0.55);
+                armillaryShadow.material.opacity = grounded * 0.5 * (1 - Math.sin(clamp01(landT) * Math.PI) * 0.28);
+            }
+            if (innerBookGlowLight && pulseT > 0) {
+                innerBookGlowLight.intensity = 2.2 + pulseEnv * 4.8;
+            }
+        }
+
+        function finishOpening() {
+            isBookOpening = false;
+            isBookOpened = true;
+            armillaryUserControl = true;
+            spreadSwapped = false;
+            hingedPages.forEach((page) => { page.visible = false; });
+            flyingPages.forEach((sheet) => {
+                sheet.visible = false;
+                sheet.material.opacity = 0;
+            });
+            if (cosmicMistGroup) cosmicMistGroup.visible = false;
+            settleArmillaryRest();
+            revealPagesImmediate();
+            document.body.classList.add("codex-unlocked");
+            snapReadCamera();
+            if (typeof releaseInscription === "function") releaseInscription();
+            resizeAll3DViewports();
         }
 
         function skipToOpenPose() {
@@ -3183,9 +3657,17 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             poseOpenLeaves(1, pageTurnT, 1);
             isBookOpening = false;
             isBookOpened = true;
-            beginCodexLanding();
-            if (fallingArmillary) fallingArmillary.visible = false;
+            armillaryUserControl = true;
+            if (!armillaryRest) placeArmillaryRest();
+            settleArmillaryRest();
+            if (cosmicMistGroup) cosmicMistGroup.visible = false;
+            if (celestialGroup) celestialGroup.visible = false;
+            revealPagesImmediate();
+            document.body.classList.add("codex-unlocked");
             snapReadCamera();
+            inscriptionHeld = false;
+            if (typeof prepareFrontispieceWriting === "function") prepareFrontispieceWriting();
+            if (typeof releaseInscription === "function") releaseInscription();
         }
 
         function triggerMechanicalBookOpening() {
@@ -3195,13 +3677,34 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 return;
             }
             isBookOpening = true;
+            armillaryUserControl = false;
             openHandoffStarted = false;
+            openPhaseEntered = {};
+            openFrameLog = [];
+            frameSpans = [];
+            flatLatched = false;
+            flatFrom = null;
+            astroLatched = null;
+            spreadSwapped = false;
+            inscriptionHeld = true;
             openAnimStartTime = performance.now();
+            openClock = 0;
+            openPlan = compileOpening(OPEN_PHASE_DEFS);
             openFrom = {
                 rx: bookRoot.rotation.x, ry: bookRoot.rotation.y, rz: bookRoot.rotation.z,
-                py: bookRoot.position.y
+                px: bookRoot.position.x, py: bookRoot.position.y, pz: bookRoot.position.z
             };
-            camFollow = { x: coverCamera.position.x, y: coverCamera.position.y, z: coverCamera.position.z, lx: 0, ly: 0.08, lz: 0 };
+            const dir = Math.abs(bookVelY) > 0.45 ? Math.sign(bookVelY) : 1;
+            const fromYaw = openFrom.ry - dir * 0.24;
+            openSpin = { dir: dir, fromYaw: fromYaw, delta: planTwirl(fromYaw, dir) };
+            camStartPos = coverCamera.position.clone();
+            camStartLook = new THREE.Vector3(0, 0.08, 0);
+            bookVelX = 0;
+            bookVelY = 0;
+            camFollow = {
+                x: coverCamera.position.x, y: coverCamera.position.y, z: coverCamera.position.z,
+                lx: 0, ly: 0.08, lz: 0
+            };
             hingedPages.forEach((page) => {
                 page.visible = false;
                 page.rotation.y = 0;
@@ -3214,242 +3717,180 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             setFolioPagesShown(false);
             setSpreadVisible(false);
             poseOpenLeaves(0, pageTurnT, 0);
+            if (!armillaryRest) placeArmillaryRest();
+            if (armillaryAnchor) armillaryAnchor.visible = false;
+            if (armillaryShadow) armillaryShadow.visible = false;
+            if (typeof prepareFrontispieceWriting === "function") prepareFrontispieceWriting();
         }
-
-        function bendHingedPage(pageMesh, arch) {
-            const posAttr = pageMesh.geometry.attributes.position;
-            const base = pageMesh.geometry.userData.baseCoords;
-            if (!posAttr || !base) return;
-            const w = pageMesh.geometry.parameters ? pageMesh.geometry.parameters.width : 3.07;
-            for (let v = 0; v < posAttr.count; v++) {
-                const bx = base[v * 3];
-                const t = Math.max(0, Math.min(1, bx / w));
-                // A turning leaf lifts at the fore-edge and trails behind its spine
-                posAttr.setXYZ(v, bx, base[v * 3 + 1], Math.sin(t * Math.PI * 0.5) * arch * t);
-            }
-            posAttr.needsUpdate = true;
-        }
-
-        let openFrom = null;
-        let spreadSwapped = false;
 
         function updateBookOpeningTimeline(now) {
-            const elapsed = (now - openAnimStartTime) / 1000;
-            const progress = Math.min(1, elapsed / OPEN_DURATION);
+            openClock = Math.max(0, (now - openAnimStartTime) / 1000);
+            openFrameLog.push({ t: Math.round(openClock * 1000) / 1000, dt: Math.round(frameDt * 1000) / 1000 });
+            const clock = openClock;
 
-            // 1. Clasps spring free
-            const claspT = Math.min(1, elapsed / 0.7);
-            const claspSpring = 1 - Math.exp(-6.2 * claspT) * Math.cos(14 * claspT);
-            setClaspAngle(Math.min(2.7, CLASP_OPEN * claspSpring));
+            const anticipateT = phase01("anticipate");
+            const spinT = phase01("spin");
+            const flatT = phase01("flatten");
+            const coverT = phase01("cover");
+            const leafT = phase01("leaves");
+            const burstT = phase01("burst");
 
-            // 2. Two weighted turns in the air
-            const spinT = Math.max(0, Math.min(1, (elapsed - 0.22) / 1.33));
-            const easeSpin = spinT < 0.5 ? 4 * spinT * spinT * spinT : 1 - Math.pow(-2 * spinT + 2, 3) / 2;
-            if (elapsed < 1.55) {
-                bookRoot.rotation.y = openFrom.ry + easeSpin * Math.PI * 4;
-                bookRoot.rotation.x = openFrom.rx + Math.sin(easeSpin * Math.PI) * 0.34;
-                bookRoot.rotation.z = openFrom.rz + Math.sin(easeSpin * Math.PI * 2) * 0.16;
-                bookRoot.position.y = Math.sin(easeSpin * Math.PI) * 0.42;
+            if (flatT <= 0) {
+                const dip = Math.sin(clamp01(anticipateT) * Math.PI);
+                const wind = smoother01(anticipateT);
+                bookRoot.position.set(
+                    openFrom.px,
+                    openFrom.py - 0.2 * dip,
+                    openFrom.pz - 0.08 * dip
+                );
+                bookRoot.rotation.x = openFrom.rx + dip * 0.1;
+                bookRoot.rotation.z = openFrom.rz;
+                bookRoot.rotation.y = lerp(openFrom.ry, openSpin.fromYaw, wind);
+                if (spinT > 0) {
+                    const spinU = smoother01(spinT);
+                    const lift = Math.sin(spinU * Math.PI);
+                    bookRoot.rotation.y = openSpin.fromYaw + openSpin.delta * spinU;
+                    bookRoot.rotation.x = openFrom.rx + lift * 0.26;
+                    bookRoot.rotation.z = openFrom.rz + lift * 0.1 * openSpin.dir;
+                    bookRoot.position.y = openFrom.py + lift * 0.58;
+                    bookRoot.position.x = openFrom.px;
+                    bookRoot.position.z = openFrom.pz;
+                }
+            } else {
+                if (!flatLatched) {
+                    flatLatched = true;
+                    flatFrom = {
+                        rx: bookRoot.rotation.x,
+                        rz: bookRoot.rotation.z,
+                        px: bookRoot.position.x,
+                        py: bookRoot.position.y,
+                        pz: bookRoot.position.z
+                    };
+                }
+                const ease = smoother01(flatT);
+                const spinU = smoother01(spinT);
+                bookRoot.rotation.y = openSpin.fromYaw + openSpin.delta * (spinT < 1 ? spinU : 1);
+                bookRoot.rotation.x = lerp(flatFrom.rx, OPEN_ROT_X, ease);
+                bookRoot.rotation.z = lerp(flatFrom.rz, 0, ease);
+                bookRoot.position.x = lerp(flatFrom.px, openSpreadShiftX(), ease);
+                bookRoot.position.y = lerp(flatFrom.py, OPEN_POS_Y, ease);
+                bookRoot.position.z = lerp(flatFrom.pz, OPEN_POS_Z, ease);
+                if (innerBookGlowLight && phase01("pulse") <= 0) {
+                    innerBookGlowLight.intensity = 0.2 + ease * 2.6;
+                }
             }
 
-            if (elapsed >= 1.55) {
-                // 3. Settle flat onto the lectern, gutter sliding to the centre of the frame
-                const flattenT = Math.min(1, (elapsed - 1.55) / 1.0);
-                const easeFlat = smooth01(flattenT);
-                const fromY = wrapAngle(openFrom.ry);
-                bookRoot.rotation.x = openFrom.rx + (OPEN_ROT_X - openFrom.rx) * easeFlat;
-                bookRoot.rotation.y = fromY * (1 - easeFlat);
-                bookRoot.rotation.z = openFrom.rz * (1 - easeFlat);
-                bookRoot.position.x = openSpreadShiftX() * easeFlat;
-                bookRoot.position.y = OPEN_POS_Y * easeFlat;
-                bookRoot.position.z = OPEN_POS_Z * easeFlat;
-                if (innerBookGlowLight) innerBookGlowLight.intensity = 0.2 + easeFlat * 3.6;
+            if (clock >= openPlan.byId.clasps.start) {
+                const claspT = phase01("clasps");
+                const spring = 1 - Math.exp(-6.4 * claspT) * Math.cos(13 * claspT);
+                setClaspAngle(claspT >= 1 ? CLASP_OPEN : Math.min(CLASP_OPEN * 1.08, CLASP_OPEN * Math.max(0, spring)));
+            }
 
-                // 4. The cover lifts, passes vertical, and falls under its own weight with a small rebound
-                const coverT = Math.max(0, Math.min(1, (elapsed - 1.7) / 1.35));
-                const gravity = coverT * coverT * (1.15 - 0.15 * coverT);
-                let coverAngle = gravity * Math.PI;
+            if (coverT > 0) {
+                let angle = coverT * coverT * (1.12 - 0.12 * coverT) * Math.PI;
                 if (coverT > 0.84) {
                     const b = (coverT - 0.84) / 0.16;
-                    coverAngle = Math.PI - Math.sin(b * Math.PI) * 0.07 * (1 - b * 0.5);
+                    angle = Math.PI - Math.sin(b * Math.PI) * 0.065 * (1 - b * 0.45);
                 }
-                setCoverAngle(coverAngle);
-
-                // 5. The front half of the text block follows the cover a beat behind
-                if (coverT > 0 && !spreadSwapped) {
+                setCoverAngle(Math.max(0, Math.min(Math.PI, angle)));
+                if (coverT > 0.02 && !spreadSwapped) {
                     setSpreadVisible(true);
                     spreadSwapped = true;
                 }
-                const leafT = Math.max(0, Math.min(1, (elapsed - 1.86) / 1.32));
-                const leafTurn = leafT * leafT * (1.1 - 0.1 * leafT);
-                const archT = smooth01((elapsed - 2.95) / 0.75);
-                if (spreadSwapped) poseOpenLeaves(leafTurn, pageTurnT, archT);
+            }
 
-                // 6. A riffle of leaves cascades from the right stack onto the left
+            if (leafT > 0 && spreadSwapped) {
+                const turn = Math.min(1, leafT * leafT * (1.08 - 0.08 * leafT));
+                const arch = smoother01(clamp01((leafT - 0.42) / 0.58));
+                poseOpenLeaves(turn, pageTurnT, arch);
                 if (openStackDims) {
                     const count = Math.max(1, hingedPages.length - 1);
                     const fromZ = openStackDims.rightTopZ || 0;
                     const toZ = openStackDims.leftTopZ || 0;
                     hingedPages.forEach((pageMesh, idx) => {
                         const lag = idx / count;
-                        const local = Math.max(0, Math.min(1, (elapsed - 2.35 - lag * 1.05) / 0.62));
-                        const eased = local * local * (3 - 2 * local);
-                        pageMesh.visible = local > 0 && local < 1;
-                        pageMesh.rotation.y = -Math.PI * eased;
-                        pageMesh.position.z = fromZ + (toZ - fromZ) * eased + Math.sin(eased * Math.PI) * 0.06;
-                        bendHingedPage(pageMesh, Math.sin(local * Math.PI) * 0.42);
+                        const local = clamp01((leafT - 0.12 - lag * 0.42) / 0.3);
+                        pageMesh.visible = local > 0.001 && local < 0.995;
+                        pageMesh.rotation.y = -Math.PI * smoother01(local);
+                        pageMesh.rotation.z = Math.sin(local * Math.PI) * 0.08;
+                        pageMesh.position.z = fromZ + (toZ - fromZ) * local + Math.sin(local * Math.PI) * 0.05;
                     });
                 }
             }
 
-            if (elapsed >= 1.55) {
-                const flyElapsed = elapsed - 1.55;
-                flyingPages.forEach((sheet) => {
-                    const d = sheet.userData;
-                    const life = flyElapsed - d.delay;
-                    if (life <= 0) {
-                        sheet.visible = false;
-                        return;
-                    }
-                    sheet.visible = true;
-                    const hang = Math.min(life, 2.6);
-                    const rise = d.vy * hang - 0.5 * d.grav * hang * hang;
-                    const travel = Math.min(life, 2.15);
-                    const eddy = Math.min(1, life / 1.2);
-                    _pageOrigin.set(bookDims ? bookDims.spineX + 0.08 : -1.58, 0, 0.2);
-                    if (bookRoot) bookRoot.localToWorld(_pageOrigin);
-                    sheet.position.set(
-                        _pageOrigin.x + d.vx * travel * 0.95 + Math.sin(d.az + life * d.swirl) * d.swirlR * eddy,
-                        _pageOrigin.y + rise,
-                        _pageOrigin.z + d.vz * travel * 0.22 + Math.cos(d.az + life * d.swirl) * d.swirlR * 0.28 * eddy
-                    );
-                    sheet.rotation.set(life * d.sx, life * d.sy, life * d.sz);
-                    const fadeIn = Math.min(1, life * 3.2);
-                    const fadeOut = elapsed > 5.05 ? Math.max(0, 1 - (elapsed - 5.05) * 1.15) : 1;
-                    const blockingSky = elapsed > 2.7 && elapsed < 4.5 && Math.abs(sheet.position.x) < 1.6 && sheet.position.y > 2.4;
-                    sheet.material.opacity = fadeIn * fadeOut * (blockingSky ? 0.22 : 1);
-                    if (life < 2.4 && (d.index % 2 === 0)) {
-                        const posAttr = sheet.geometry.attributes.position;
-                        const base = sheet.geometry.userData.baseCoords;
-                        const amp = d.nearLens ? 0.05 : 0.09;
-                        for (let v = 0; v < posAttr.count; v++) {
-                            const bx = base[v * 3];
-                            const by = base[v * 3 + 1];
-                            const wave = Math.sin(life * d.flutter + bx * 3.1) * amp;
-                            const curl = (bx > 0.25 && by < -0.2) ? 0.1 : 0;
-                            posAttr.setXYZ(v, bx, by, wave + curl);
-                        }
-                        posAttr.needsUpdate = true;
-                    }
+            const burst = openPlan.byId.burst;
+            const burstAge = clock - burst.start;
+            const burstFade = burstT <= 0 ? 0 : 1 - smoother01(clamp01((burstT - 0.56) / 0.44));
+            flyingPages.forEach((sheet) => {
+                const data = sheet.userData;
+                const life = burstAge - data.delay;
+                if (burstT <= 0 || life <= 0 || burstFade <= 0) {
+                    sheet.visible = false;
+                    return;
+                }
+                sheet.visible = true;
+                const hang = life;
+                const rise = data.vy * hang - 0.5 * data.grav * hang * hang;
+                const travel = life;
+                const eddy = Math.min(1, life / 0.8);
+                const clear = smoother01(clamp01((life - 0.35) / 0.7));
+                _pageOrigin.set(bookDims ? bookDims.spineX + 0.08 : -1.58, 0.1, 0.25);
+                if (bookRoot) bookRoot.localToWorld(_pageOrigin);
+                const ox = _pageOrigin.x + data.vx * travel + Math.sin(data.az + life * data.swirl) * data.swirlR * eddy;
+                const oy = _pageOrigin.y + rise;
+                const oz = _pageOrigin.z + data.vz * travel + Math.cos(data.az + life * data.swirl) * data.swirlR * 0.25 * eddy;
+                const radial = clear * (1.8 + data.index % 5 * 0.15);
+                const len = Math.hypot(ox, oy) || 1;
+                sheet.position.set(ox + (ox / len) * radial, oy + radial * 0.35, oz);
+                const flutter = Math.sin(life * data.flutter) * 0.18;
+                sheet.rotation.set(life * data.sx + flutter, life * data.sy, life * data.sz + flutter * 0.4);
+                const fadeIn = Math.min(1, life * 4);
+                sheet.material.opacity = fadeIn * burstFade;
+            });
+
+            if (cosmicMistGroup) {
+                const mistIn = smoother01(clamp01((burstT - 0.6) / 0.4));
+                const mistOut = 1 - smoother01(clamp01(phase01("appear") / 0.72));
+                const mist = burstT <= 0 ? 0 : mistIn * mistOut;
+                cosmicMistGroup.visible = mist > 0.01;
+                cosmicMistGroup.rotation.y = clock * 0.35;
+                cosmicMistPuffs.forEach((puff, idx) => {
+                    const pulse = 1 + Math.sin(clock * 2.4 + idx) * 0.1;
+                    const scale = puff.userData.base * mist * pulse;
+                    puff.scale.set(scale, scale, 1);
+                    puff.material.opacity = mist * 0.24;
                 });
-
-                if (cosmicMistGroup) {
-                    cosmicMistGroup.visible = true;
-                    cosmicMistGroup.rotation.y = flyElapsed * 0.22;
-                    const mistIn = Math.min(1, Math.max(0, (flyElapsed - 0.15) / 0.8));
-                    const mistOut = elapsed > 4.7 ? Math.max(0, 1 - (elapsed - 4.7) * 1.4) : 1;
-                    cosmicMistPuffs.forEach((puff, idx) => {
-                        const pulse = 1 + Math.sin(flyElapsed * 2.2 + idx) * 0.12;
-                        const scale = puff.userData.base * mistIn * pulse;
-                        puff.scale.set(scale, scale, 1);
-                        puff.material.opacity = mistIn * mistOut * 0.22;
-                    });
-                }
-                if (emberParticles) {
-                    const glow = Math.min(1, Math.max(0, (elapsed - 1.55) / 0.6));
-                    const dim = elapsed > 5.1 ? Math.max(0.62, 0.95 - (elapsed - 5.1)) : 0.62 + glow * 0.28;
-                    emberParticles.material.opacity = dim;
-                }
             }
 
-            if (elapsed >= 2.25 && celestialGroup) {
-                const sky = elapsed - 2.25;
-                celestialGroup.visible = true;
-                if (sky < 1.15) {
-                    const form = smooth01(sky / 1.0);
-                    celestialGroup.scale.set(form, form, form);
-                    celestialPlanets.forEach((planet) => {
-                        planet.angle += 0.012 * planet.speed;
-                        planet.mesh.position.set(
-                            Math.cos(planet.angle) * planet.radius,
-                            Math.sin(planet.angle * 2) * planet.radius * 0.12,
-                            Math.sin(planet.angle) * planet.radius
-                        );
-                    });
-                    celestialRings.forEach((ring, idx) => {
-                        ring.rotation.y += 0.004 + idx * 0.001;
-                    });
-                    if (celestialCorona) celestialCorona.material.opacity = 0.35 + form * 0.45;
-                } else if (sky < 1.9) {
-                    const col = smooth01((sky - 1.15) / 0.75);
-                    const shrink = Math.max(0.04, 1 - col);
-                    if (celestialSun) celestialSun.scale.set(shrink, shrink, shrink);
-                    celestialRings.forEach((ring) => ring.scale.set(shrink, shrink, shrink));
-                    celestialPlanets.forEach((planet) => planet.mesh.scale.set(shrink, shrink, shrink));
-                    if (celestialCorona) {
-                        celestialCorona.material.opacity = 0.8 * (1 - col) + Math.sin(col * Math.PI) * 0.35;
-                        celestialCorona.scale.set(2.1 + col * 2.4, 2.1 + col * 2.4, 1);
-                    }
-                    if (fallingArmillary) {
-                        fallingArmillary.visible = true;
-                        const grown = 0.15 + col * 0.85;
-                        fallingArmillary.scale.set(grown, grown, grown);
-                        fallingArmillary.position.set(0, 0, 3.6);
-                        fallingArmillary.rotation.y = col * Math.PI * 2;
-                    }
-                } else {
-                    if (celestialSun) celestialSun.visible = false;
-                    celestialRings.forEach((ring) => { ring.visible = false; });
-                    celestialPlanets.forEach((planet) => { planet.mesh.visible = false; });
-                }
-            }
+            if (notePhase("appear") && !armillaryRest) placeArmillaryRest();
+            poseArmillary(clock);
 
-            // 7. The armillary drops onto the left leaf and comes to rest over its hanger
-            if (elapsed >= 4.2 && fallingArmillary) {
-                fallingArmillary.visible = true;
-                const land = armillaryLandingPoint();
-                const fallT = Math.min(1, (elapsed - 4.2) / 0.95);
-                const easeFall = fallT * fallT;
-                let landZ = 3.6 + (land.z - 3.6) * easeFall;
-                if (fallT > 0.82) {
-                    const bounce = (fallT - 0.82) / 0.18;
-                    landZ += Math.sin(bounce * Math.PI) * 0.16 * Math.exp(-bounce * 3);
-                }
-                fallingArmillary.position.set(land.x * easeFall, land.y * easeFall, landZ);
-                fallingArmillary.rotation.y += 0.012;
-                const sc = 0.95 - easeFall * 0.26;
-                fallingArmillary.scale.set(sc, sc, sc);
+            if (notePhase("pageFade")) {
+                if (typeof prepareFrontispieceWriting === "function") prepareFrontispieceWriting();
+                setLeafOpacity(0);
+                syncCssPages();
             }
+            const fadeT = phase01("pageFade");
+            if (fadeT > 0) setLeafOpacity(smoother01(fadeT));
 
-            if (elapsed < 2.6) {
-                camGoal.x = 0;
-                camGoal.y = 1.4 + elapsed * 0.55;
-                camGoal.z = 18.8 + Math.sin(Math.min(1, elapsed / 1.5) * Math.PI) * 1.6;
-                camGoal.lx = 0;
-                camGoal.ly = 0.15;
-                camGoal.lz = 0;
-            } else {
-                fitReadCamera();
-            }
-            dampToward(camFollow, camGoal, frameDt, elapsed > 4.4 ? 3.4 : 2.1);
-            applyReadCamera();
+            if (notePhase("write") && typeof releaseInscription === "function") releaseInscription();
 
-            if (elapsed >= 6.2) beginCodexLanding();
+            authoredCamera(clock);
 
-            if (progress >= 1) {
-                isBookOpening = false;
-                isBookOpened = true;
-                spreadSwapped = false;
-                beginCodexLanding();
-                hingedPages.forEach((p) => { p.visible = false; });
-                resizeAll3DViewports();
-            }
+            if (clock >= openPlan.total) finishOpening();
         }
 
         function resetBookToClosed3DStage() {
             isBookOpening = false;
             isBookOpened = false;
             spreadSwapped = false;
+            armillaryUserControl = false;
+            inscriptionHeld = true;
+            inscriptionPlaying = false;
+            bookVelX = 0;
+            bookVelY = 0;
+            if (armillaryAnchor) armillaryAnchor.visible = false;
+            if (armillaryShadow) armillaryShadow.visible = false;
 
             setClaspAngle(0);
             setCoverAngle(0);
@@ -3497,7 +3938,21 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const baseCoords = pageMesh.geometry.userData.baseCoords;
             if (!posAttr || !baseCoords) return;
             for (let v = 0; v < posAttr.count; v++) {
-                posAttr.setXYZ(v, baseCoords[v * 3], baseCoords[v * 3 + 1], 0);
+                posAttr.setXYZ(v, baseCoords[v * 3], baseCoords[v * 3 + 1], baseCoords[v * 3 + 2] || 0);
+            }
+            posAttr.needsUpdate = true;
+        }
+
+        function bendHingedPage(pageMesh, amount) {
+            const posAttr = pageMesh.geometry.attributes.position;
+            const baseCoords = pageMesh.geometry.userData.baseCoords;
+            if (!posAttr || !baseCoords) return;
+            const width = (pageMesh.geometry.parameters && pageMesh.geometry.parameters.width) || 3;
+            for (let v = 0; v < posAttr.count; v++) {
+                const x = baseCoords[v * 3];
+                const y = baseCoords[v * 3 + 1];
+                const curl = Math.sin(Math.max(0, Math.min(1, x / width)) * Math.PI) * amount;
+                posAttr.setXYZ(v, x, y, curl);
             }
             posAttr.needsUpdate = true;
         }
@@ -3511,6 +3966,10 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             }
             isBookClosing = true;
             isBookOpened = false;
+            armillaryUserControl = false;
+            if (armillaryAnchor && armillaryRest) {
+                armillaryAnchor.userData.closeScale = armillaryRest.scale;
+            }
             closeAnimStartTime = performance.now();
             document.body.classList.add("tome-closing");
             document.body.classList.remove("codex-unlocked");
@@ -3537,6 +3996,13 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const elapsed = (now - closeAnimStartTime) / 1000;
             const progress = Math.min(1, elapsed / CLOSE_DURATION);
 
+            if (armillaryAnchor && armillaryRest) {
+                const fade = 1 - smooth01(Math.min(1, elapsed / 0.42));
+                armillaryAnchor.visible = fade > 0.03;
+                armillaryAnchor.scale.setScalar(armillaryRest.scale * (0.3 + 0.7 * fade));
+                if (armillaryGlow) armillaryGlow.intensity = 0.65 * fade;
+                if (armillaryShadow) armillaryShadow.material.opacity = 0.42 * fade;
+            }
             // 1. The ink and the instrument fade from the leaves
             if (elapsed > 0.55 && leftCssObj && leftCssObj.visible) setFolioPagesShown(false);
             if (leftCssObj && leftCssObj.visible) {
@@ -3607,90 +4073,18 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
         // ============================================================================
         // 5. 3D ORBITAL ARMILLARY ASTROLABE (LEFT FOLIO, MOUNTED ON THE LEAF)
         // ============================================================================
-        let astrolabeScene, astrolabeCamera, astrolabeRenderer;
         let armillaryRoot;
         let gimbalRing1, gimbalRing2, gimbalRing3, gimbalRing4, gimbalRing5, solarCoreMesh;
         let htmlOrbitalTags = [];
 
-        let armillaryPrevPointer = { x: 0, y: 0 };
+        let armillaryPrevPointer = { x: 0, y: 0, t: 0 };
         let armillaryPointerDown = { x: 0, y: 0 };
+        let armillaryPointerId = null;
 
-        let armillaryRaycaster = new THREE.Raycaster();
-        let armillaryMouse = new THREE.Vector2();
-
-        function frameArmillaryCamera() {
-            if (!astrolabeCamera) return;
-            const aspect = Math.max(0.35, astrolabeCamera.aspect || 1);
-            const tanV = Math.tan((34 * Math.PI) / 360);
-            const tanH = tanV * aspect;
-            const reach = 2.95;
-            const z = Math.max(9.4, reach / tanV, reach / tanH);
-            astrolabeCamera.fov = 34;
-            astrolabeCamera.position.set(0, 0.12, z);
-            astrolabeCamera.lookAt(0, -0.42, 0);
-            astrolabeCamera.updateProjectionMatrix();
-        }
-
-        function init3DOrbitalArmillary() {
-            const container = document.getElementById("astrolabe3DViewport");
-            if (!container) return;
-
-            const width = container.clientWidth || 520;
-            const height = container.clientHeight || 460;
-
-            astrolabeScene = new THREE.Scene();
-            astrolabeCamera = new THREE.PerspectiveCamera(34, width / height, 0.1, 100);
-            frameArmillaryCamera();
-
-            astrolabeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            astrolabeRenderer.setSize(width, height);
-            astrolabeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            astrolabeRenderer.shadowMap.enabled = true;
-            astrolabeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            astrolabeRenderer.toneMapping = THREE.ACESFilmicToneMapping;
-            astrolabeRenderer.toneMappingExposure = 1.1;
-            container.appendChild(astrolabeRenderer.domElement);
-
-            const envMap = createCandlelightEnvMap(astrolabeRenderer);
-            astrolabeScene.environment = envMap;
-
-            // Grounded Chiaroscuro Lighting for the 3D Armillary Instrument
-            astrolabeScene.add(new THREE.AmbientLight(0xf5dec4, 0.34));
-            const sunPoint = new THREE.PointLight(0xf59e0b, 2.6, 18);
-            sunPoint.position.set(0, 0, 0);
-            astrolabeScene.add(sunPoint);
-
-            const keyLight = new THREE.DirectionalLight(0xffcf87, 1.85);
-            keyLight.position.set(4, 7, 5);
-            keyLight.castShadow = true;
-            keyLight.shadow.mapSize.width = 1024;
-            keyLight.shadow.mapSize.height = 1024;
-            keyLight.shadow.camera.near = 0.4;
-            keyLight.shadow.camera.far = 24;
-            keyLight.shadow.camera.left = -6;
-            keyLight.shadow.camera.right = 6;
-            keyLight.shadow.camera.top = 6;
-            keyLight.shadow.camera.bottom = -6;
-            keyLight.shadow.bias = -0.0015;
-            keyLight.shadow.camera.updateProjectionMatrix();
-            astrolabeScene.add(keyLight);
-
-            const shadowCatcher = new THREE.Mesh(
-                new THREE.PlaneGeometry(8, 5.5),
-                new THREE.ShadowMaterial({ opacity: 0.34 })
-            );
-            shadowCatcher.rotation.x = -Math.PI / 2;
-            shadowCatcher.position.y = -2.62;
-            shadowCatcher.receiveShadow = true;
-            astrolabeScene.add(shadowCatcher);
-
-            const rimLight = new THREE.PointLight(0x648296, 1.1, 18);
-            rimLight.position.set(-4, -3, -4);
-            astrolabeScene.add(rimLight);
-
-            const bronzeTex = createMetalTexture("bronze");
-            const ironTex = createMetalTexture("iron");
-            const steelTex = createMetalTexture("steel");
+        function buildOrbitalArmillary(anchor, textures) {
+            const bronzeTex = textures.bronzeTex;
+            const ironTex = textures.ironTex;
+            const steelTex = textures.steelTex;
 
             const meridianIronMat = new THREE.MeshStandardMaterial({
                 map: ironTex, bumpMap: ironTex, bumpScale: 0.028,
@@ -3710,22 +4104,23 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             });
 
             armillaryRoot = new THREE.Group();
-            astrolabeScene.add(armillaryRoot);
+            armillaryRoot.name = "armillaryRoot";
+            armillaryRoot.frustumCulled = false;
+            anchor.add(armillaryRoot);
+
 
             // Central Amber Lodestone Sun Core + Soft Radial Halo Sprite
-            solarCoreMesh = new THREE.Mesh(
-                new THREE.SphereGeometry(0.42, 32, 32),
-                new THREE.MeshStandardMaterial({
-                    map: bronzeTex,
-                    bumpMap: bronzeTex,
-                    bumpScale: 0.02,
-                    color: 0xd97706,
-                    emissive: 0x92400e,
-                    emissiveIntensity: 0.75,
-                    roughness: 0.22,
-                    metalness: 0.35
-                })
-            );
+            solarCoreMat = new THREE.MeshStandardMaterial({
+                map: bronzeTex,
+                bumpMap: bronzeTex,
+                bumpScale: 0.02,
+                color: 0xd97706,
+                emissive: 0x92400e,
+                emissiveIntensity: 0.75,
+                roughness: 0.22,
+                metalness: 0.35
+            });
+            solarCoreMesh = new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 32), solarCoreMat);
             armillaryRoot.add(solarCoreMesh);
 
             const sunGlowSprite = new THREE.Sprite(
@@ -3783,6 +4178,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             gimbalRing5 = new THREE.Mesh(new THREE.TorusGeometry(1.02, 0.032, 16, 64), zodiacBrassMat);
             gimbalRing5.rotation.x = -Math.PI / 4;
             armillaryRoot.add(gimbalRing5);
+            armillaryRings = [gimbalRing1, gimbalRing2, gimbalRing3, gimbalRing4, gimbalRing5];
 
             // Central Forged Spindle Axis Rod
             const axisRod = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 5.05, 16), equinoxSteelMat);
@@ -3845,60 +4241,38 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 armillaryRoot.add(spokeMesh);
             });
 
-            container.addEventListener("pointerdown", (e) => {
-                isDraggingArmillary = true;
-                armillaryPointerDown = { x: e.clientX, y: e.clientY };
-                armillaryPrevPointer = { x: e.clientX, y: e.clientY };
-            });
-
-            window.addEventListener("pointermove", (e) => {
-                if (!isDraggingArmillary) return;
-                const dx = e.clientX - armillaryPrevPointer.x;
-                const dy = e.clientY - armillaryPrevPointer.y;
-                targetArmillaryRotY += dx * 0.009;
-                targetArmillaryRotX = Math.max(-1.2, Math.min(1.2, targetArmillaryRotX + dy * 0.009));
-                armillaryPrevPointer = { x: e.clientX, y: e.clientY };
-            });
-
-            window.addEventListener("pointerup", (e) => {
-                if (!isDraggingArmillary) return;
-                isDraggingArmillary = false;
-                const dist = Math.hypot(e.clientX - armillaryPointerDown.x, e.clientY - armillaryPointerDown.y);
-                const canvas = astrolabeRenderer && astrolabeRenderer.domElement;
-                // The leaf is transformed by CSS3D, so pick in the canvas's own pixel space.
-                if (dist < 6 && canvas && e.target === canvas && canvas.clientWidth && canvas.clientHeight) {
-                    armillaryMouse.x = (e.offsetX / canvas.clientWidth) * 2 - 1;
-                    armillaryMouse.y = -(e.offsetY / canvas.clientHeight) * 2 + 1;
-                    armillaryRaycaster.setFromCamera(armillaryMouse, astrolabeCamera);
-                    const hits = armillaryRaycaster.intersectObjects(orbitalPlanetNodes);
-                    if (hits.length > 0) {
-                        selectBookFolio(hits[0].object.userData.bookIndex);
+            const well = document.getElementById("astrolabe3DViewport");
+            if (well && !well.dataset.armillaryWired) {
+                well.dataset.armillaryWired = "1";
+                well.addEventListener("pointerdown", (e) => {
+                    if (!isBookOpened || !armillaryUserControl) return;
+                    isDraggingArmillary = true;
+                    armillaryPointerId = e.pointerId;
+                    try { well.setPointerCapture(e.pointerId); } catch (err) {}
+                    armillaryPointerDown = { x: e.clientX, y: e.clientY };
+                    armillaryPrevPointer = { x: e.clientX, y: e.clientY, t: performance.now() };
+                    e.stopPropagation();
+                });
+                well.addEventListener("pointermove", (e) => {
+                    if (!isDraggingArmillary || e.pointerId !== armillaryPointerId) return;
+                    const dx = e.clientX - armillaryPrevPointer.x;
+                    const dy = e.clientY - armillaryPrevPointer.y;
+                    targetArmillaryRotY += dx * 0.009;
+                    targetArmillaryRotX = Math.max(-1.2, Math.min(1.2, targetArmillaryRotX + dy * 0.009));
+                    armillaryPrevPointer = { x: e.clientX, y: e.clientY, t: performance.now() };
+                });
+                well.addEventListener("pointerup", (e) => {
+                    if (!isDraggingArmillary || e.pointerId !== armillaryPointerId) return;
+                    isDraggingArmillary = false;
+                    try { well.releasePointerCapture(e.pointerId); } catch (err) {}
+                    armillaryPointerId = null;
+                    const dist = Math.hypot(e.clientX - armillaryPointerDown.x, e.clientY - armillaryPointerDown.y);
+                    if (dist < 6 && coverCamera) {
+                        const hits = hitFromEvent(e, orbitalPlanetNodes);
+                        if (hits.length) selectBookFolio(hits[0].object.userData.bookIndex);
                     }
-                }
-            });
-        }
-
-        function updateOrbitalNodeHTMLTags() {
-            const container = document.getElementById("astrolabe3DViewport");
-            if (!container || !astrolabeCamera) return;
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-            if (width === 0 || height === 0) return;
-
-            const worldVec = new THREE.Vector3();
-            htmlOrbitalTags.forEach(item => {
-                item.group.getWorldPosition(worldVec);
-                worldVec.project(astrolabeCamera);
-
-                const x = (worldVec.x * 0.5 + 0.5) * width;
-                const y = (-(worldVec.y * 0.5) + 0.5) * height - 22;
-
-                item.element.style.left = `${x}px`;
-                item.element.style.top = `${y}px`;
-                const isFront = worldVec.z < 0.885;
-                item.element.style.opacity = isFront ? "1" : "0.42";
-                item.element.classList.toggle("active-node", item.bookIndex === activeBookIndex);
-            });
+                });
+            }
         }
 
         // ============================================================================
@@ -3914,6 +4288,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             lastLoopNow = now;
 
             if (bookRoot && coverRenderer && coverScene && coverCamera) {
+                const poseStart = Date.now();
                 if (bookForming) updateMaterialization(now);
                 if (isBookOpening) {
                     updateBookOpeningTimeline(now);
@@ -3944,13 +4319,23 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
                 // The opening and the close own the camera. Damping would drag the shot back to the lectern.
                 if (!isBookOpening && !isBookClosing && !isBookOpened) {
-                    bookRoot.rotation.x += (targetBookRotX - bookRoot.rotation.x) * 0.075;
-                    bookRoot.rotation.y += (targetBookRotY - bookRoot.rotation.y) * 0.075;
-                    bookRoot.rotation.z += (targetBookRotZ - bookRoot.rotation.z) * 0.075;
-
-                    coverCamera.position.x += (targetCameraX - coverCamera.position.x) * 0.085;
-                    coverCamera.position.y += (targetCameraY - coverCamera.position.y) * 0.085;
-                    coverCamera.position.z += (targetCameraZ - coverCamera.position.z) * 0.085;
+                    if (!isDraggingBook) {
+                        const decay = Math.exp(-2.8 * frameDt);
+                        bookVelX *= decay;
+                        bookVelY *= decay;
+                        if (Math.abs(bookVelX) < 0.012) bookVelX = 0;
+                        if (Math.abs(bookVelY) < 0.012) bookVelY = 0;
+                        targetBookRotY += bookVelY * frameDt;
+                        targetBookRotX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, targetBookRotX + bookVelX * frameDt));
+                    }
+                    const k = 1 - Math.exp(-4.7 * frameDt);
+                    const kc = 1 - Math.exp(-5.3 * frameDt);
+                    bookRoot.rotation.x += (targetBookRotX - bookRoot.rotation.x) * k;
+                    bookRoot.rotation.y += (targetBookRotY - bookRoot.rotation.y) * k;
+                    bookRoot.rotation.z += (targetBookRotZ - bookRoot.rotation.z) * k;
+                    coverCamera.position.x += (targetCameraX - coverCamera.position.x) * kc;
+                    coverCamera.position.y += (targetCameraY - coverCamera.position.y) * kc;
+                    coverCamera.position.z += (targetCameraZ - coverCamera.position.z) * kc;
                 }
 
                 // Slow, mechanical horological rotation on cover medallion rings
@@ -3962,43 +4347,48 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     emberParticles.position.y = Math.sin(now * 0.0008) * 0.15;
                 }
 
+                const poseMs = Date.now() - poseStart;
+                const glStart = Date.now();
                 coverRenderer.render(coverScene, coverCamera);
-
+                const glMs = Date.now() - glStart;
+                let cssMs = 0;
                 if (leftCssObj && leftCssObj.visible && cssRenderer) {
+                    const cssStart = Date.now();
                     syncCssPages();
                     cssRenderer.render(cssScene, coverCamera);
+                    cssMs = Date.now() - cssStart;
+                }
+                if (glMs + cssMs >= 12) {
+                    frameSpans.push({ t: Math.round(openClock * 1000), pose: poseMs, gl: glMs, css: cssMs });
+                    if (frameSpans.length > 80) frameSpans.shift();
                 }
             }
 
-            if (leftCssObj && leftCssObj.visible && armillaryRoot && astrolabeRenderer && astrolabeScene && astrolabeCamera) {
-                armillaryRoot.rotation.x += (targetArmillaryRotX - armillaryRoot.rotation.x) * 0.08;
-                armillaryRoot.rotation.y += (targetArmillaryRotY - armillaryRoot.rotation.y) * 0.08;
-
-                if (gimbalRing2) gimbalRing2.rotation.z += 0.0024;
+            if (armillaryRoot && armillaryAnchor && armillaryAnchor.visible) {
+                if (armillaryUserControl) {
+                    const k = 1 - Math.exp(-5 * frameDt);
+                    armillaryRoot.rotation.x += (targetArmillaryRotX - armillaryRoot.rotation.x) * k;
+                    armillaryRoot.rotation.y += (targetArmillaryRotY - armillaryRoot.rotation.y) * k;
+                }
+                if (gimbalRing2) gimbalRing2.rotation.z += 0.144 * frameDt;
                 if (gimbalRing3) {
-                    gimbalRing3.rotation.x += 0.0028;
-                    gimbalRing3.rotation.y -= 0.002;
+                    gimbalRing3.rotation.y -= 0.12 * frameDt;
                 }
-                if (gimbalRing4) gimbalRing4.rotation.x -= 0.0035;
+                if (gimbalRing4) gimbalRing4.rotation.z += 0.21 * frameDt;
                 if (gimbalRing5) {
-                    gimbalRing5.rotation.y += 0.0045;
-                    gimbalRing5.rotation.z += 0.0028;
+                    gimbalRing5.rotation.z += 0.27 * frameDt;
                 }
-                if (solarCoreMesh) {
-                    solarCoreMesh.rotation.y -= 0.005;
-                }
-
+                if (solarCoreMesh) solarCoreMesh.rotation.y -= 0.3 * frameDt;
+                const pop = 1 - Math.exp(-6 * frameDt);
                 orbitalPlanetNodes.forEach((mesh, idx) => {
                     const targetScale = idx === activeBookIndex ? 1.38 : 1.0;
-                    mesh.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+                    mesh.scale.x += (targetScale - mesh.scale.x) * pop;
+                    mesh.scale.y += (targetScale - mesh.scale.y) * pop;
+                    mesh.scale.z += (targetScale - mesh.scale.z) * pop;
                     if (mesh.parent && mesh.parent.children[1]) {
-                        mesh.parent.children[1].rotation.z += 0.014;
-                        mesh.parent.children[1].rotation.y += 0.01;
+                        mesh.parent.children[1].rotation.z += 0.84 * frameDt;
                     }
                 });
-
-                astrolabeRenderer.render(astrolabeScene, astrolabeCamera);
-                updateOrbitalNodeHTMLTags();
             }
         }
 
@@ -4012,16 +4402,6 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 coverRenderer.setSize(bw, bh);
             }
             if (cssRenderer) cssRenderer.setSize(window.innerWidth || 1024, window.innerHeight || 768);
-
-            const astroContainer = document.getElementById("astrolabe3DViewport");
-            if (astroContainer && astrolabeRenderer && astrolabeCamera && astroContainer.clientWidth) {
-                const aw = astroContainer.clientWidth || 520;
-                const ah = astroContainer.clientHeight || 460;
-                astrolabeCamera.aspect = aw / ah;
-                astrolabeCamera.updateProjectionMatrix();
-                frameArmillaryCamera();
-                astrolabeRenderer.setSize(aw, ah);
-            }
             if (isBookOpened) fitReadCamera();
         }
 
@@ -4290,32 +4670,90 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             else pyroDrawing = false;
         }
 
+        let inscriptionPlaying = false;
+
+        function motionStill() {
+            return document.documentElement.classList.contains("tome-still")
+                || document.documentElement.classList.contains("tome-quiet")
+                || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        }
+
+        function settleWords(words) {
+            (words || document.querySelectorAll(".pyro-word")).forEach((word) => {
+                word.classList.remove("pending", "burning");
+                word.classList.add("settled");
+            });
+        }
+
+        function prepareFrontispieceWriting() {
+            const header = document.querySelector("#leftFolioLeaf .frontispiece");
+            if (!header || header.dataset.inscribed) return;
+            header.dataset.inscribed = "1";
+            const words = wrapScorchWords(header);
+            if (motionStill()) settleWords(words);
+        }
+
+        function armillaryScreenPoint() {
+            if (!armillaryAnchor || !coverCamera) {
+                return { x: window.innerWidth * 0.34, y: window.innerHeight * 0.46 };
+            }
+            const projected = armillaryAnchor.getWorldPosition(new THREE.Vector3()).project(coverCamera);
+            return {
+                x: (projected.x * 0.5 + 0.5) * window.innerWidth,
+                y: (-projected.y * 0.5 + 0.5) * window.innerHeight
+            };
+        }
+
+        function releaseInscription() {
+            if (inscriptionPlaying) return;
+            inscriptionHeld = false;
+            const pending = Array.from(document.querySelectorAll(".pyro-word.pending"));
+            if (motionStill() || !pending.length) {
+                settleWords(pending);
+                inscriptionPlaying = true;
+                return;
+            }
+            inscriptionPlaying = true;
+            ensurePyroCanvas();
+            const origin = armillaryScreenPoint();
+            const ranked = pending.map((word) => {
+                const rect = word.getBoundingClientRect();
+                return {
+                    word: word,
+                    dist: Math.hypot(rect.left + rect.width * 0.5 - origin.x, rect.top + rect.height * 0.5 - origin.y)
+                };
+            }).sort((a, b) => a.dist - b.dist);
+            const maxDist = Math.max(1, ranked[ranked.length - 1].dist);
+            const spread = 1.45;
+            const start = performance.now();
+            const token = inscribeToken;
+            const step = (now) => {
+                if (token !== inscribeToken) return;
+                const elapsed = (now - start) / 1000;
+                ranked.forEach((item) => {
+                    if (!item.word.classList.contains("pending")) return;
+                    if (elapsed < (item.dist / maxDist) * spread) return;
+                    item.word.classList.remove("pending");
+                    item.word.classList.add("burning");
+                    spawnPaperScorch(item.word);
+                });
+                if (elapsed < spread + 0.04) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        }
+
         function inscribeManuscript(container, html) {
-            const token = ++inscribeToken;
+            inscribeToken += 1;
+            inscriptionPlaying = false;
             pyroParticles = [];
             container.innerHTML = html;
             const words = wrapScorchWords(container);
-            const still = document.documentElement.classList.contains("tome-still")
-                || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-            if (still || !words.length) {
-                words.forEach((word) => {
-                    word.classList.remove("pending");
-                    word.classList.add("settled");
-                });
+            if (motionStill() || !words.length) {
+                settleWords(words);
                 return;
             }
-            ensurePyroCanvas();
-            let index = 0;
-            const tick = () => {
-                if (token !== inscribeToken) return;
-                for (let n = 0; n < 2 && index < words.length; n += 1, index += 1) {
-                    words[index].classList.remove("pending");
-                    words[index].classList.add("burning");
-                    spawnPaperScorch(words[index]);
-                }
-                if (index < words.length) window.setTimeout(tick, 36);
-            };
-            tick();
+            if (inscriptionHeld && !isBookOpened) return;
+            releaseInscription();
         }
 
         function renderBottomSixSealsBar() {
@@ -4421,6 +4859,26 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const left = document.getElementById("leftFolioLeaf");
             if (stillMount && left && !stillMount.contains(left)) stillMount.appendChild(left);
         }
+
+        window.__codex = {
+            open: function () { triggerMechanicalBookOpening(); },
+            snapshot: function () {
+                return {
+                    forming: bookForming,
+                    opening: isBookOpening,
+                    opened: isBookOpened,
+                    clock: openClock,
+                    total: openPlan ? openPlan.total : 0,
+                    armillary: !!(armillaryAnchor && armillaryAnchor.visible),
+                    armillaryPos: armillaryAnchor ? armillaryAnchor.position.toArray().map((n) => Math.round(n * 100) / 100) : null,
+                    well: wellMetrics,
+                    quiet: document.documentElement.classList.contains("tome-quiet"),
+                    frames: openFrameLog.slice(-8),
+                    spans: frameSpans.slice(-12),
+                    phases: openPlan ? openPlan.byId : null
+                };
+            }
+        };
 
         window.onload = function () {
             tomeStill = document.documentElement.classList.contains("tome-still");
