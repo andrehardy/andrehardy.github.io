@@ -121,7 +121,8 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
+            gap: 0.35rem;
             opacity: 0;
             transition: opacity 0.45s ease;
             box-shadow: inset 0 0 48px rgba(120, 78, 28, 0.14);
@@ -150,19 +151,24 @@
 
         #astrolabe3DViewport {
             width: 100%;
-            height: 430px;
+            height: 100%;
+            min-height: 0;
+            flex: 1 1 auto;
             position: relative;
             cursor: grab;
             touch-action: none;
             background: transparent;
-            overflow: visible;
+            overflow: hidden;
             z-index: 1;
         }
         .astrolabe-hanger {
             position: relative;
             width: 100%;
-            overflow: visible;
-            padding: 0.15rem 0 1.4rem;
+            flex: 1 1 auto;
+            min-height: 180px;
+            display: flex;
+            overflow: hidden;
+            padding: 0.15rem 0;
         }
         .astrolabe-hanger::after {
             content: none;
@@ -227,6 +233,30 @@
             inset: 0;
             pointer-events: none;
             box-shadow: inset 0 0 140px 45px rgba(0, 0, 0, 0.88);
+        }
+        /* Once the leaves are the picture, the stage vignette must not grade over the type. */
+        body.codex-unlocked #book3DViewport::after {
+            box-shadow: none;
+        }
+        #folioTurn {
+            position: fixed;
+            z-index: 46;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%);
+            font-family: Cinzel, serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: #f6edd6;
+            background: rgba(28, 16, 8, 0.88);
+            border: 1px solid rgba(212, 175, 55, 0.75);
+            border-radius: 999px;
+            padding: 0.6rem 1.15rem;
+            cursor: pointer;
+        }
+        #folioTurn[hidden] {
+            display: none !important;
         }
         #book3DViewport:active {
             cursor: grabbing;
@@ -345,9 +375,18 @@
                 url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='vellumNoiseL'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.038' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.55  0 0 0 0 0.38  0 0 0 0 0.18  0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23vellumNoiseL)'/%3E%3C/svg%3E"),
                 linear-gradient(90deg, #f5ebd6 0%, #ead9b6 32%, #f4e6c8 76%, #d8c09a 94%, #c4a574 100%);
         }
-        .page-leaf.left-leaf > :not(#leftLeafVellum) {
+        /* Furniture that is positioned (the shared frame, the foxing) must stay
+           out of flow. Forcing it relative made the left page drop its frame
+           and shove the heading out of the leaf. */
+        .page-leaf.left-leaf > :not(#leftLeafVellum):not(.margin-ruling-overlay):not(.foxing-spot) {
             position: relative;
             z-index: 1;
+        }
+        .frontispiece,
+        .folio-concordance,
+        #livingManuscriptContainer3d,
+        #rectoFooterPortal3d {
+            flex: 0 0 auto;
         }
         html.tome-still .page-leaf.right-leaf,
         html.tome-still #leftLeafVellum {
@@ -363,15 +402,15 @@
         /* Authentic Medieval Margin Ruling & Pricking Guides (marginRuling / prickingGuide) */
         .margin-ruling-overlay {
             position: absolute;
-            inset: 14px;
+            inset: 16px;
             pointer-events: none;
-            border: 1px solid rgba(212, 175, 55, 0.9);
-            box-shadow: inset 0 0 0 5px rgba(140, 28, 22, 0.28);
+            border: 1px solid rgba(166, 124, 46, 0.72);
+            box-shadow: inset 0 0 0 4px rgba(166, 124, 46, 0.22);
             z-index: 5;
         }
         body.registry-parchment .margin-ruling-overlay {
-            border: 1px solid rgba(212, 175, 55, 0.9);
-            box-shadow: inset 0 0 0 5px rgba(140, 28, 22, 0.28);
+            border: 1px solid rgba(138, 96, 32, 0.7);
+            box-shadow: inset 0 0 0 4px rgba(138, 96, 32, 0.2);
         }
 
         /* Historical Foxing Stains & Organic Aging Mottling (foxing / ageSpots) */
@@ -473,13 +512,13 @@
 
         .frontispiece {
             text-align: center;
-            padding: 0.35rem 1.25rem 0.15rem;
+            padding: 0.2rem 0.85rem 0.05rem;
             position: relative;
             z-index: 10;
         }
         .frontispiece-kicker {
             font-family: Cinzel, serif;
-            letter-spacing: 0.28em;
+            letter-spacing: 0.22em;
             font-size: 11px;
             text-transform: uppercase;
             color: #8a5a12;
@@ -487,19 +526,19 @@
         .frontispiece-title {
             font-family: Cinzel, serif;
             color: #3b2412;
-            letter-spacing: 0.16em;
-            font-size: clamp(1.35rem, 2.4vw, 1.85rem);
-            line-height: 1.25;
-            margin-top: 0.35rem;
+            letter-spacing: 0.12em;
+            font-size: 1.42rem;
+            line-height: 1.2;
+            margin-top: 0.28rem;
         }
         .frontispiece-invite {
             font-family: "Cormorant Garamond", serif;
             font-style: italic;
             color: #5c4033;
-            font-size: 1.05rem;
-            line-height: 1.45;
-            max-width: 38rem;
-            margin: 0.45rem auto 0;
+            font-size: 1rem;
+            line-height: 1.35;
+            max-width: 36rem;
+            margin: 0.35rem auto 0;
         }
         .parchment-folio label,
         .parchment-folio .text-amber-200,
@@ -542,24 +581,24 @@
         .folio-title {
             font-family: Cinzel, serif;
             color: #2a1a10;
-            font-size: clamp(1.55rem, 2.6vw, 2.15rem);
+            font-size: 1.42rem;
             line-height: 1.2;
-            margin-top: 0.3rem;
+            margin-top: 0.28rem;
         }
         .folio-epigraph {
             font-family: "Cormorant Garamond", serif;
             font-style: italic;
-            font-size: 1.2rem;
-            line-height: 1.5;
+            font-size: 1.08rem;
+            line-height: 1.4;
             color: #4a3020;
-            border-left: 2px solid #9a3412;
-            padding: 0.15rem 0 0.15rem 0.9rem;
-            margin: 0.85rem 0;
+            border: none;
+            padding: 0.15rem 0.15rem 0.1rem;
+            margin: 0.55rem 0 0.45rem;
         }
         .folio-body {
             font-family: "Cormorant Garamond", serif;
-            font-size: 1.2rem;
-            line-height: 1.65;
+            font-size: 1.08rem;
+            line-height: 1.5;
             color: #23150b;
             text-align: justify;
         }
@@ -581,12 +620,12 @@
             text-align: left;
             background: transparent;
             border: none;
-            border-bottom: 1px solid rgba(138, 90, 40, 0.22);
-            padding: 0.4rem 0;
+            padding: 0.28rem 0;
             cursor: pointer;
             font-family: "Cormorant Garamond", serif;
             font-style: italic;
-            font-size: 1.02rem;
+            font-size: 1rem;
+            line-height: 1.35;
             color: #3b2a1a;
         }
         .folio-note strong {
@@ -651,10 +690,10 @@
         }
         .folio-body > .pyro-word:first-child {
             font-family: "Cinzel Decorative", serif;
-            font-size: 3.15rem;
+            font-size: 2.4rem;
             float: left;
-            line-height: 0.78;
-            padding: 0.2rem 0.55rem 0 0;
+            line-height: 0.8;
+            padding: 0.12rem 0.4rem 0 0;
         }
         .folio-body > .pyro-word:first-child.settled {
             color: #8a5a12;
@@ -813,12 +852,12 @@
                 <p class="frontispiece-invite">Spin the 3D Orbital Armillary Astrolabe on the left folio to align any Volume in 3D space, or look up a word in the Concordance.</p>
             </header>
 
-            <div class="astrolabe-hanger my-1">
+            <div class="astrolabe-hanger">
                 <div id="astrolabe3DViewport"></div>
             </div>
 
             <!-- THE WHISPERING CONCORDANCE -->
-            <div class="pt-3 border-t border-amber-500/20 space-y-2.5 relative z-10">
+            <div class="folio-concordance pt-2 border-t border-amber-900/25 space-y-2 relative z-10">
                 <div class="flex flex-col items-start gap-0.5">
                     <label for="concordanceInput" class="text-xs font-mono uppercase tracking-widest text-amber-400 flex items-center gap-1.5">
                         <i class="ph-fill ph-feather"></i> The Whispering Concordance
@@ -859,7 +898,7 @@
             <div class="foxing-spot w-10 h-10 top-8 left-12"></div>
             <div class="foxing-spot w-6 h-6 bottom-14 right-10"></div>
 
-            <div id="livingManuscriptContainer3d" class="my-auto py-3 relative z-10"></div>
+            <div id="livingManuscriptContainer3d" class="py-2 relative z-10"></div>
 
             <div id="rectoFooterPortal3d" class="folio-foot pt-4 flex flex-wrap items-center justify-between gap-3 relative z-10"></div>
         </section>
@@ -867,6 +906,7 @@
 
     <nav id="tabA11y" class="sr-only" aria-label="The six seals"></nav>
     <button id="closeBookBtn" type="button" class="sr-only" aria-label="Relatch the tome" onclick="triggerMechanicalBookClosing()">Relatch the tome</button>
+    <button id="folioTurn" type="button" hidden onclick="turnPortraitLeaf()">Facing page</button>
 
     <!-- MODAL FOR PREVIEWING UPCOMING BOOKS -->
     <div id="folioPreviewModal" role="dialog" aria-modal="true" aria-labelledby="modalFolioTitle" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -1731,7 +1771,8 @@
         let leafMatR = null;
         let leafVellumNight = null;
         let leafVellumParchment = null;
-        let portraitLeaf = 1;
+        let portraitLeaf = 0;
+        let folioSwipe = null;
         let pageTurnT = 1;
         let emberParticles;
         let cosmicMistGroup = null;
@@ -1772,7 +1813,7 @@
         // Interactive Rotation & Camera Target State
         let isDraggingBook = false;
         let isDraggingArmillary = false;
-        let targetArmillaryRotX = 0.28;
+        let targetArmillaryRotX = 0.09;
         let targetArmillaryRotY = 0;
         let bookPointerDownPos = { x: 0, y: 0 };
         let bookPrevPointer = { x: 0, y: 0 };
@@ -2745,6 +2786,10 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     transparent: true,
                     opacity: 0,
                     depthWrite: false,
+                    depthTest: true,
+                    polygonOffset: true,
+                    polygonOffsetFactor: -2,
+                    polygonOffsetUnits: -2,
                     side: THREE.DoubleSide
                 })
             );
@@ -2978,6 +3023,12 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
         function setupBookViewportInteractions(container) {
             container.addEventListener("pointerdown", (e) => {
+                if (isBookOpened && !isBookOpening && !isBookClosing && window.innerWidth < 900) {
+                    const tag = e.target && e.target.tagName;
+                    if (tag !== "INPUT" && tag !== "TEXTAREA" && tag !== "BUTTON" && tag !== "A") {
+                        folioSwipe = { x: e.clientX, y: e.clientY, id: e.pointerId };
+                    }
+                }
                 if (isBookOpening || isBookClosing || bookForming || isBookOpened) return;
                 const hits = tomePickHits(e);
                 if (!hits.length) return;
@@ -3018,6 +3069,21 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             });
 
             window.addEventListener("pointerup", (e) => {
+                if (folioSwipe && e.pointerId === folioSwipe.id) {
+                    const dx = e.clientX - folioSwipe.x;
+                    const dy = e.clientY - folioSwipe.y;
+                    folioSwipe = null;
+                    if (isBookOpened && window.innerWidth < 900 && Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+                        const next = dx < 0 ? 1 : 0;
+                        if (next !== portraitLeaf) {
+                            portraitLeaf = next;
+                            applyMobileLeaf();
+                            fitReadCamera();
+                            snapReadCamera();
+                        }
+                        return;
+                    }
+                }
                 if (bookPointerId != null && e.pointerId === bookPointerId) {
                     try { container.releasePointerCapture(bookPointerId); } catch (err) {}
                     bookPointerId = null;
@@ -3059,9 +3125,11 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     triggerMechanicalBookClosing();
                     return;
                 }
-                if (isBookOpened && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+                if (isBookOpened && (e.key === "ArrowLeft" || e.key === "ArrowRight") && window.innerWidth < 900) {
                     portraitLeaf = e.key === "ArrowLeft" ? 0 : 1;
+                    applyMobileLeaf();
                     fitReadCamera();
+                    snapReadCamera();
                     return;
                 }
                 if (isBookOpened && e.key >= "1" && e.key <= "6") {
@@ -3158,6 +3226,60 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             return bookDims ? -(bookDims.spineX + 0.08) : 1.58;
         }
 
+        function mobileResting() {
+            return isBookOpened && !isBookOpening && !isBookClosing && window.innerWidth < 900;
+        }
+
+        // Phone rest shows one leaf, centred, with room for the turn control.
+        // The other leaf is hidden so the gutter neighbour cannot crop into frame.
+        function applyMobileLeaf() {
+            const single = mobileResting();
+            const showLeft = !single || portraitLeaf === 0;
+            const showRight = !single || portraitLeaf === 1;
+            if (isBookOpened || isBookOpening || isBookClosing) {
+                if (leftStackGroup) leftStackGroup.visible = showLeft;
+                if (rightStackGroup) rightStackGroup.visible = showRight;
+                if (leftCssObj) leftCssObj.visible = showLeft;
+                if (rightCssObj) rightCssObj.visible = showRight;
+            }
+            const btn = document.getElementById("folioTurn");
+            if (btn) {
+                btn.hidden = !single;
+                btn.textContent = portraitLeaf === 0 ? "Facing page" : "Armillary";
+            }
+        }
+
+        function turnPortraitLeaf() {
+            portraitLeaf = portraitLeaf === 0 ? 1 : 0;
+            applyMobileLeaf();
+            fitReadCamera();
+            snapReadCamera();
+            if (cssRenderer && cssScene && coverCamera) {
+                syncCssPages();
+                cssRenderer.render(cssScene, coverCamera);
+            }
+        }
+
+        function pageDustAllowed() {
+            if (isBookOpened) return false;
+            if (isBookOpening && phase01("pageFade") > 0) return false;
+            if (isBookClosing && ((leftCssObj && leftCssObj.visible) || (rightCssObj && rightCssObj.visible))) return false;
+            return true;
+        }
+
+        function syncPageDust() {
+            if (!emberParticles) return;
+            if (!pageDustAllowed()) {
+                emberParticles.visible = false;
+                emberParticles.material.opacity = 0;
+                return;
+            }
+            if (!emberParticles.visible) {
+                emberParticles.visible = true;
+                if (!bookForming) emberParticles.material.opacity = 0.62;
+            }
+        }
+
         function fitReadCamera() {
             if (!coverCamera) return;
             const portrait = window.innerWidth < 900;
@@ -3165,9 +3287,9 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const tanV = Math.tan((coverCamera.fov * Math.PI) / 360);
             const leafW = openStackDims ? openStackDims.leafW : 3.09;
             const leafH = openStackDims ? openStackDims.leafH : 4.16;
-            const halfH = leafH / 2 + 0.34;
-            const halfW = portrait ? leafW / 2 + 0.28 : leafW + 1.45;
-            const dist = Math.max(halfH / tanV, halfW / (tanV * aspect)) * 1.1;
+            const halfH = portrait ? leafH / 2 + 0.72 : leafH / 2 + 0.34;
+            const halfW = portrait ? leafW / 2 + 0.55 : leafW + 1.45;
+            const dist = Math.max(halfH / tanV, halfW / (tanV * aspect)) * (portrait ? 1.16 : 1.1);
             const xOff = portrait ? (portraitLeaf === 0 ? -leafW / 2 : leafW / 2) : 0;
             // The page surface sits a little above the board plane; its normal is the reading direction.
             const nY = Math.sin(-OPEN_ROT_X);
@@ -3375,7 +3497,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             }
             celestialRings.forEach((ring) => { ring.visible = true; ring.scale.set(1, 1, 1); });
             celestialPlanets.forEach((planet) => { planet.mesh.visible = true; planet.mesh.scale.set(1, 1, 1); });
-            if (emberParticles) emberParticles.material.opacity = 0.62;
+            syncPageDust();
         }
 
         const OPEN_PHASE_DEFS = [
@@ -3396,8 +3518,11 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
         ];
         const ARMILLARY_HOVER = 2.45;
         const ARMILLARY_NATIVE = 5.15;
-        // At rest the sphere settles into the leaf: a relief in the page, not a ball hovering over it.
-        const ARMILLARY_PAGE_DEPTH = 0.2;
+        // Rest is a shallow relief in the leaf plane. A full cage reads as a model
+        // pasted in front of the page; this squash is what lays the rings down on it.
+        const ARMILLARY_PAGE_DEPTH = 0.06;
+        const ARMILLARY_REST_TILT = 0.09;
+        const ARMILLARY_FIT = 0.68;
         const _hover = new THREE.Vector3();
         const _camPos = new THREE.Vector3();
         const _camLook = new THREE.Vector3();
@@ -3500,7 +3625,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const dy = wellMetrics.dyPx * sy;
             const rest = new THREE.Vector3(leafW / 2 - dx, -dy, 0);
             const quat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
-            const fit = Math.min(wellMetrics.wellW * sx, wellMetrics.wellH * sy) * 0.9;
+            const fit = Math.min(wellMetrics.wellW * sx, wellMetrics.wellH * sy) * ARMILLARY_FIT;
             const scale = fit / ARMILLARY_NATIVE;
             armillaryRest = {
                 position: rest,
@@ -3521,41 +3646,50 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             seatArmillaryOnPage();
         }
 
-        // Drop the instrument until its lowest point rests on the leaf. The page normal
-        // on the verso is local -Z (toward the reader), so that point sits just off z = 0.
+        const _seatBox = new THREE.Box3();
+        const _seatCorner = new THREE.Vector3();
+        // Park the deepest point just on the camera side of the leaf. The verso normal
+        // is local -Z, so a ring centre parked on z = 0 is sliced in half by the page.
         function seatArmillaryOnPage() {
             if (!armillaryAnchor || !leftLeafMesh || !armillaryRest) return;
+            const savedZ = armillaryAnchor.position.z;
             armillaryAnchor.position.z = 0;
             armillaryAnchor.updateWorldMatrix(true, true);
-            const v = new THREE.Vector3();
+            _seatBox.setFromObject(armillaryAnchor);
+            if (_seatBox.isEmpty()) {
+                armillaryAnchor.position.z = savedZ;
+                return;
+            }
             let maxZ = -Infinity;
             let minX = Infinity;
             let maxX = -Infinity;
             let minY = Infinity;
             let maxY = -Infinity;
-            armillaryAnchor.traverse((obj) => {
-                if (!obj.isMesh || !obj.geometry || !obj.geometry.attributes || !obj.geometry.attributes.position) return;
-                const pos = obj.geometry.attributes.position;
-                for (let i = 0; i < pos.count; i++) {
-                    v.fromBufferAttribute(pos, i);
-                    obj.localToWorld(v);
-                    leftLeafMesh.worldToLocal(v);
-                    if (v.z > maxZ) maxZ = v.z;
-                    if (v.x < minX) minX = v.x;
-                    if (v.x > maxX) maxX = v.x;
-                    if (v.y < minY) minY = v.y;
-                    if (v.y > maxY) maxY = v.y;
+            const lo = _seatBox.min;
+            const hi = _seatBox.max;
+            for (let xi = 0; xi < 2; xi++) {
+                for (let yi = 0; yi < 2; yi++) {
+                    for (let zi = 0; zi < 2; zi++) {
+                        _seatCorner.set(xi ? hi.x : lo.x, yi ? hi.y : lo.y, zi ? hi.z : lo.z);
+                        leftLeafMesh.worldToLocal(_seatCorner);
+                        if (_seatCorner.z > maxZ) maxZ = _seatCorner.z;
+                        if (_seatCorner.x < minX) minX = _seatCorner.x;
+                        if (_seatCorner.x > maxX) maxX = _seatCorner.x;
+                        if (_seatCorner.y < minY) minY = _seatCorner.y;
+                        if (_seatCorner.y > maxY) maxY = _seatCorner.y;
+                    }
                 }
-            });
-            if (!isFinite(maxX)) return;
-            // The equatorial ring lives in the anchor plane. Park that plane on the
-            // leaf (camera side is -Z) so the instrument is in the page, not above it.
-            armillaryAnchor.position.z = -0.02;
+            }
+            if (!isFinite(maxZ)) {
+                armillaryAnchor.position.z = savedZ;
+                return;
+            }
+            armillaryAnchor.position.z = -0.016 - maxZ;
             armillaryRest.position.copy(armillaryAnchor.position);
             armillaryRest.gutter.z = armillaryRest.position.z;
             const rx = Math.max(0.2, (maxX - minX) / 2);
             const ry = Math.max(0.2, (maxY - minY) / 2);
-            armillaryRest.shadowScale = { x: rx / 1.15, y: ry / 1.15 };
+            armillaryRest.shadowScale = { x: (rx / 1.15) * 1.14, y: (ry / 1.15) * 1.14 };
             layoutArmillaryShadow(armillaryShadow && armillaryShadow.material.opacity > 0.02 ? armillaryShadow.material.opacity : 0);
         }
 
@@ -3563,7 +3697,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             if (!armillaryShadow || !armillaryRest) return;
             const base = armillaryRest.shadowScale || { x: 1, y: 1 };
             armillaryShadow.visible = opacity > 0.02;
-            armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y, -0.006);
+            armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y - 0.03, -0.004);
             armillaryShadow.scale.set(base.x, base.y, 1);
             armillaryShadow.material.opacity = opacity;
         }
@@ -3587,7 +3721,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             armillaryRings.forEach((ring) => ring.scale.setScalar(1));
             if (solarCoreMesh) solarCoreMesh.scale.setScalar(1);
             seatArmillaryOnPage();
-            layoutArmillaryShadow(0.72);
+            layoutArmillaryShadow(0.46);
             if (armillaryGlow) armillaryGlow.intensity = 0.65;
             if (solarCoreMat) solarCoreMat.emissiveIntensity = 0.75;
         }
@@ -3803,9 +3937,9 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 const base = armillaryRest.shadowScale || { x: 1, y: 1 };
                 const spread = 1 + lift * 0.55;
                 armillaryShadow.visible = grounded > 0.02;
-                armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y, -0.006);
+                armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y - 0.03, -0.004);
                 armillaryShadow.scale.set(base.x * spread, base.y * spread, 1);
-                armillaryShadow.material.opacity = grounded * 0.72 * (1 - Math.sin(clamp01(landT) * Math.PI) * 0.22);
+                armillaryShadow.material.opacity = grounded * 0.46 * (1 - Math.sin(clamp01(landT) * Math.PI) * 0.22);
             }
             if (innerBookGlowLight && pulseT > 0) {
                 innerBookGlowLight.intensity = 2.2 + pulseEnv * 4.8;
@@ -3828,6 +3962,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             placeArmillaryRest();
             settleArmillaryRest();
             document.body.classList.add("codex-unlocked");
+            applyMobileLeaf();
+            syncPageDust();
             camGoal.x = camFollow.x;
             camGoal.y = camFollow.y;
             camGoal.z = camFollow.z;
@@ -3853,6 +3989,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             placeArmillaryRest();
             settleArmillaryRest();
             document.body.classList.add("codex-unlocked");
+            applyMobileLeaf();
+            syncPageDust();
             snapReadCamera();
             inscriptionHeld = false;
             if (typeof prepareFrontispieceWriting === "function") prepareFrontispieceWriting();
@@ -4204,7 +4342,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             }
             // 1. The ink and the instrument fade from the leaves
             if (elapsed > 0.55 && leftCssObj && leftCssObj.visible) setFolioPagesShown(false);
-            if (leftCssObj && leftCssObj.visible) {
+            if ((leftCssObj && leftCssObj.visible) || (rightCssObj && rightCssObj.visible)) {
                 syncCssPages();
                 if (cssRenderer) cssRenderer.render(cssScene, coverCamera);
             }
@@ -4308,31 +4446,20 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             anchor.add(armillaryRoot);
 
 
-            // Central Amber Lodestone Sun Core + Soft Radial Halo Sprite
+            // Amber lodestone. No sprite halo: an additive sprite quad reads as a
+            // hard translucent square behind the sun once the cage lies on the page.
             solarCoreMat = new THREE.MeshStandardMaterial({
                 map: bronzeTex,
                 bumpMap: bronzeTex,
                 bumpScale: 0.02,
-                color: 0xd97706,
-                emissive: 0x92400e,
-                emissiveIntensity: 0.75,
-                roughness: 0.22,
-                metalness: 0.35
+                color: 0xf59e0b,
+                emissive: 0xc2410c,
+                emissiveIntensity: 0.9,
+                roughness: 0.28,
+                metalness: 0.22
             });
             solarCoreMesh = new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 32), solarCoreMat);
             armillaryRoot.add(solarCoreMesh);
-
-            const sunGlowSprite = new THREE.Sprite(
-                new THREE.SpriteMaterial({
-                    map: createSoftParticleTexture(),
-                    color: 0xf59e0b,
-                    transparent: true,
-                    opacity: 0.65,
-                    blending: THREE.AdditiveBlending
-                })
-            );
-            sunGlowSprite.scale.set(1.85, 1.85, 1);
-            solarCoreMesh.add(sunGlowSprite);
 
             // Equinoctial Brass Cage around the Solar Core
             const coreBand1 = new THREE.Mesh(new THREE.TorusGeometry(0.52, 0.018, 12, 48), zodiacBrassMat);
@@ -4457,7 +4584,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     const dx = e.clientX - armillaryPrevPointer.x;
                     const dy = e.clientY - armillaryPrevPointer.y;
                     targetArmillaryRotY += dx * 0.009;
-                    targetArmillaryRotX = Math.max(-1.2, Math.min(1.2, targetArmillaryRotX + dy * 0.009));
+                    targetArmillaryRotX = Math.max(ARMILLARY_REST_TILT - 0.14, Math.min(ARMILLARY_REST_TILT + 0.14, targetArmillaryRotX + dy * 0.004));
                     armillaryPrevPointer = { x: e.clientX, y: e.clientY, t: performance.now() };
                 });
                 well.addEventListener("pointerup", (e) => {
@@ -4472,7 +4599,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     }
                     if (isBookOpened && armillaryRest) {
                         seatArmillaryOnPage();
-                        layoutArmillaryShadow(0.72);
+                        layoutArmillaryShadow(0.46);
                     }
                 });
             }
@@ -4499,6 +4626,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     updateBookClosingTimeline(now);
                 } else if (isBookOpened) {
                     applyOpenBookPose();
+                    applyMobileLeaf();
+                    if (armillaryAnchor && armillaryAnchor.visible && armillaryUserControl) seatArmillaryOnPage();
                     fitReadCamera();
                     dampToward(camFollow, camGoal, frameDt, 4.2);
                     applyReadCamera();
@@ -4545,7 +4674,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 if (coverMedallionRing1) coverMedallionRing1.rotation.z = now * 0.00035;
                 if (coverMedallionRing2) coverMedallionRing2.rotation.z = -now * 0.00055;
 
-                if (emberParticles) {
+                syncPageDust();
+                if (emberParticles && emberParticles.visible) {
                     emberParticles.rotation.y = now * 0.00014;
                     emberParticles.position.y = Math.sin(now * 0.0008) * 0.15;
                 }
@@ -4555,7 +4685,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 coverRenderer.render(coverScene, coverCamera);
                 const glMs = Date.now() - glStart;
                 let cssMs = 0;
-                if (leftCssObj && leftCssObj.visible && cssRenderer) {
+                if (cssRenderer && ((leftCssObj && leftCssObj.visible) || (rightCssObj && rightCssObj.visible))) {
                     const cssStart = Date.now();
                     syncCssPages();
                     cssRenderer.render(cssScene, coverCamera);
@@ -4605,7 +4735,10 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 coverRenderer.setSize(bw, bh);
             }
             if (cssRenderer) cssRenderer.setSize(window.innerWidth || 1024, window.innerHeight || 768);
-            if (isBookOpened) fitReadCamera();
+            if (isBookOpened) {
+                applyMobileLeaf();
+                fitReadCamera();
+            }
         }
 
         window.addEventListener("resize", resizeAll3DViewports);
@@ -4633,7 +4766,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             activeBookIndex = (targetIndex + SIX_BOOKS.length) % SIX_BOOKS.length;
             const book = SIX_BOOKS[activeBookIndex];
             targetArmillaryRotY = -(activeBookIndex * (Math.PI / 3));
-            targetArmillaryRotX = 0.06;
+            targetArmillaryRotX = ARMILLARY_REST_TILT;
             pageTurnT = activeBookIndex / Math.max(1, SIX_BOOKS.length - 1);
             if (isBookOpened) poseOpenLeaves(1, pageTurnT, 1);
             if (armillaryRest && armillaryAnchor && armillaryRoot) {
@@ -4645,7 +4778,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 seatArmillaryOnPage();
                 if (isBookOpened) {
                     armillaryAnchor.visible = true;
-                    layoutArmillaryShadow(0.72);
+                    layoutArmillaryShadow(0.46);
                 }
             }
 
@@ -5030,7 +5163,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             if (rotNext) rotNext.addEventListener("click", () => selectBookFolio(activeBookIndex + 1));
             if (resetArm) {
                 resetArm.addEventListener("click", () => {
-                    targetArmillaryRotX = 0.25;
+                    targetArmillaryRotX = ARMILLARY_REST_TILT;
                     targetArmillaryRotY = -(activeBookIndex * (Math.PI / 3));
                 });
             }
@@ -5165,6 +5298,33 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                         z: Math.round(armillaryAnchor.position.z * 1000) / 1000
                     };
                 }
+                const armBox = { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity, maxLeafZ: null };
+                let sprites = 0;
+                if (armillaryAnchor && leftLeafMesh && coverCamera) {
+                    const box = new THREE.Box3().setFromObject(armillaryAnchor);
+                    const lo = box.min;
+                    const hi = box.max;
+                    const corner = new THREE.Vector3();
+                    let maxLeafZ = -Infinity;
+                    for (let xi = 0; xi < 2; xi++) {
+                        for (let yi = 0; yi < 2; yi++) {
+                            for (let zi = 0; zi < 2; zi++) {
+                                corner.set(xi ? hi.x : lo.x, yi ? hi.y : lo.y, zi ? hi.z : lo.z);
+                                const leafZ = leftLeafMesh.worldToLocal(corner.clone()).z;
+                                if (leafZ > maxLeafZ) maxLeafZ = leafZ;
+                                const p = corner.clone().project(coverCamera);
+                                const sx = (p.x * 0.5 + 0.5) * window.innerWidth;
+                                const sy = (-p.y * 0.5 + 0.5) * window.innerHeight;
+                                if (sx < armBox.minX) armBox.minX = sx;
+                                if (sx > armBox.maxX) armBox.maxX = sx;
+                                if (sy < armBox.minY) armBox.minY = sy;
+                                if (sy > armBox.maxY) armBox.maxY = sy;
+                            }
+                        }
+                    }
+                    armBox.maxLeafZ = Math.round(maxLeafZ * 1000) / 1000;
+                    armillaryAnchor.traverse((obj) => { if (obj.isSprite) sprites += 1; });
+                }
                 return {
                     leftErr: domL ? Math.round(err(leafL, domL) * 10) / 10 : null,
                     rightErr: domR ? Math.round(err(leafR, domR) * 10) / 10 : null,
@@ -5175,6 +5335,14 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     gutterGap: Math.round((leafR.minX - leafL.maxX) * 10) / 10,
                     arm: arm,
                     astro: astro,
+                    armBox: armBox,
+                    sprites: sprites,
+                    scaleZ: armillaryRoot ? Math.round(armillaryRoot.scale.z * 1000) / 1000 : null,
+                    dust: emberParticles ? { visible: emberParticles.visible, opacity: Math.round(emberParticles.material.opacity * 100) / 100 } : null,
+                    stacks: {
+                        left: !!(leftStackGroup && leftStackGroup.visible),
+                        right: !!(rightStackGroup && rightStackGroup.visible)
+                    },
                     mask: (document.getElementById("leftLeafVellum") || {}).style
                         ? (document.getElementById("leftLeafVellum").style.maskImage || "")
                         : ""
