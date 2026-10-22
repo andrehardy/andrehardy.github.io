@@ -3287,9 +3287,15 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const tanV = Math.tan((coverCamera.fov * Math.PI) / 360);
             const leafW = openStackDims ? openStackDims.leafW : 3.09;
             const leafH = openStackDims ? openStackDims.leafH : 4.16;
-            const halfH = portrait ? leafH / 2 + 0.72 : leafH / 2 + 0.34;
-            const halfW = portrait ? leafW / 2 + 0.55 : leafW + 1.45;
-            const dist = Math.max(halfH / tanV, halfW / (tanV * aspect)) * (portrait ? 1.16 : 1.1);
+            const sidePx = portrait ? 18 : 0;
+            const chinPx = portrait ? 86 : 0;
+            const halfH = portrait
+                ? (leafH / 2) * (window.innerHeight / Math.max(120, window.innerHeight - sidePx * 2 - chinPx))
+                : leafH / 2 + 0.34;
+            const halfW = portrait
+                ? (leafW / 2) * (window.innerWidth / Math.max(80, window.innerWidth - sidePx * 2))
+                : leafW + 1.45;
+            const dist = Math.max(halfH / tanV, halfW / (tanV * aspect)) * (portrait ? 1.02 : 1.1);
             const xOff = portrait ? (portraitLeaf === 0 ? -leafW / 2 : leafW / 2) : 0;
             // The page surface sits a little above the board plane; its normal is the reading direction.
             const nY = Math.sin(-OPEN_ROT_X);
@@ -3646,41 +3652,48 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             seatArmillaryOnPage();
         }
 
-        const _seatBox = new THREE.Box3();
         const _seatCorner = new THREE.Vector3();
         // Park the deepest point just on the camera side of the leaf. The verso normal
-        // is local -Z, so a ring centre parked on z = 0 is sliced in half by the page.
+        // is local -Z. A world-axis box is useless here: the page is tilted, so that
+        // box's corners sit far off the leaf and the instrument gets lifted into the air.
         function seatArmillaryOnPage() {
             if (!armillaryAnchor || !leftLeafMesh || !armillaryRest) return;
             const savedZ = armillaryAnchor.position.z;
             armillaryAnchor.position.z = 0;
             armillaryAnchor.updateWorldMatrix(true, true);
-            _seatBox.setFromObject(armillaryAnchor);
-            if (_seatBox.isEmpty()) {
-                armillaryAnchor.position.z = savedZ;
-                return;
-            }
             let maxZ = -Infinity;
             let minX = Infinity;
             let maxX = -Infinity;
             let minY = Infinity;
             let maxY = -Infinity;
-            const lo = _seatBox.min;
-            const hi = _seatBox.max;
-            for (let xi = 0; xi < 2; xi++) {
-                for (let yi = 0; yi < 2; yi++) {
-                    for (let zi = 0; zi < 2; zi++) {
-                        _seatCorner.set(xi ? hi.x : lo.x, yi ? hi.y : lo.y, zi ? hi.z : lo.z);
-                        leftLeafMesh.worldToLocal(_seatCorner);
-                        if (_seatCorner.z > maxZ) maxZ = _seatCorner.z;
-                        if (_seatCorner.x < minX) minX = _seatCorner.x;
-                        if (_seatCorner.x > maxX) maxX = _seatCorner.x;
-                        if (_seatCorner.y < minY) minY = _seatCorner.y;
-                        if (_seatCorner.y > maxY) maxY = _seatCorner.y;
+            let samples = 0;
+            armillaryAnchor.traverse((obj) => {
+                if (!obj.isMesh || !obj.geometry) return;
+                const geo = obj.geometry;
+                if (!geo.boundingBox) geo.computeBoundingBox();
+                const bb = geo.boundingBox;
+                if (!bb) return;
+                for (let xi = 0; xi < 2; xi++) {
+                    for (let yi = 0; yi < 2; yi++) {
+                        for (let zi = 0; zi < 2; zi++) {
+                            _seatCorner.set(
+                                xi ? bb.max.x : bb.min.x,
+                                yi ? bb.max.y : bb.min.y,
+                                zi ? bb.max.z : bb.min.z
+                            );
+                            obj.localToWorld(_seatCorner);
+                            leftLeafMesh.worldToLocal(_seatCorner);
+                            samples += 1;
+                            if (_seatCorner.z > maxZ) maxZ = _seatCorner.z;
+                            if (_seatCorner.x < minX) minX = _seatCorner.x;
+                            if (_seatCorner.x > maxX) maxX = _seatCorner.x;
+                            if (_seatCorner.y < minY) minY = _seatCorner.y;
+                            if (_seatCorner.y > maxY) maxY = _seatCorner.y;
+                        }
                     }
                 }
-            }
-            if (!isFinite(maxZ)) {
+            });
+            if (!samples || !isFinite(maxZ)) {
                 armillaryAnchor.position.z = savedZ;
                 return;
             }
@@ -5301,29 +5314,38 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 const armBox = { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity, maxLeafZ: null };
                 let sprites = 0;
                 if (armillaryAnchor && leftLeafMesh && coverCamera) {
-                    const box = new THREE.Box3().setFromObject(armillaryAnchor);
-                    const lo = box.min;
-                    const hi = box.max;
                     const corner = new THREE.Vector3();
                     let maxLeafZ = -Infinity;
-                    for (let xi = 0; xi < 2; xi++) {
-                        for (let yi = 0; yi < 2; yi++) {
-                            for (let zi = 0; zi < 2; zi++) {
-                                corner.set(xi ? hi.x : lo.x, yi ? hi.y : lo.y, zi ? hi.z : lo.z);
-                                const leafZ = leftLeafMesh.worldToLocal(corner.clone()).z;
-                                if (leafZ > maxLeafZ) maxLeafZ = leafZ;
-                                const p = corner.clone().project(coverCamera);
-                                const sx = (p.x * 0.5 + 0.5) * window.innerWidth;
-                                const sy = (-p.y * 0.5 + 0.5) * window.innerHeight;
-                                if (sx < armBox.minX) armBox.minX = sx;
-                                if (sx > armBox.maxX) armBox.maxX = sx;
-                                if (sy < armBox.minY) armBox.minY = sy;
-                                if (sy > armBox.maxY) armBox.maxY = sy;
+                    armillaryAnchor.traverse((obj) => {
+                        if (obj.isSprite) sprites += 1;
+                        if (!obj.isMesh || !obj.geometry) return;
+                        if (!obj.geometry.boundingBox) obj.geometry.computeBoundingBox();
+                        const bb = obj.geometry.boundingBox;
+                        if (!bb) return;
+                        for (let xi = 0; xi < 2; xi++) {
+                            for (let yi = 0; yi < 2; yi++) {
+                                for (let zi = 0; zi < 2; zi++) {
+                                    corner.set(
+                                        xi ? bb.max.x : bb.min.x,
+                                        yi ? bb.max.y : bb.min.y,
+                                        zi ? bb.max.z : bb.min.z
+                                    );
+                                    obj.localToWorld(corner);
+                                    const world = corner.clone();
+                                    const leafZ = leftLeafMesh.worldToLocal(corner).z;
+                                    if (leafZ > maxLeafZ) maxLeafZ = leafZ;
+                                    world.project(coverCamera);
+                                    const sx = (world.x * 0.5 + 0.5) * window.innerWidth;
+                                    const sy = (-world.y * 0.5 + 0.5) * window.innerHeight;
+                                    if (sx < armBox.minX) armBox.minX = sx;
+                                    if (sx > armBox.maxX) armBox.maxX = sx;
+                                    if (sy < armBox.minY) armBox.minY = sy;
+                                    if (sy > armBox.maxY) armBox.maxY = sy;
+                                }
                             }
                         }
-                    }
+                    });
                     armBox.maxLeafZ = Math.round(maxLeafZ * 1000) / 1000;
-                    armillaryAnchor.traverse((obj) => { if (obj.isSprite) sprites += 1; });
                 }
                 return {
                     leftErr: domL ? Math.round(err(leafL, domL) * 10) / 10 : null,
