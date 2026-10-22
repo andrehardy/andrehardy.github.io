@@ -1791,6 +1791,7 @@
         let folioSwipe = null;
         let folioTurnAnim = null;
         let folioTurnCamX = null;
+        let folioTurnCamMul = null;
         let pageTurnT = 1;
         let emberParticles;
         let cosmicMistGroup = null;
@@ -2894,23 +2895,23 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             rightCssObj.scale.set(sx, sy, sx);
             leftCssObj.position.set(leafW / 2, 0, 0.04);
             rightCssObj.position.set(leafW / 2, 0, 0.04);
+            // The folio copies the leaf anchor's world matrix. Decomposing it
+            // into position and quaternion shears once the leaf leaves the flat pose.
+            leftCssObj.matrixAutoUpdate = false;
+            rightCssObj.matrixAutoUpdate = false;
             leftCssObj.visible = false;
             rightCssObj.visible = false;
             cssScene.add(leftCssObj);
             cssScene.add(rightCssObj);
         }
 
-        const _cssPos = new THREE.Vector3();
-        const _cssQuat = new THREE.Quaternion();
-        const _cssScale = new THREE.Vector3();
         function syncCssPages() {
             if (!leftCssObj || !rightCssObj || !leftFolioAnchor || !rightFolioAnchor) return;
             const place = (cssObj, anchor) => {
                 anchor.updateWorldMatrix(true, false);
-                anchor.matrixWorld.decompose(_cssPos, _cssQuat, _cssScale);
-                cssObj.position.copy(_cssPos);
-                cssObj.quaternion.copy(_cssQuat);
-                cssObj.scale.copy(_cssScale);
+                cssObj.matrix.copy(anchor.matrixWorld);
+                cssObj.matrixAutoUpdate = false;
+                cssObj.matrixWorldNeedsUpdate = true;
             };
             place(leftCssObj, leftFolioAnchor);
             place(rightCssObj, rightFolioAnchor);
@@ -3268,8 +3269,16 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             }
         }
 
-        // The leaf swings on its hinge. Going to the facing page lifts the verso
-        // up to the gutter; coming back lays it down again. The camera rides along.
+        function setStackBlocksVisible(on) {
+            const lb = leftStackGroup && leftStackGroup.getObjectByName("leftStackBlock");
+            const rb = rightStackGroup && rightStackGroup.getObjectByName("rightStackBlock");
+            if (lb) lb.visible = on;
+            if (rb) rb.visible = on;
+        }
+
+        // The leaf swings on its hinge, but only through the angle that still
+        // reads as a page. Standing it on edge in front of the close phone camera
+        // throws the fore-edge through the lens and stretches it into a sliver.
         function turnPortraitLeaf() {
             if (!mobileResting() || folioTurnAnim || !openStackDims) return;
             const from = portraitLeaf;
@@ -3285,18 +3294,20 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const leafW = openStackDims.leafW;
             const xFrom = folioTurnAnim.from === 0 ? -leafW / 2 : leafW / 2;
             const xTo = folioTurnAnim.to === 0 ? -leafW / 2 : leafW / 2;
-            folioTurnCamX = lerp(xFrom, xTo, e);
-            // The hinged leaf rises through vertical at mid-swing, then lays flat
-            // again as the eye arrives. The pose at the end matches the pose at the start.
             const lift = Math.sin(Math.PI * u);
-            const turn = 1 - lift * 0.5;
-            const flat = 1 - lift * 0.34;
-            poseOpenLeaves(turn, pageTurnT, flat);
+            // 0.22 of the way from flat to vertical is about forty degrees.
+            const turn = 1 - lift * 0.22;
+            folioTurnCamX = lerp(xFrom, xTo, e);
+            folioTurnCamMul = 1 + lift * 0.32;
+            poseOpenLeaves(turn, pageTurnT, 1);
+            setStackBlocksVisible(false);
             if (u >= 1) {
                 portraitLeaf = folioTurnAnim.to;
                 folioTurnAnim = null;
                 folioTurnCamX = null;
+                folioTurnCamMul = null;
                 poseOpenLeaves(1, pageTurnT, 1);
+                setStackBlocksVisible(true);
                 applyMobileLeaf();
                 applyMobileShell();
             }
@@ -3353,7 +3364,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const halfW = portrait
                 ? (leafW / 2) * (window.innerWidth / Math.max(80, window.innerWidth - sidePx * 2))
                 : leafW + 1.45;
-            const dist = Math.max(halfH / tanV, halfW / (tanV * aspect)) * (portrait ? 1.02 : 1.1);
+            const distMul = portrait && folioTurnCamMul ? folioTurnCamMul : 1;
+            const dist = Math.max(halfH / tanV, halfW / (tanV * aspect)) * (portrait ? 1.02 : 1.1) * distMul;
             const xOff = portrait
                 ? (folioTurnCamX != null ? folioTurnCamX : (portraitLeaf === 0 ? -leafW / 2 : leafW / 2))
                 : 0;
@@ -5474,6 +5486,66 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                         spine: !!(spineGroup && spineGroup.visible),
                         back: !!(backCoverGroup && backCoverGroup.visible)
                     },
+                    geom: (function () {
+                        const corner = new THREE.Vector3();
+                        let maxW = 0;
+                        let maxH = 0;
+                        let worst = "";
+                        let behind = false;
+                        let count = 0;
+                        if (!bookRoot) return { maxW: 0, maxH: 0, worst: "", behind: false, count: 0 };
+                        bookRoot.traverse((obj) => {
+                            if (!obj.isMesh || !obj.geometry) return;
+                            let node = obj;
+                            while (node) {
+                                if (!node.visible) return;
+                                node = node.parent;
+                            }
+                            if (!obj.geometry.boundingBox) obj.geometry.computeBoundingBox();
+                            const bb = obj.geometry.boundingBox;
+                            if (!bb) return;
+                            let minX = Infinity;
+                            let maxX = -Infinity;
+                            let minY = Infinity;
+                            let maxY = -Infinity;
+                            obj.updateWorldMatrix(true, false);
+                            for (let xi = 0; xi < 2; xi++) {
+                                for (let yi = 0; yi < 2; yi++) {
+                                    for (let zi = 0; zi < 2; zi++) {
+                                        corner.set(
+                                            xi ? bb.max.x : bb.min.x,
+                                            yi ? bb.max.y : bb.min.y,
+                                            zi ? bb.max.z : bb.min.z
+                                        );
+                                        obj.localToWorld(corner);
+                                        corner.project(coverCamera);
+                                        if (corner.z < -1 || corner.z > 1) behind = true;
+                                        const sx = (corner.x * 0.5 + 0.5) * window.innerWidth;
+                                        const sy = (-corner.y * 0.5 + 0.5) * window.innerHeight;
+                                        if (sx < minX) minX = sx;
+                                        if (sx > maxX) maxX = sx;
+                                        if (sy < minY) minY = sy;
+                                        if (sy > maxY) maxY = sy;
+                                    }
+                                }
+                            }
+                            const w = maxX - minX;
+                            const h = maxY - minY;
+                            count += 1;
+                            if (w > maxW || h > maxH) {
+                                if (Math.max(w, h) >= Math.max(maxW, maxH)) worst = obj.name || (obj.parent && obj.parent.name) || "mesh";
+                            }
+                            if (w > maxW) maxW = w;
+                            if (h > maxH) maxH = h;
+                        });
+                        return {
+                            maxW: Math.round(maxW * 10) / 10,
+                            maxH: Math.round(maxH * 10) / 10,
+                            worst: worst,
+                            behind: behind,
+                            count: count
+                        };
+                    })(),
                     mask: (document.getElementById("leftLeafVellum") || {}).style
                         ? (document.getElementById("leftLeafVellum").style.maskImage || "")
                         : ""
