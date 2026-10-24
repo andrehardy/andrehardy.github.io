@@ -1,0 +1,227 @@
+---
+import Window from './Window.astro';
+import { ROSE_FRAME, sceneBays, type BayBox } from '../data/bays';
+import { hallFrame, hallLayers, roster } from '../data/house';
+
+const bays = sceneBays();
+const creatures = roster();
+const layers = hallLayers();
+const base = import.meta.env.BASE_URL;
+const geometry = `--nave-img:url("${layers.nave.day ?? ''}");--nave-img-night:url("${layers.nave.night ?? layers.nave.day ?? ''}")`;
+
+function boxStyle(box: BayBox) {
+  return `left:${(box.x * 100).toFixed(3)}%;top:${(box.y * 100).toFixed(3)}%;width:${(box.w * 100).toFixed(3)}%;height:${(box.h * 100).toFixed(3)}%`;
+}
+
+function plateStyle(box: BayBox) {
+  const cx = (box.x + box.w / 2) * 100;
+  const top = (box.y + box.h) * 100;
+  return `left:${cx.toFixed(3)}%;top:${top.toFixed(3)}%`;
+}
+
+function floorStyle(box: BayBox, glow: string) {
+  const cx = (box.x + box.w / 2) * 100;
+  const top = (box.y + box.h * 0.94) * 100;
+  const width = Math.max(box.w * 1.7, 0.08) * 100;
+  return `--glow:${glow};left:${cx.toFixed(3)}%;top:${top.toFixed(3)}%;width:${width.toFixed(3)}%;height:17%`;
+}
+---
+
+<div class="hall" data-hall style={geometry}>
+  <div class="scene" id="nave" data-scene data-bay="1">
+    <div class="scene-fit" data-scene-fit>
+      {
+        bays.map((bay) => (
+          <section class="scene-bay" data-scene-bay={bay.n} data-n={bay.n} aria-label={`Bay ${bay.numeral}`}>
+            {(['day', 'night'] as const).map((phase) => (
+              <div
+                class:list={['scene-variant', `variant-${phase}`]}
+                data-door-x={phase === 'day' ? bay.doorDay?.[0] : bay.doorNight?.[0]}
+                data-door-y={phase === 'day' ? bay.doorDay?.[1] : bay.doorNight?.[1]}
+              >
+                <div class="scene-media">
+                  {bay.slots.map((slot) => {
+                    const box = phase === 'day' ? slot.day : slot.night;
+                    const href = slot.href ? `${base}${slot.href}` : null;
+                    if (slot.kind === 'rose') {
+                      return (
+                        <div class="scene-aperture" data-side="center" data-for={slot.id} style={`--glow:${slot.glow};${boxStyle(box)}`}>
+                          <div class="scene-window scene-rose" role="img" aria-label="Rose window" style={`clip-path:polygon(${box.clip})`}>
+                            <span class="rose-light scene-still"></span>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div class="scene-aperture" data-side={slot.side} data-for={slot.id} style={`--glow:${slot.glow};${boxStyle(box)}`}>
+                        <a
+                          class:list={['scene-window', slot.kind === 'portal' ? `is-portal portal-${slot.slug}` : '']}
+                          href={href ?? undefined}
+                          data-for={slot.id}
+                          data-slug={slot.slug ?? undefined}
+                          data-idle={slot.idle ?? undefined}
+                          data-kind={slot.kind}
+                          aria-label={slot.name}
+                          style={`clip-path:polygon(${box.clip})`}
+                        >
+                          {slot.kind === 'portal' ? (
+                            <span class="portal-glass scene-still" aria-hidden="true">
+                              <span class="portal-lead"></span>
+                            </span>
+                          ) : (
+                            <img class="scene-still" data-src={slot.poster ?? undefined} alt="" draggable="false" />
+                          )}
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+                <img
+                  class="scene-foreground"
+                  data-src={phase === 'day' ? bay.daySrc : bay.nightSrc}
+                  alt=""
+                  draggable="false"
+                  onload="this.closest('.scene-variant')&&this.closest('.scene-variant').classList.add('is-framed')"
+                />
+                <div class="scene-cast" aria-hidden="true">
+                  {bay.slots.map((slot) => {
+                    const box = phase === 'day' ? slot.day : slot.night;
+                    if (slot.kind === 'rose') {
+                      return (
+                        <span class="scene-halo is-rose" data-for={slot.id} style={`--glow:${slot.glow};${boxStyle(box)}`} />
+                      );
+                    }
+                    return (
+                      <>
+                        <span class="scene-halo" data-for={slot.id} style={`--glow:${slot.glow};${boxStyle(box)}`} />
+                        <span class="scene-pool" data-for={slot.id} style={floorStyle(box, slot.glow)} />
+                      </>
+                    );
+                  })}
+                </div>
+                {phase === 'night' && bay.roseNight && (
+                  <img
+                    class="rose-tracery"
+                    data-src={ROSE_FRAME}
+                    alt=""
+                    draggable="false"
+                    style={boxStyle(bay.roseNight)}
+                  />
+                )}
+                <div class="scene-names">
+                  {bay.slots.map((slot) => {
+                    if (slot.kind === 'rose') return null;
+                    const box = phase === 'day' ? slot.day : slot.night;
+                    return (
+                      <span
+                        class:list={['scene-plate', slot.kind === 'portal' ? 'is-portal' : '']}
+                        data-for={slot.id}
+                        style={plateStyle(box)}
+                      >
+                        <span class="label">{slot.mark}</span>
+                        <span class="scene-plate-name">{slot.name}</span>
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </section>
+        ))
+      }
+    </div>
+    <div class="scene-veil" aria-hidden="true"></div>
+    <div class="scene-plaque">
+      <p class="edition label">Edition II</p>
+      <h1>The Bestiary</h1>
+      <p class="epithet">
+        <span data-layer="almanac">Sixteen windows open on the nave, and in each a world is kept.</span>
+        <span data-layer="cipher">Sixteen non-human entities, accessioned, each behind its own arch.</span>
+      </p>
+    </div>
+    <div class="scene-walk">
+      <div class="scene-controls">
+        <button type="button" data-walk="-1">Walk back</button>
+        <div class="scene-index" role="group" aria-label="Bay">
+          {bays.map((bay) => (
+            <button type="button" data-jump={bay.n} aria-current={bay.n === 1 ? 'true' : undefined}>
+              {bay.numeral}
+            </button>
+          ))}
+        </div>
+        <button type="button" data-walk="1">Walk on</button>
+      </div>
+      <p class="scene-hint">
+        <span class="hint-keys">Arrow keys, the wheel, or these controls walk the nave. Enter opens a window.</span>
+        <span class="hint-touch">Swipe to walk the nave. Tap a window.</span>
+      </p>
+    </div>
+    <script is:inline>
+      (function () {
+        var scene = document.getElementById('nave');
+        if (!scene) return;
+        var match = location.hash.match(/^#bay-([123])$/);
+        var bay = match ? match[1] : '1';
+        var index = Number(bay);
+        scene.dataset.bay = bay;
+        var want = {};
+        want[index] = true;
+        if (index > 1) want[index - 1] = true;
+        if (index < 3) want[index + 1] = true;
+        [1, 2, 3].forEach(function (n) {
+          if (!want[n]) return;
+          scene.querySelectorAll('[data-scene-bay="' + n + '"] [data-src]').forEach(function (img) {
+            if (!img.getAttribute('src')) img.setAttribute('src', img.getAttribute('data-src'));
+          });
+        });
+        var current = scene.querySelector('[data-jump="' + bay + '"]');
+        scene.querySelectorAll('[data-jump]').forEach(function (button) {
+          if (button === current) button.setAttribute('aria-current', 'true');
+          else button.removeAttribute('aria-current');
+        });
+      })();
+    </script>
+  </div>
+
+  <div class="phone">
+    <div class="hall-copy">
+      <p class="edition label">Edition II</p>
+      <h1>The Bestiary</h1>
+      <p class="epithet">
+        <span data-layer="almanac">Sixteen windows open on the nave, and in each a world is kept.</span>
+        <span data-layer="cipher">Sixteen non-human entities, accessioned, each behind its own arch.</span>
+      </p>
+      <p class="walk walk-touch">Scroll the nave. Tap a window.</p>
+    </div>
+    {
+      creatures.map((creature, index) => {
+        const frame = hallFrame(creature.frame.glow, creature.frame.particle, creature.frame.opening);
+        return (
+          <a
+            class="bay"
+            href={`${base}${creature.slug}/`}
+            data-phone-bay
+            data-slug={creature.slug}
+            data-seq={index}
+            tabindex="0"
+            style={`--seq:${index};--glow:${creature.frame.glow}`}
+          >
+            <span class="bay-pool" aria-hidden="true" />
+            <Window
+              slug={creature.slug}
+              mode="hall"
+              frame={frame}
+              state={creature.states[0] ?? ''}
+              name={creature.entity.name}
+              priority={index < 2}
+            />
+            <span class="bay-caption">
+              <span class="bay-mark label">{creature.entity.mark}</span>
+              <span class="bay-name">{creature.entity.name}</span>
+            </span>
+          </a>
+        );
+      })
+    }
+  </div>
+</div>

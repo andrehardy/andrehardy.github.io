@@ -1,0 +1,23 @@
+---
+import Hall from '../components/Hall.astro';
+import House from '../layouts/House.astro';
+
+const description = 'The Bestiary of the Magic Registry: sixteen windows open on the nave, and in each a world is kept.';
+const url = 'https://andrehardy.github.io/magic-registry/bestiary/';
+---
+
+<House
+  title="The Bestiary"
+  description={description}
+  current="hall"
+  og={{
+    'og:type': 'website',
+    'og:site_name': 'The Magic Registry',
+    'og:title': 'The Bestiary',
+    'og:description': description,
+    'og:url': url,
+    'og:image': 'https://andrehardy.github.io/magic-registry/og/bestiary.jpg',
+  }}
+>
+  <Hall />
+</House>

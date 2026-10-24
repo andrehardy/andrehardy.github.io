@@ -1,0 +1,71 @@
+---
+import { hallImagePlace, idlePosterUrl, posterUrl, type Frame } from '../data/house';
+
+interface Props {
+  slug: string;
+  mode: 'hall' | 'specimen';
+  frame: Frame;
+  state: string;
+  name: string;
+  priority?: boolean;
+}
+
+const { slug, mode, frame, state, name, priority = false } = Astro.props;
+const poster = posterUrl(slug, state);
+const art = Boolean(poster);
+const place = mode === 'hall' && art ? hallImagePlace(frame.opening) : null;
+const nightOverlay = frame.overlayNight || frame.overlay;
+const videoPoster = idlePosterUrl(slug, state) || poster;
+const style = [
+  `--glow:${frame.glow}`,
+  `--mask:url("${frame.mask}")`,
+  place ? `--img-x:${(place.x * 100).toFixed(2)}%` : '',
+  place ? `--img-y:${(place.y * 100).toFixed(2)}%` : '',
+  place ? `--img-s:${(place.s * 100).toFixed(2)}%` : '',
+]
+  .filter(Boolean)
+  .join(';');
+---
+
+<div
+  class:list={['window', art ? '' : 'is-empty']}
+  data-window
+  data-slug={slug}
+  data-mode={mode}
+  data-state={state}
+  data-shape={frame.shape}
+  data-material={frame.material}
+  data-frame-ornament={frame.ornament}
+  data-art={art ? '' : undefined}
+  style={style}
+>
+  <div class="window-world">
+    <div class="window-stage">
+      <img
+        class="window-poster is-show"
+        alt=""
+        decoding="async"
+        src={poster ?? undefined}
+        fetchpriority={priority ? 'high' : 'auto'}
+      />
+      <img class="window-poster" alt="" decoding="async" />
+      <video
+        class="window-motion"
+        muted
+        playsinline
+        preload="none"
+        disablepictureinpicture
+        poster={videoPoster ?? undefined}
+      ></video>
+      <canvas class="window-dust" aria-hidden="true"></canvas>
+      <p class="window-placeholder" aria-hidden="true">{name}</p>
+    </div>
+    <slot name="world" />
+  </div>
+  <img class="window-frame frame-day" src={frame.overlay} alt="" draggable="false" />
+  <img class="window-frame frame-night" src={nightOverlay} alt="" draggable="false" />
+  <div class="window-spill" aria-hidden="true"></div>
+  <div class="window-face">
+    <slot name="face" />
+  </div>
+</div>

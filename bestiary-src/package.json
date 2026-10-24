@@ -1,0 +1,14 @@
+{
+  "name": "bestiary",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prebuild": "node scripts/generate.mjs",
+    "build": "astro build && rm -f ../magic-registry/bestiary/content-assets.mjs ../magic-registry/bestiary/content-modules.mjs",
+    "dev": "node scripts/generate.mjs && astro dev",
+    "generate": "node scripts/generate.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.14.1"
+  }
+}

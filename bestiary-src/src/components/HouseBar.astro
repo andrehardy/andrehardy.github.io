@@ -1,0 +1,46 @@
+---
+interface Props {
+  current?: 'hall' | 'reports' | 'journal';
+}
+const { current } = Astro.props;
+const hall = `${import.meta.env.BASE_URL}`;
+---
+
+<header class="house-bar">
+  <a class="house-mark" href={hall}>
+    <span class="label">The Magic Registry</span>
+    <span class="house-name">The Bestiary</span>
+  </a>
+  <nav aria-label="The house">
+    <ul>
+      <li><a class="label" href={hall} aria-current={current === 'hall' ? 'page' : undefined}>The Hall</a></li>
+      <li>
+        <a class="label" href={`${hall}field-reports/`} aria-current={current === 'reports' ? 'page' : undefined}
+          >Field Reports</a
+        >
+      </li>
+      <li>
+        <a class="label" href={`${hall}journal/`} aria-current={current === 'journal' ? 'page' : undefined}>The Journal</a>
+      </li>
+      <li><a class="label" href="/magic-registry/">Back to the Registry</a></li>
+    </ul>
+  </nav>
+  <div class="house-tools">
+    <button class="night-switch" type="button" data-night-switch aria-pressed="false" aria-label="Switch to night">
+      <svg class="night-sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"></circle>
+        <path
+          d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.1 5.1l1.6 1.6M17.3 17.3l1.6 1.6M18.9 5.1l-1.6 1.6M6.7 17.3l-1.6 1.6"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"></path>
+      </svg>
+      <svg class="night-moon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15.5 3.5a8 8 0 1 0 5 12.2A6.5 6.5 0 1 1 15.5 3.5z" fill="currentColor"></path>
+      </svg>
+    </button>
+    <button class="label" type="button" data-cipher-switch aria-pressed="false"><span>Read the Cipher</span></button>
+    <button class="label" type="button" data-sound-switch aria-pressed="false">Hear the Specimens</button>
+  </div>
+</header>
