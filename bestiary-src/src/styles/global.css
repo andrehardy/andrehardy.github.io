@@ -1092,7 +1092,9 @@ html[data-night="on"] .scene { background: #05060c; }
 .variant-day { opacity: calc(1 - var(--night)); }
 .variant-night { opacity: var(--night); }
 html[data-night="off"] .variant-night,
-html[data-night="on"] .variant-day { pointer-events: none; }
+html[data-night="off"] .variant-night *,
+html[data-night="on"] .variant-day,
+html[data-night="on"] .variant-day * { pointer-events: none; }
 .scene-media,
 .scene-cast,
 .scene-names { position: absolute; inset: 0; }
@@ -1157,13 +1159,13 @@ img.rose-tracery:not([src]) { visibility: hidden; }
   transform: scale(1.42);
   transform-origin: 50% 46%;
 }
-.scene-halo.is-hot,
-.scene-pool.is-hot { opacity: 0.9; }
+.scene-halo.is-hot { opacity: 0.72; }
+.scene-pool.is-hot { opacity: 1; }
 .scene-halo.is-rose { opacity: 0.72; transform: scale(1.55); }
 .scene-pool {
-  background: radial-gradient(ellipse at 50% 0%, var(--glow), transparent 72%);
-  transform: translateY(78%) scale(1.55, 0.85);
-  transform-origin: 50% 0;
+  background: radial-gradient(ellipse at 50% 0%, var(--glow), transparent 70%);
+  transform: translateX(-50%);
+  filter: blur(1.5px);
 }
 .rose-tracery {
   position: absolute;
@@ -1203,27 +1205,41 @@ img.rose-tracery:not([src]) { visibility: hidden; }
 .scene-names { z-index: 5; pointer-events: none; }
 .scene-plate {
   position: absolute;
-  transform: translate(-50%, 0.4rem);
-  width: max(8.5rem, 11vw);
+  transform: translate(-50%, 0.55rem);
+  width: max-content;
+  max-width: 13rem;
+  padding: 0.18rem 0.55rem 0.28rem;
   text-align: center;
   opacity: 0;
   color: #f7f1e6;
-  text-shadow: 0 1px 3px rgb(0 0 0 / 0.85);
+  background: rgb(14 10 7 / 0.62);
+  border: 1px solid rgb(226 194 122 / 0.38);
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.35);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
   transition: opacity 0.35s ease, transform 0.35s ease;
+}
+html[data-night="on"] .scene-plate {
+  background: rgb(6 10 20 / 0.7);
+  border-color: rgb(186 204 232 / 0.35);
 }
 .scene-plate.is-hot,
 .scene-plate.is-portal {
   opacity: 1;
-  transform: translate(-50%, 0.15rem);
+  transform: translate(-50%, 0.85rem);
 }
-.scene-plate .label { display: block; color: var(--gold); margin-bottom: 0.08rem; }
+.scene-plate .label { display: block; color: var(--gold); margin-bottom: 0.04rem; font-size: 0.58rem; }
 .scene-plate-name {
-  display: block;
+  display: inline-block;
   font-family: Cinzel, serif;
-  font-size: clamp(0.62rem, 1.5vw, 0.78rem);
-  letter-spacing: 0.12em;
+  font-size: clamp(0.62rem, 1.4vw, 0.76rem);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1.25;
+}
+.scene-plate-name::after {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
 }
 .scene-veil {
   position: absolute;

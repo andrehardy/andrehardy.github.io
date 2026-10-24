@@ -50,6 +50,8 @@ export function mountHall(root: HTMLElement) {
       const high = Math.min(0, vh - winBottom);
       top = high >= low ? Math.min(high, Math.max(low, top)) : (low + high) / 2;
     }
+    fit.style.left = '0px';
+    fit.style.top = '0px';
     fit.style.width = `${W.toFixed(2)}px`;
     fit.style.height = `${H.toFixed(2)}px`;
     fit.style.transform = `translate(${left.toFixed(2)}px, ${top.toFixed(2)}px)`;
