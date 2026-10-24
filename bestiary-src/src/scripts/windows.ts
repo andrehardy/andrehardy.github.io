@@ -166,13 +166,39 @@ export function mountWindow(el: HTMLElement) {
     settleIdle(next);
   };
 
+  const swaps = new Map<HTMLElement, { index: number; token: number }>();
+  const crossfadeCaption = (node: HTMLElement, text: string) => {
+    const faces = [...node.querySelectorAll<HTMLElement>('.plate')];
+    const slot = swaps.get(node) ?? { index: 0, token: 0 };
+    swaps.set(node, slot);
+    const shown = faces[slot.index];
+    const next = faces[slot.index ^ 1];
+    if (!shown || !next) return;
+    if (shown.classList.contains('is-on') && (shown.textContent ?? '') === text) return;
+    if (reducedMotion()) {
+      shown.textContent = text;
+      shown.classList.add('is-on');
+      next.classList.remove('is-on');
+      next.textContent = '';
+      return;
+    }
+    const token = ++slot.token;
+    next.textContent = text;
+    next.classList.add('is-on');
+    shown.classList.remove('is-on');
+    slot.index ^= 1;
+    window.setTimeout(() => {
+      if (slot.token !== token) return;
+      shown.textContent = '';
+    }, 600);
+  };
   const publishCaption = (name: string) => {
     const caption = captionFor(assets, name);
     const almanac = document.querySelector<HTMLElement>('[data-caption-almanac]');
     const cipher = document.querySelector<HTMLElement>('[data-caption-cipher]');
     if (!almanac || !cipher || el.dataset.mode !== 'specimen') return;
-    almanac.textContent = caption?.almanac || name;
-    cipher.textContent = caption?.cipher || name;
+    crossfadeCaption(almanac, caption?.almanac || name);
+    crossfadeCaption(cipher, caption?.cipher || name);
   };
 
   publishCaption(state);

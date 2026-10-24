@@ -1,0 +1,52 @@
+---
+import { findCreature, posterUrl } from '../data/house';
+import { openingFrame, type PaintedBay } from '../data/bays';
+
+interface Props {
+  bay: PaintedBay;
+}
+
+const { bay } = Astro.props;
+const openings = bay.openings.map((opening) => {
+  const creature = findCreature(opening.slug);
+  const state = creature?.states[0] ?? '';
+  return {
+    slug: opening.slug,
+    name: creature?.entity.name ?? opening.slug,
+    poster: posterUrl(opening.slug, state),
+    glow: creature?.frame.glow ?? '#e2c27a',
+    box: openingFrame(opening.polygon),
+  };
+});
+---
+
+<section
+  class="scene-bay"
+  data-scene-bay={bay.id}
+  style={`--bay-aspect:${bay.aspect}`}
+>
+  <div class="scene-stage">
+    {
+      openings.map((opening) => (
+        <div
+          class="scene-aperture"
+          style={`left:${(opening.box.x * 100).toFixed(2)}%;top:${(opening.box.y * 100).toFixed(2)}%;width:${(opening.box.w * 100).toFixed(2)}%;height:${(opening.box.h * 100).toFixed(2)}%;--glow:${opening.glow}`}
+        >
+          <a
+            class="scene-window"
+            href={`${import.meta.env.BASE_URL}${opening.slug}/`}
+            data-scene-window
+            data-slug={opening.slug}
+            aria-label={opening.name}
+            style={`clip-path:polygon(${opening.box.clip})`}
+          >
+            {opening.poster && <img src={opening.poster} alt="" draggable="false" />}
+          </a>
+          <span class="scene-pool" aria-hidden="true"></span>
+        </div>
+      ))
+    }
+    <img class="scene-foreground plate-day" src={bay.day} alt="" draggable="false" />
+    <img class="scene-foreground plate-night" src={bay.night} alt="" draggable="false" />
+  </div>
+</section>

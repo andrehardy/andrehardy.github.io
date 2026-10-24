@@ -338,15 +338,14 @@ html[data-night="on"] .night-sun { display: block; }
 }
 .readout {
   position: absolute;
-  left: 50%;
-  bottom: 11%;
-  transform: translateX(-50%);
-  margin: 0;
-  font-family: Cinzel, serif;
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
-  color: #f6f0e4;
-  text-shadow: 0 1px 2px rgb(0 0 0 / 0.7);
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .vessel-mount { pointer-events: auto; }
 .lich-vessel {
@@ -434,7 +433,8 @@ body:has(.hall) {
   transform-origin: center bottom;
   transform: rotateX(-90deg);
 }
-.plate {
+.floor-plane > .plate,
+.vault-plane > .plate {
   position: absolute;
   inset: 0;
   background-repeat: repeat;
@@ -768,7 +768,7 @@ body:has(.hall) {
 
 /* ---------- creature page ---------- */
 .creature {
-  max-width: 1180px;
+  max-width: 1240px;
   margin: 0 auto;
   padding: 1.6rem 1.4rem 4rem;
 }
@@ -782,42 +782,72 @@ body:has(.hall) {
 .creature-head .epithet { color: var(--ink-soft); font-size: 1.45rem; }
 .room {
   display: grid;
-  grid-template-columns: minmax(260px, 400px) minmax(0, 1fr);
-  gap: 3rem 3.5rem;
+  grid-template-columns: minmax(16rem, 45%) minmax(0, 1fr);
+  gap: 2.2rem 2.6rem;
   align-items: start;
 }
-.window-col { position: sticky; top: 1rem; }
+.window-col { position: sticky; top: 1.15rem; }
 .specimen { position: relative; margin: 0; }
 .specimen::before {
   content: "";
   position: absolute;
   z-index: 0;
   left: 50%;
-  top: 34%;
-  width: 168%;
-  height: 96%;
-  transform: translate(-50%, -40%);
-  background: radial-gradient(ellipse at 50% 42%, var(--glow), transparent 64%);
-  opacity: calc(var(--night) * 0.62);
-  mix-blend-mode: screen;
+  top: -4%;
+  width: 148%;
+  height: 108%;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(ellipse at 50% 38%, color-mix(in srgb, var(--glow) 62%, transparent), transparent 64%),
+    radial-gradient(ellipse at 50% 86%, color-mix(in srgb, var(--glow) 48%, transparent), transparent 68%);
+  opacity: calc(0.42 + var(--night) * 0.4);
+  filter: blur(8px);
+  pointer-events: none;
+}
+.sill {
+  position: relative;
+  z-index: 2;
+  height: 0.9rem;
+  margin: -0.45rem 5% 0.2rem;
+  border-radius: 2px 2px 46% 46% / 2px 2px 100% 100%;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, #e4d3b0 calc(100% - var(--night) * 72%), #241c14),
+    color-mix(in srgb, #8a6840 calc(100% - var(--night) * 60%), #100e0c)
+  );
+  box-shadow:
+    0 14px 26px rgb(36 28 20 / 0.24),
+    0 0 34px color-mix(in srgb, var(--glow) 55%, transparent);
   pointer-events: none;
 }
 .specimen .window,
 .specimen figcaption,
 .specimen .script-mount { position: relative; z-index: 1; }
-.specimen .window {
-  width: min(100%, calc((100dvh - 8.5rem) * 640 / 980));
+.specimen .window,
+.specimen .window[data-art] {
+  width: min(100%, calc((100dvh - 12rem) * 0.75));
+  margin-inline: auto;
   view-transition-name: creature-arch;
 }
-.specimen .window[data-art] {
-  width: min(100%, calc((100dvh - 8.5rem) * 3 / 4));
-}
 .specimen figcaption { margin: 0.85rem 0 0; text-align: center; }
-.plate {
+.caption-swap {
+  display: grid;
+}
+.caption-swap .plate {
+  grid-area: 1 / 1;
+  position: relative;
+  inset: auto;
   margin: 0;
+  background: none;
+  pointer-events: none;
   font-style: italic;
   font-size: 1.25rem;
+  line-height: 1.35;
+  opacity: 0;
+  transition: opacity 0.55s ease;
 }
+.caption-swap .plate.is-on { opacity: 1; }
+html[data-cipher] div.caption-swap[data-layer="cipher"] { display: grid; }
 .hint { margin: 0.4rem 0 0; color: var(--ink-soft); }
 .frame-note { margin: 0.35rem 0 0; color: var(--gold-dim); }
 .script-mount { margin-top: 1rem; }
@@ -973,7 +1003,9 @@ html[data-cipher] p.epithet [data-layer="cipher"] { display: inline; }
   .house-name { font-size: 0.88rem; }
   .room { grid-template-columns: 1fr; gap: 1.4rem; }
   .window-col { position: static; overflow: hidden; }
-  .specimen .window { width: min(100%, 26rem); margin-inline: auto; }
+  .specimen .window,
+  .specimen .window[data-art] { width: min(100%, 26rem); max-height: none; margin-inline: auto; }
+  .specimen::before { width: 120%; opacity: calc(0.28 + var(--night) * 0.4); }
   .prose { font-size: 1.15rem; }
   .creature { padding-inline: 1rem; }
 }
@@ -1014,9 +1046,59 @@ html[data-cipher] p.epithet [data-layer="cipher"] { display: inline; }
   mix-blend-mode: screen;
 }
 
+/* Painted full-scene bays. Mounted when the bay plates arrive. Desktop walker
+   crossfades these; the narrow layout keeps one card per window. */
+.scene-stage {
+  position: relative;
+  aspect-ratio: var(--bay-aspect, 1.6);
+  background: #100e0c;
+}
+.scene-aperture { position: absolute; }
+.scene-window {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+}
+.scene-window img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  transition: filter 0.35s ease;
+}
+.scene-window:hover img,
+.scene-window:focus-visible img { filter: brightness(1.16) saturate(1.08); }
+.scene-foreground {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.scene-pool {
+  position: absolute;
+  z-index: 2;
+  left: -18%;
+  width: 136%;
+  top: 78%;
+  height: 62%;
+  background: radial-gradient(ellipse at 50% 0%, var(--glow), transparent 72%);
+  opacity: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.scene-aperture:hover .scene-pool,
+.scene-aperture:focus-within .scene-pool { opacity: 0.82; }
+
 @media (prefers-reduced-motion: reduce) {
   html.is-night-ready { transition: none; }
   .window-poster,
+  .caption-swap .plate,
   .nave-dolly,
   .plate-day,
   .plate-night,
