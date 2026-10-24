@@ -1,83 +1,117 @@
 ---
 import Window from './Window.astro';
-import { bayPlace, hallFrame, hallLayers, roster } from '../data/house';
+import { HALL, bayMetrics, hallFrame, hallLayers, roster } from '../data/house';
 
 const creatures = roster();
 const layers = hallLayers();
-const rose = `${import.meta.env.BASE_URL}frames/hall/rose.svg`;
-const roseDay = layers.rose.day ?? rose;
-const roseNight = layers.rose.night;
-const plates = ['stone', 'floor', 'gilt', 'shafts'] as const;
+const geometry = `--tile:${HALL.tileW}px;--wall-h:${HALL.wallH}px;--span:${HALL.span}px;--win-w:${HALL.winW}px;--win-h:${HALL.winH}px;--nave-img:url("${layers.nave.day ?? ''}")`;
+const walls = ['north', 'south'] as const;
+
+function row(layer: { day: string | null; night: string | null } | undefined) {
+  return [
+    layer?.day ? { phase: 'day' as const, src: layer.day } : null,
+    layer?.night ? { phase: 'night' as const, src: layer.night } : null,
+  ].filter((item) => item !== null);
+}
 ---
 
-<div class="hall" data-hall>
-  <div class="nave">
+<div class="hall is-painted" data-hall style={geometry}>
+  <div class="hall-view">
     <div class="nave-world">
-      {
-        plates.flatMap((name) => {
-          const plate = layers[name];
-          return [
-            plate.day && (
-              <img class="hall-layer hall-layer-day" data-layer-name={name} src={plate.day} alt="" draggable="false" />
-            ),
-            plate.night && (
-              <img class="hall-layer hall-layer-night" data-layer-name={name} src={plate.night} alt="" draggable="false" />
-            ),
-          ];
-        })
-      }
-      <div class="vault" aria-hidden="true"></div>
-      <div class="hall-gilt" aria-hidden="true"></div>
-      <div class="hall-shafts" aria-hidden="true"></div>
-      <canvas class="hall-dust" data-hall-dust aria-hidden="true"></canvas>
-      <div class="apse">
-        <div class="rose-mount">
-          <img class="rose rose-day" src={roseDay} alt="" />
-          {roseNight && <img class="rose rose-night" src={roseNight} alt="" />}
+      <div class="nave-dolly">
+        <div class="plane floor-plane">
+          {
+            row(layers.floor).map((plate) => (
+              <div class:list={['plate', `plate-${plate.phase}`]} style={`background-image:url("${plate.src}")`} />
+            ))
+          }
+          <div class="shade"></div>
         </div>
-        <p class="edition label">Edition II</p>
-        <h1>The Bestiary</h1>
-        <p class="epithet">
-          <span data-layer="almanac">Sixteen windows open on the nave, and in each a world is kept.</span>
-          <span data-layer="cipher">Sixteen non-human entities, accessioned, each behind its own arch.</span>
-        </p>
-        <p class="walk walk-keys">Arrow keys walk the nave. Enter opens a window.</p>
-        <p class="walk walk-touch">Scroll the nave. Tap a window.</p>
+        <div class="plane vault-plane">
+          {
+            row(layers.vault).map((plate) => (
+              <div class:list={['plate', `plate-${plate.phase}`]} style={`background-image:url("${plate.src}")`} />
+            ))
+          }
+          <div class="vault-falloff"></div>
+          <div class="shade"></div>
+        </div>
+        {
+          walls.map((wall) => (
+            <div class:list={['wall', `wall-${wall}`]} data-wall={wall}>
+              <div class="wall-skin">
+                {row(layers.wall).map((plate) => (
+                  <div class:list={['tile-row', `tile-row-${plate.phase}`]}>
+                    <img src={plate.src} alt="" draggable="false" />
+                    <img src={plate.src} alt="" draggable="false" />
+                    <img src={plate.src} alt="" draggable="false" />
+                  </div>
+                ))}
+                <div class="shade"></div>
+              </div>
+              {creatures.map((creature, index) => {
+                if (creature.wall !== wall) return null;
+                const spot = bayMetrics(creature.depth, creature.wall);
+                const frame = hallFrame(creature.frame.glow, creature.frame.particle, creature.frame.opening);
+                const near = creature.depth === 0;
+                return (
+                  <a
+                    class="bay"
+                    href={`${import.meta.env.BASE_URL}${creature.slug}/`}
+                    data-bay
+                    data-slug={creature.slug}
+                    data-wall={creature.wall}
+                    data-depth={creature.depth}
+                    data-seq={index}
+                    data-near={near ? '' : undefined}
+                    tabindex="0"
+                    style={`--x:${spot.left.toFixed(1)}px;--along:${spot.along.toFixed(1)};--seq:${index};--name:${near ? 1 : 0};--glow:${creature.frame.glow}`}
+                  >
+                    <span class="bay-pool" aria-hidden="true" />
+                    <Window
+                      slug={creature.slug}
+                      mode="hall"
+                      frame={frame}
+                      state={creature.states[0] ?? ''}
+                      name={creature.entity.name}
+                      priority={near}
+                    />
+                    <span class="bay-caption">
+                      <span class="bay-mark label">{creature.entity.mark}</span>
+                      <span class="bay-name">{creature.entity.name}</span>
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          ))
+        }
+        <div class="plane apse-plane">
+          {
+            row(layers.nave).map((plate) => (
+              <img class:list={['nave-img', `plate-${plate.phase}`]} src={plate.src} alt="" draggable="false" />
+            ))
+          }
+          {
+            row(layers.rose).map((plate) => (
+              <img class:list={['rose-img', `plate-${plate.phase}`]} src={plate.src} alt="" draggable="false" />
+            ))
+          }
+          <div class="shade"></div>
+        </div>
       </div>
-      <div class="floor" aria-hidden="true"></div>
-      {
-        creatures.map((creature) => {
-          const place = bayPlace(creature.depth);
-          const frame = hallFrame(creature.frame.glow, creature.frame.particle);
-          const style = `--h:${place.height.toFixed(2)};--bottom:${place.bottom.toFixed(2)};--inset:${place.inset.toFixed(2)};--z:${place.z};--fade:${place.fade.toFixed(2)};--name:${place.name}`;
-          return (
-            <a
-              class="bay"
-              href={`${import.meta.env.BASE_URL}${creature.slug}/`}
-              data-bay
-              data-slug={creature.slug}
-              data-wall={creature.wall}
-              data-depth={creature.depth}
-              data-near={place.near ? '' : undefined}
-              tabindex={place.tab ? 0 : -1}
-              style={style}
-            >
-              <span class="bay-pool" aria-hidden="true" style={`--glow:${creature.frame.glow}`} />
-              <Window
-                slug={creature.slug}
-                mode="hall"
-                frame={frame}
-                state={creature.states[0] ?? ''}
-                name={creature.entity.name}
-              />
-              <span class="bay-caption">
-                <span class="bay-mark label">{creature.entity.mark}</span>
-                <span class="bay-name">{creature.entity.name}</span>
-              </span>
-            </a>
-          );
-        })
-      }
     </div>
   </div>
+  <div class="hall-copy">
+    <p class="edition label">Edition II</p>
+    <h1>The Bestiary</h1>
+    <p class="epithet">
+      <span data-layer="almanac">Sixteen windows open on the nave, and in each a world is kept.</span>
+      <span data-layer="cipher">Sixteen non-human entities, accessioned, each behind its own arch.</span>
+    </p>
+    <p class="walk walk-keys">Arrow keys walk the nave. Enter opens a window.</p>
+    <p class="walk walk-touch">Scroll the nave. Tap a window.</p>
+  </div>
+  <div class="hall-shafts" aria-hidden="true"></div>
+  <canvas class="hall-dust" data-hall-dust aria-hidden="true"></canvas>
 </div>

@@ -3,6 +3,8 @@ import manifest from './manifest.json';
 
 export type Plate = { almanac: string; cipher: string };
 
+export type Opening = { x: number; y: number; w: number; h: number };
+
 export type Frame = {
   shape: string;
   material: string;
@@ -11,7 +13,20 @@ export type Frame = {
   particle: string;
   sill: string;
   overlay: string;
+  overlayNight?: string | null;
   mask: string;
+  opening?: Opening;
+};
+
+/** World units for the painted nave. Wall length is three tiles; eight windows use the first eight panels. */
+export const HALL = {
+  tileW: 1500,
+  wallH: 844,
+  span: 700,
+  winW: 280,
+  winH: 373,
+  tiles: 3,
+  centers: [0.175, 0.5, 0.825] as const,
 };
 
 export type EntityFile = {
@@ -78,13 +93,13 @@ export function findCreature(slug: string) {
   return roster().find((item) => item.slug === slug) ?? null;
 }
 
-/** Day and night plates for the nave. Null until the painted file is dropped in. */
+/** Day and night plates for the nave. Night reuses the day file until a night plate is delivered. */
 export function hallLayers() {
   return manifest.hall.layers;
 }
 
-/** The nave shares one arch. Glow and motes still belong to the creature. */
-export function hallFrame(glow: string, particle: string): Frame {
+/** The nave shares one arch. Glow, motes, and the creature's own opening still belong to it. */
+export function hallFrame(glow: string, particle: string, opening?: Opening): Frame {
   return {
     shape: manifest.hall.shape,
     material: manifest.hall.material,
@@ -93,8 +108,46 @@ export function hallFrame(glow: string, particle: string): Frame {
     glow,
     particle,
     overlay: manifest.hall.overlay,
+    overlayNight: manifest.hall.overlayNight,
     mask: manifest.hall.mask,
+    opening,
   };
+}
+
+const FALLBACK_HOLE: Opening = { x: 0.2488, y: 0.1675, w: 0.4989, h: 0.7301 };
+
+/** Cover-scale a creature still so its opening fills the hall arch. */
+export function hallImagePlace(opening?: Opening | null) {
+  const hole = manifest.hall.hole ?? FALLBACK_HOLE;
+  const open = opening ?? { x: 0.18, y: 0.08, w: 0.64, h: 0.8 };
+  const s = Math.max(hole.w / open.w, hole.h / open.h);
+  return {
+    x: hole.x + (hole.w - open.w * s) / 2 - open.x * s,
+    y: hole.y + (hole.h - open.h * s) / 2 - open.y * s,
+    s,
+  };
+}
+
+export function posterUrl(slug: string, state: string) {
+  const assets = creatures[slug];
+  if (!assets) return null;
+  return assets.posters[state] ?? null;
+}
+
+export function idlePosterUrl(slug: string, state: string) {
+  const assets = creatures[slug];
+  if (!assets) return null;
+  return assets.idlePosters[state] ?? null;
+}
+
+/** Distance along a wall to the centre of a bay, and the CSS left of its element. */
+export function bayMetrics(depth: number, wall: 'north' | 'south') {
+  const tile = Math.floor(depth / 3);
+  const slot = depth % 3;
+  const along = tile * HALL.tileW + HALL.centers[slot] * HALL.tileW;
+  const span = HALL.tileW * HALL.tiles;
+  const left = wall === 'north' ? along - HALL.winW / 2 : span - along - HALL.winW / 2;
+  return { along, left };
 }
 
 export function openingCaption(creature: Creature) {

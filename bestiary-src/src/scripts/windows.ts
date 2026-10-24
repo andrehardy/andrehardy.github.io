@@ -16,13 +16,13 @@ export function notifyHall() {
   layoutWatchers.forEach((fn) => fn());
 }
 
-type Transition = { src: string; reverse: boolean };
+type Transition = { src: string; reverse: boolean; poster: string | null };
 
 function findTransition(assets: CreatureAssets, from: string, to: string): Transition | null {
   const forward = assets.transitions.find((item) => item.from === from && item.to === to);
-  if (forward) return { src: forward.src, reverse: false };
+  if (forward) return { src: forward.src, reverse: false, poster: forward.poster };
   const backward = assets.transitions.find((item) => item.from === to && item.to === from);
-  if (backward) return { src: backward.src, reverse: true };
+  if (backward) return { src: backward.src, reverse: true, poster: backward.poster };
   return null;
 }
 
@@ -48,6 +48,7 @@ export function mountWindow(el: HTMLElement) {
   let hovered = false;
 
   const posterOf = (name: string) => assets.posters[name] ?? null;
+  const paintedStill = mode === 'specimen' && el.hasAttribute('data-art');
 
   const paintPoster = (name: string, fade: boolean) => {
     const src = posterOf(name);
@@ -88,6 +89,7 @@ export function mountWindow(el: HTMLElement) {
     }
     video.loop = true;
     video.playbackRate = 1;
+    video.poster = assets.idlePosters[name] || posterOf(name) || '';
     if (video.getAttribute('src') !== idle) {
       video.src = idle;
       video.load();
@@ -118,6 +120,7 @@ export function mountWindow(el: HTMLElement) {
         resolve();
       };
       video.loop = false;
+      video.poster = clip.poster || posterOf(state) || '';
       video.classList.add('is-show');
       video.onloadeddata = () => {
         if (!clip.reverse) return;
@@ -197,7 +200,7 @@ export function mountWindow(el: HTMLElement) {
     }
   };
   const onPointer = (event: PointerEvent) => {
-    if (reducedMotion() || !world) return;
+    if (reducedMotion() || !world || paintedStill) return;
     const rect = el.getBoundingClientRect();
     const px = (event.clientX - rect.left) / rect.width - 0.5;
     const py = (event.clientY - rect.top) / rect.height - 0.5;

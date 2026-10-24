@@ -4,28 +4,39 @@
     "material": "limestone",
     "ornament": "leaf",
     "sill": "Limestone",
-    "overlay": "/magic-registry/bestiary/frames/hall/frame.svg",
-    "mask": "/magic-registry/bestiary/frames/hall/mask.svg",
+    "overlay": "/magic-registry/bestiary/hall/arch-frame-hall.webp",
+    "overlayNight": "/magic-registry/bestiary/hall/arch-frame-hall.webp",
+    "mask": "/magic-registry/bestiary/frames/hall/opening-mask.png",
+    "hole": {
+      "x": 0.2488,
+      "y": 0.1675,
+      "w": 0.4989,
+      "h": 0.7301
+    },
     "layers": {
-      "stone": {
-        "day": null,
-        "night": null
+      "nave": {
+        "day": "/magic-registry/bestiary/hall/nave-back.webp",
+        "night": "/magic-registry/bestiary/hall/nave-back.webp"
+      },
+      "wall": {
+        "day": "/magic-registry/bestiary/hall/wall-tile.webp",
+        "night": "/magic-registry/bestiary/hall/wall-tile.webp"
       },
       "floor": {
-        "day": null,
-        "night": null
+        "day": "/magic-registry/bestiary/hall/floor.webp",
+        "night": "/magic-registry/bestiary/hall/floor.webp"
+      },
+      "vault": {
+        "day": "/magic-registry/bestiary/hall/vault.webp",
+        "night": "/magic-registry/bestiary/hall/vault.webp"
+      },
+      "arch": {
+        "day": "/magic-registry/bestiary/hall/arch-frame-hall.webp",
+        "night": "/magic-registry/bestiary/hall/arch-frame-hall.webp"
       },
       "rose": {
-        "day": null,
-        "night": null
-      },
-      "gilt": {
-        "day": null,
-        "night": null
-      },
-      "shafts": {
-        "day": null,
-        "night": null
+        "day": "/magic-registry/bestiary/hall/rose-frame.webp",
+        "night": "/magic-registry/bestiary/hall/rose-frame.webp"
       }
     }
   },
@@ -38,14 +49,25 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "man": null,
-        "wolf": null
+        "man": "/magic-registry/bestiary/windows/lycanthrope/01-man.webp",
+        "wolf": "/magic-registry/bestiary/windows/lycanthrope/02-wolf.webp"
       },
       "idles": {
         "man": null,
-        "wolf": null
+        "wolf": "/magic-registry/bestiary/windows/lycanthrope/idle-wolf.mp4"
       },
-      "transitions": [],
+      "idlePosters": {
+        "man": null,
+        "wolf": "/magic-registry/bestiary/windows/lycanthrope/idle-wolf-poster.webp"
+      },
+      "transitions": [
+        {
+          "from": "man",
+          "to": "wolf",
+          "src": "/magic-registry/bestiary/windows/lycanthrope/t01-man-to-wolf.mp4",
+          "poster": "/magic-registry/bestiary/windows/lycanthrope/t01-man-to-wolf-poster.webp"
+        }
+      ],
       "plates": {
         "man": {
           "almanac": "The man, with the wolf folded in him.",
@@ -63,6 +85,12 @@
         "glow": "#d9c58f",
         "particle": "dust",
         "sill": "Oak and iron",
+        "opening": {
+          "x": 0.18,
+          "y": 0.07,
+          "w": 0.64,
+          "h": 0.82
+        },
         "overlay": "/magic-registry/bestiary/frames/lycanthrope/frame.svg",
         "mask": "/magic-registry/bestiary/frames/lycanthrope/mask.svg"
       }
@@ -76,16 +104,34 @@
       "captionAlias": {},
       "readout": true,
       "posters": {
-        "cold": null,
-        "waking": null,
-        "flushed": null
+        "cold": "/magic-registry/bestiary/windows/vampire/01-cold.webp",
+        "waking": "/magic-registry/bestiary/windows/vampire/03-waking.webp",
+        "flushed": "/magic-registry/bestiary/windows/vampire/02-flushed.webp"
       },
       "idles": {
         "cold": null,
-        "waking": null,
+        "waking": "/magic-registry/bestiary/windows/vampire/idle-waking.mp4",
         "flushed": null
       },
-      "transitions": [],
+      "idlePosters": {
+        "cold": null,
+        "waking": "/magic-registry/bestiary/windows/vampire/idle-waking-poster.webp",
+        "flushed": null
+      },
+      "transitions": [
+        {
+          "from": "cold",
+          "to": "flushed",
+          "src": "/magic-registry/bestiary/windows/vampire/t01-cold-to-flushed.mp4",
+          "poster": "/magic-registry/bestiary/windows/vampire/t01-cold-to-flushed-poster.webp"
+        },
+        {
+          "from": "flushed",
+          "to": "waking",
+          "src": "/magic-registry/bestiary/windows/vampire/t02-flushed-to-waking.mp4",
+          "poster": "/magic-registry/bestiary/windows/vampire/t02-flushed-to-waking-poster.webp"
+        }
+      ],
       "plates": {
         "flushed": {
           "almanac": "Flushed, its head turned toward the warmth that came near.",
@@ -107,6 +153,12 @@
         "glow": "#ff5850",
         "particle": "ember",
         "sill": "Black marble",
+        "opening": {
+          "x": 0.18,
+          "y": 0.07,
+          "w": 0.62,
+          "h": 0.8
+        },
         "overlay": "/magic-registry/bestiary/frames/vampire/frame.svg",
         "mask": "/magic-registry/bestiary/frames/vampire/mask.svg"
       }
@@ -124,20 +176,52 @@
       },
       "readout": false,
       "posters": {
-        "winter": null,
-        "spring": null,
-        "summer": null,
-        "autumn": null,
-        "recoil": null
+        "winter": "/magic-registry/bestiary/windows/sidhe/01-winter.webp",
+        "spring": "/magic-registry/bestiary/windows/sidhe/02-spring.webp",
+        "summer": "/magic-registry/bestiary/windows/sidhe/03-summer.webp",
+        "autumn": "/magic-registry/bestiary/windows/sidhe/04-autumn.webp",
+        "recoil": "/magic-registry/bestiary/windows/sidhe/05-recoil.webp"
       },
       "idles": {
         "winter": null,
         "spring": null,
         "summer": null,
         "autumn": null,
-        "recoil": null
+        "recoil": "/magic-registry/bestiary/windows/sidhe/idle-recoil.mp4"
       },
-      "transitions": [],
+      "idlePosters": {
+        "winter": null,
+        "spring": null,
+        "summer": null,
+        "autumn": null,
+        "recoil": "/magic-registry/bestiary/windows/sidhe/idle-recoil-poster.webp"
+      },
+      "transitions": [
+        {
+          "from": "winter",
+          "to": "spring",
+          "src": "/magic-registry/bestiary/windows/sidhe/t01-winter-to-spring.mp4",
+          "poster": "/magic-registry/bestiary/windows/sidhe/t01-winter-to-spring-poster.webp"
+        },
+        {
+          "from": "spring",
+          "to": "summer",
+          "src": "/magic-registry/bestiary/windows/sidhe/t02-spring-to-summer.mp4",
+          "poster": "/magic-registry/bestiary/windows/sidhe/t02-spring-to-summer-poster.webp"
+        },
+        {
+          "from": "summer",
+          "to": "autumn",
+          "src": "/magic-registry/bestiary/windows/sidhe/t03-summer-to-autumn.mp4",
+          "poster": "/magic-registry/bestiary/windows/sidhe/t03-summer-to-autumn-poster.webp"
+        },
+        {
+          "from": "autumn",
+          "to": "recoil",
+          "src": "/magic-registry/bestiary/windows/sidhe/t04-autumn-to-recoil.mp4",
+          "poster": "/magic-registry/bestiary/windows/sidhe/t04-autumn-to-recoil-poster.webp"
+        }
+      ],
       "plates": {
         "blistered": {
           "almanac": "Drawn aside from the iron, the blister rising where it touched.",
@@ -171,6 +255,12 @@
         "glow": "#b9a3e3",
         "particle": "pollen",
         "sill": "Pale stone",
+        "opening": {
+          "x": 0.28,
+          "y": 0.12,
+          "w": 0.44,
+          "h": 0.74
+        },
         "overlay": "/magic-registry/bestiary/frames/sidhe/frame.svg",
         "mask": "/magic-registry/bestiary/frames/sidhe/mask.svg"
       }
@@ -183,14 +273,25 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "one-tail": null,
-        "unfurled": null
+        "one-tail": "/magic-registry/bestiary/windows/kitsune/01-one-tail.webp",
+        "unfurled": "/magic-registry/bestiary/windows/kitsune/02-unfurled.webp"
       },
       "idles": {
         "one-tail": null,
-        "unfurled": null
+        "unfurled": "/magic-registry/bestiary/windows/kitsune/idle-unfurled.mp4"
       },
-      "transitions": [],
+      "idlePosters": {
+        "one-tail": null,
+        "unfurled": "/magic-registry/bestiary/windows/kitsune/idle-unfurled-poster.webp"
+      },
+      "transitions": [
+        {
+          "from": "one-tail",
+          "to": "unfurled",
+          "src": "/magic-registry/bestiary/windows/kitsune/t01-one-tail-to-unfurled.mp4",
+          "poster": "/magic-registry/bestiary/windows/kitsune/t01-one-tail-to-unfurled-poster.webp"
+        }
+      ],
       "plates": {
         "one-tail": {
           "almanac": "One tail, as the fox is first seen.",
@@ -208,6 +309,12 @@
         "glow": "#e25a45",
         "particle": "ember",
         "sill": "Cedar",
+        "opening": {
+          "x": 0.14,
+          "y": 0.05,
+          "w": 0.72,
+          "h": 0.86
+        },
         "overlay": "/magic-registry/bestiary/frames/kitsune/frame.svg",
         "mask": "/magic-registry/bestiary/frames/kitsune/mask.svg"
       }
@@ -220,14 +327,25 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "pod": null,
-        "grown": null
+        "pod": "/magic-registry/bestiary/windows/orc/01-pod.webp",
+        "grown": "/magic-registry/bestiary/windows/orc/02-grown.webp"
       },
       "idles": {
         "pod": null,
-        "grown": null
+        "grown": "/magic-registry/bestiary/windows/orc/idle-grown.mp4"
       },
-      "transitions": [],
+      "idlePosters": {
+        "pod": null,
+        "grown": "/magic-registry/bestiary/windows/orc/idle-grown-poster.webp"
+      },
+      "transitions": [
+        {
+          "from": "pod",
+          "to": "grown",
+          "src": "/magic-registry/bestiary/windows/orc/t01-pod-to-grown.mp4",
+          "poster": "/magic-registry/bestiary/windows/orc/t01-pod-to-grown-poster.webp"
+        }
+      ],
       "plates": {
         "pod": {
           "almanac": "The pod in the clay, its threads spreading out through the soil.",
@@ -245,6 +363,12 @@
         "glow": "#e39a55",
         "particle": "spore",
         "sill": "Packed earth",
+        "opening": {
+          "x": 0.24,
+          "y": 0.06,
+          "w": 0.53,
+          "h": 0.84
+        },
         "overlay": "/magic-registry/bestiary/frames/orc/frame.svg",
         "mask": "/magic-registry/bestiary/frames/orc/mask.svg"
       }
@@ -257,14 +381,25 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "breathing": null,
-        "stone": null
+        "breathing": "/magic-registry/bestiary/windows/troll/02-breathing.webp",
+        "stone": "/magic-registry/bestiary/windows/troll/01-stone.webp"
       },
       "idles": {
-        "breathing": null,
+        "breathing": "/magic-registry/bestiary/windows/troll/idle-breathing.mp4",
         "stone": null
       },
-      "transitions": [],
+      "idlePosters": {
+        "breathing": "/magic-registry/bestiary/windows/troll/idle-breathing-poster.webp",
+        "stone": null
+      },
+      "transitions": [
+        {
+          "from": "stone",
+          "to": "breathing",
+          "src": "/magic-registry/bestiary/windows/troll/t01-stone-to-breathing.mp4",
+          "poster": "/magic-registry/bestiary/windows/troll/t01-stone-to-breathing-poster.webp"
+        }
+      ],
       "plates": {
         "stone": {
           "almanac": "By day: stone, with lichen on its shoulders and a bird on its head.",
@@ -282,6 +417,12 @@
         "glow": "#a3b06a",
         "particle": "dust",
         "sill": "Lichen stone",
+        "opening": {
+          "x": 0.18,
+          "y": 0.1,
+          "w": 0.64,
+          "h": 0.76
+        },
         "overlay": "/magic-registry/bestiary/frames/troll/frame.svg",
         "mask": "/magic-registry/bestiary/frames/troll/mask.svg"
       }
@@ -295,16 +436,34 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "asleep": null,
-        "awake": null,
-        "sabbath": null
+        "asleep": "/magic-registry/bestiary/windows/golem/01-asleep.webp",
+        "awake": "/magic-registry/bestiary/windows/golem/02-awake.webp",
+        "sabbath": "/magic-registry/bestiary/windows/golem/03-sabbath.webp"
       },
       "idles": {
         "asleep": null,
         "awake": null,
-        "sabbath": null
+        "sabbath": "/magic-registry/bestiary/windows/golem/idle-sabbath.mp4"
       },
-      "transitions": [],
+      "idlePosters": {
+        "asleep": null,
+        "awake": null,
+        "sabbath": "/magic-registry/bestiary/windows/golem/idle-sabbath-poster.webp"
+      },
+      "transitions": [
+        {
+          "from": "asleep",
+          "to": "awake",
+          "src": "/magic-registry/bestiary/windows/golem/t01-asleep-to-awake.mp4",
+          "poster": "/magic-registry/bestiary/windows/golem/t01-asleep-to-awake-poster.webp"
+        },
+        {
+          "from": "awake",
+          "to": "sabbath",
+          "src": "/magic-registry/bestiary/windows/golem/t02-awake-to-sabbath.mp4",
+          "poster": "/magic-registry/bestiary/windows/golem/t02-awake-to-sabbath-poster.webp"
+        }
+      ],
       "plates": {
         "asleep": {
           "almanac": "Asleep, grey, with its eyes shut and the word dark on its brow.",
@@ -326,6 +485,12 @@
         "glow": "#e0b15a",
         "particle": "dust",
         "sill": "Beaten brass",
+        "opening": {
+          "x": 0.16,
+          "y": 0.08,
+          "w": 0.68,
+          "h": 0.8
+        },
         "overlay": "/magic-registry/bestiary/frames/golem/frame.svg",
         "mask": "/magic-registry/bestiary/frames/golem/mask.svg"
       }
@@ -339,16 +504,34 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "hidden": null,
-        "revealed": null,
-        "glaring": null
+        "hidden": "/magic-registry/bestiary/windows/unicorn/01-hidden.webp",
+        "revealed": "/magic-registry/bestiary/windows/unicorn/02-revealed.webp",
+        "glaring": "/magic-registry/bestiary/windows/unicorn/03-glaring.webp"
       },
       "idles": {
         "hidden": null,
         "revealed": null,
-        "glaring": null
+        "glaring": "/magic-registry/bestiary/windows/unicorn/idle-glaring.mp4"
       },
-      "transitions": [],
+      "idlePosters": {
+        "hidden": null,
+        "revealed": null,
+        "glaring": "/magic-registry/bestiary/windows/unicorn/idle-glaring-poster.webp"
+      },
+      "transitions": [
+        {
+          "from": "hidden",
+          "to": "revealed",
+          "src": "/magic-registry/bestiary/windows/unicorn/t01-hidden-to-revealed.mp4",
+          "poster": "/magic-registry/bestiary/windows/unicorn/t01-hidden-to-revealed-poster.webp"
+        },
+        {
+          "from": "revealed",
+          "to": "glaring",
+          "src": "/magic-registry/bestiary/windows/unicorn/t02-revealed-to-glaring.mp4",
+          "poster": "/magic-registry/bestiary/windows/unicorn/t02-revealed-to-glaring-poster.webp"
+        }
+      ],
       "plates": {
         "revealed": {
           "almanac": "Out at the water, with its horn in the stream.",
@@ -370,6 +553,12 @@
         "glow": "#d7e7cf",
         "particle": "pollen",
         "sill": "Spring stone",
+        "opening": {
+          "x": 0.14,
+          "y": 0.06,
+          "w": 0.72,
+          "h": 0.82
+        },
         "overlay": "/magic-registry/bestiary/frames/unicorn/frame.svg",
         "mask": "/magic-registry/bestiary/frames/unicorn/mask.svg"
       }
@@ -382,14 +571,25 @@
       "captionAlias": {},
       "readout": true,
       "posters": {
-        "agitated": null,
-        "contained": null
+        "agitated": "/magic-registry/bestiary/windows/minotaur/02-agitated.webp",
+        "contained": "/magic-registry/bestiary/windows/minotaur/01-contained.webp"
       },
       "idles": {
-        "agitated": null,
+        "agitated": "/magic-registry/bestiary/windows/minotaur/idle-agitated.mp4",
         "contained": null
       },
-      "transitions": [],
+      "idlePosters": {
+        "agitated": "/magic-registry/bestiary/windows/minotaur/idle-agitated-poster.webp",
+        "contained": null
+      },
+      "transitions": [
+        {
+          "from": "contained",
+          "to": "agitated",
+          "src": "/magic-registry/bestiary/windows/minotaur/t01-contained-to-agitated.mp4",
+          "poster": "/magic-registry/bestiary/windows/minotaur/t01-contained-to-agitated-poster.webp"
+        }
+      ],
       "plates": {
         "contained": {
           "almanac": "Every wall drawn, and the mark at the centre still.",
@@ -407,6 +607,12 @@
         "glow": "#6aa4c8",
         "particle": "dust",
         "sill": "Cyclopean stone",
+        "opening": {
+          "x": 0.16,
+          "y": 0.08,
+          "w": 0.7,
+          "h": 0.8
+        },
         "overlay": "/magic-registry/bestiary/frames/minotaur/frame.svg",
         "mask": "/magic-registry/bestiary/frames/minotaur/mask.svg"
       }
@@ -419,14 +625,25 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "waiting": null,
-        "bound": null
+        "waiting": "/magic-registry/bestiary/windows/fae/01-waiting.webp",
+        "bound": "/magic-registry/bestiary/windows/fae/02-bound.webp"
       },
       "idles": {
         "waiting": null,
-        "bound": null
+        "bound": "/magic-registry/bestiary/windows/fae/idle-bound.mp4"
       },
-      "transitions": [],
+      "idlePosters": {
+        "waiting": null,
+        "bound": "/magic-registry/bestiary/windows/fae/idle-bound-poster.webp"
+      },
+      "transitions": [
+        {
+          "from": "waiting",
+          "to": "bound",
+          "src": "/magic-registry/bestiary/windows/fae/t01-waiting-to-bound.mp4",
+          "poster": "/magic-registry/bestiary/windows/fae/t01-waiting-to-bound-poster.webp"
+        }
+      ],
       "plates": {
         "waiting": {
           "almanac": "Waiting: the lattice fine and still, and no term struck.",
@@ -444,6 +661,12 @@
         "glow": "#e2c14a",
         "particle": "pollen",
         "sill": "Gilt thorn",
+        "opening": {
+          "x": 0.2,
+          "y": 0.12,
+          "w": 0.58,
+          "h": 0.74
+        },
         "overlay": "/magic-registry/bestiary/frames/fae/frame.svg",
         "mask": "/magic-registry/bestiary/frames/fae/mask.svg"
       }
@@ -457,16 +680,28 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "lit": null,
-        "shimmer": null,
-        "decoy": null
+        "lit": "/magic-registry/bestiary/windows/will-o-the-wisp/01-lit.webp",
+        "shimmer": "/magic-registry/bestiary/windows/will-o-the-wisp/02-shimmer.webp",
+        "decoy": "/magic-registry/bestiary/windows/will-o-the-wisp/02-shimmer.webp"
       },
       "idles": {
         "lit": null,
-        "shimmer": null,
+        "shimmer": "/magic-registry/bestiary/windows/will-o-the-wisp/idle-shimmer.mp4",
         "decoy": null
       },
-      "transitions": [],
+      "idlePosters": {
+        "lit": null,
+        "shimmer": "/magic-registry/bestiary/windows/will-o-the-wisp/idle-shimmer-poster.webp",
+        "decoy": null
+      },
+      "transitions": [
+        {
+          "from": "lit",
+          "to": "shimmer",
+          "src": "/magic-registry/bestiary/windows/will-o-the-wisp/t01-lit-to-shimmer.mp4",
+          "poster": "/magic-registry/bestiary/windows/will-o-the-wisp/t01-lit-to-shimmer-poster.webp"
+        }
+      ],
       "plates": {
         "lit": {
           "almanac": "Lit, over the farthest pool.",
@@ -484,6 +719,12 @@
         "glow": "#7fd1c1",
         "particle": "mote",
         "sill": "Bog oak",
+        "opening": {
+          "x": 0.2,
+          "y": 0.12,
+          "w": 0.58,
+          "h": 0.7
+        },
         "overlay": "/magic-registry/bestiary/frames/will-o-the-wisp/frame.svg",
         "mask": "/magic-registry/bestiary/frames/will-o-the-wisp/mask.svg"
       }
@@ -497,16 +738,34 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "watching": null,
-        "blazing": null,
-        "attending": null
+        "watching": "/magic-registry/bestiary/windows/ophanim/02-watching.webp",
+        "blazing": "/magic-registry/bestiary/windows/ophanim/01-blazing.webp",
+        "attending": "/magic-registry/bestiary/windows/ophanim/03-attending.webp"
       },
       "idles": {
         "watching": null,
         "blazing": null,
-        "attending": null
+        "attending": "/magic-registry/bestiary/windows/ophanim/idle-attending.mp4"
       },
-      "transitions": [],
+      "idlePosters": {
+        "watching": null,
+        "blazing": null,
+        "attending": "/magic-registry/bestiary/windows/ophanim/idle-attending-poster.webp"
+      },
+      "transitions": [
+        {
+          "from": "blazing",
+          "to": "watching",
+          "src": "/magic-registry/bestiary/windows/ophanim/t01-blazing-to-watching.mp4",
+          "poster": "/magic-registry/bestiary/windows/ophanim/t01-blazing-to-watching-poster.webp"
+        },
+        {
+          "from": "watching",
+          "to": "attending",
+          "src": "/magic-registry/bestiary/windows/ophanim/t02-watching-to-attending.mp4",
+          "poster": "/magic-registry/bestiary/windows/ophanim/t02-watching-to-attending-poster.webp"
+        }
+      ],
       "plates": {
         "blazing": {
           "almanac": "At noon, the rims blazing and every eye looking out.",
@@ -528,6 +787,12 @@
         "glow": "#ff9f1c",
         "particle": "ember",
         "sill": "Burnished gold",
+        "opening": {
+          "x": 0.12,
+          "y": 0.08,
+          "w": 0.76,
+          "h": 0.82
+        },
         "overlay": "/magic-registry/bestiary/frames/ophanim/frame.svg",
         "mask": "/magic-registry/bestiary/frames/ophanim/mask.svg"
       }
@@ -540,14 +805,25 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "sealed": null,
-        "cracked": null
+        "sealed": "/magic-registry/bestiary/windows/djinn/01-sealed.webp",
+        "cracked": "/magic-registry/bestiary/windows/djinn/02-cracked.webp"
       },
       "idles": {
         "sealed": null,
-        "cracked": null
+        "cracked": "/magic-registry/bestiary/windows/djinn/idle-cracked.mp4"
       },
-      "transitions": [],
+      "idlePosters": {
+        "sealed": null,
+        "cracked": "/magic-registry/bestiary/windows/djinn/idle-cracked-poster.webp"
+      },
+      "transitions": [
+        {
+          "from": "sealed",
+          "to": "cracked",
+          "src": "/magic-registry/bestiary/windows/djinn/t01-sealed-to-cracked.mp4",
+          "poster": "/magic-registry/bestiary/windows/djinn/t01-sealed-to-cracked-poster.webp"
+        }
+      ],
       "plates": {
         "cracked": {
           "almanac": "The sealed vessel, with its crack drawn in.",
@@ -565,6 +841,12 @@
         "glow": "#7eb6ff",
         "particle": "ember",
         "sill": "Smoked brass",
+        "opening": {
+          "x": 0.14,
+          "y": 0.08,
+          "w": 0.72,
+          "h": 0.82
+        },
         "overlay": "/magic-registry/bestiary/frames/djinn/frame.svg",
         "mask": "/magic-registry/bestiary/frames/djinn/mask.svg"
       }
@@ -577,14 +859,25 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "decoy": null,
-        "found": null
+        "decoy": "/magic-registry/bestiary/windows/lich/01-decoy.webp",
+        "found": "/magic-registry/bestiary/windows/lich/02-found.webp"
       },
       "idles": {
         "decoy": null,
-        "found": null
+        "found": "/magic-registry/bestiary/windows/lich/idle-found.mp4"
       },
-      "transitions": [],
+      "idlePosters": {
+        "decoy": null,
+        "found": "/magic-registry/bestiary/windows/lich/idle-found-poster.webp"
+      },
+      "transitions": [
+        {
+          "from": "decoy",
+          "to": "found",
+          "src": "/magic-registry/bestiary/windows/lich/t01-decoy-to-found.mp4",
+          "poster": "/magic-registry/bestiary/windows/lich/t01-decoy-to-found-poster.webp"
+        }
+      ],
       "plates": {
         "decoy": {
           "almanac": "The body in its reliquary, and the stone unregarded in the margin.",
@@ -602,6 +895,12 @@
         "glow": "#3fbfb8",
         "particle": "dust",
         "sill": "Tomb marble",
+        "opening": {
+          "x": 0.14,
+          "y": 0.08,
+          "w": 0.7,
+          "h": 0.82
+        },
         "overlay": "/magic-registry/bestiary/frames/lich/frame.svg",
         "mask": "/magic-registry/bestiary/frames/lich/mask.svg"
       }
@@ -614,14 +913,25 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "playing": null,
-        "torn": null
+        "playing": "/magic-registry/bestiary/windows/wraith/01-playing.webp",
+        "torn": "/magic-registry/bestiary/windows/wraith/02-torn.webp"
       },
       "idles": {
         "playing": null,
-        "torn": null
+        "torn": "/magic-registry/bestiary/windows/wraith/idle-torn.mp4"
       },
-      "transitions": [],
+      "idlePosters": {
+        "playing": null,
+        "torn": "/magic-registry/bestiary/windows/wraith/idle-torn-poster.webp"
+      },
+      "transitions": [
+        {
+          "from": "playing",
+          "to": "torn",
+          "src": "/magic-registry/bestiary/windows/wraith/t01-playing-to-torn.mp4",
+          "poster": "/magic-registry/bestiary/windows/wraith/t01-playing-to-torn-poster.webp"
+        }
+      ],
       "plates": {
         "playing": {
           "almanac": "The moment playing on the wall, the figure taking its few steps.",
@@ -639,6 +949,12 @@
         "glow": "#d5e6f2",
         "particle": "frost",
         "sill": "Ice",
+        "opening": {
+          "x": 0.16,
+          "y": 0.06,
+          "w": 0.68,
+          "h": 0.8
+        },
         "overlay": "/magic-registry/bestiary/frames/wraith/frame.svg",
         "mask": "/magic-registry/bestiary/frames/wraith/mask.svg"
       }
@@ -651,14 +967,25 @@
       "captionAlias": {},
       "readout": false,
       "posters": {
-        "sleeping": null,
-        "pressed": null
+        "sleeping": "/magic-registry/bestiary/windows/succubus/01-sleeping.webp",
+        "pressed": "/magic-registry/bestiary/windows/succubus/02-pressed.webp"
       },
       "idles": {
         "sleeping": null,
-        "pressed": null
+        "pressed": "/magic-registry/bestiary/windows/succubus/idle-pressed.mp4"
       },
-      "transitions": [],
+      "idlePosters": {
+        "sleeping": null,
+        "pressed": "/magic-registry/bestiary/windows/succubus/idle-pressed-poster.webp"
+      },
+      "transitions": [
+        {
+          "from": "sleeping",
+          "to": "pressed",
+          "src": "/magic-registry/bestiary/windows/succubus/t01-sleeping-to-pressed.mp4",
+          "poster": "/magic-registry/bestiary/windows/succubus/t01-sleeping-to-pressed-poster.webp"
+        }
+      ],
       "plates": {
         "sleeping": {
           "almanac": "The sleeper breathing, and the trace long and even on the drum.",
@@ -676,6 +1003,12 @@
         "glow": "#e06a96",
         "particle": "mote",
         "sill": "Rose stone",
+        "opening": {
+          "x": 0.16,
+          "y": 0.07,
+          "w": 0.68,
+          "h": 0.82
+        },
         "overlay": "/magic-registry/bestiary/frames/succubus/frame.svg",
         "mask": "/magic-registry/bestiary/frames/succubus/mask.svg"
       }

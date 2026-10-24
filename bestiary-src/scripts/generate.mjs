@@ -14,10 +14,19 @@ const dropWindows = join(repo, 'magic-registry/public/bestiary/windows');
 const IMAGE = new Set(['.webp', '.png', '.jpg', '.jpeg']);
 const FRAME_NAMES = ['frame.webp', 'frame.png', 'frame.jpg', 'frame.jpeg', 'frame.svg'];
 const MASK_NAMES = ['mask.webp', 'mask.png', 'mask.jpg', 'mask.jpeg', 'mask.svg'];
-// Painted hall plates the owner drops in. Each layer has a day and a night file:
-// <layer>-day.webp and <layer>-night.webp (png, jpg, jpeg, and svg accepted).
-const HALL_LAYERS = ['stone', 'floor', 'rose', 'gilt', 'shafts'];
+// Painted hall plates. A plain file stands in for both day and night until
+// <name>-day / <name>-night variants are dropped beside it.
+const HALL_PLATES = [
+  ['nave', ['nave-back', 'nave']],
+  ['wall', ['wall-tile', 'wall']],
+  ['floor', ['floor']],
+  ['vault', ['vault']],
+  ['arch', ['arch-frame-hall', 'arch']],
+  ['rose', ['rose-frame', 'rose']],
+];
 const LAYER_EXT = ['.webp', '.png', '.jpg', '.jpeg', '.svg'];
+const HALL_MASK = '/magic-registry/bestiary/frames/hall/opening-mask.png';
+const HALL_HOLE = { x: 0.2488, y: 0.1675, w: 0.4989, h: 0.7301 };
 const servedHall = join(repo, 'magic-registry/bestiary/hall');
 const dropHall = join(repo, 'magic-registry/public/bestiary/hall');
 
@@ -54,17 +63,53 @@ function indexOfState(states, name) {
   return states.indexOf(name);
 }
 
+function splitName(file) {
+  const ext = extname(file).toLowerCase();
+  return { ext, stem: file.slice(0, file.length - ext.length) };
+}
+
+function transitionEnds(stem) {
+  const match = stem.match(/^t?\d*-?(.+)-to-(.+)$/);
+  if (!match) return null;
+  return { from: match[1], to: match[2] };
+}
+
 function parseAssets(files, states) {
   const posters = Object.fromEntries(states.map((state) => [state, null]));
   const idles = Object.fromEntries(states.map((state) => [state, null]));
-  const transitions = [];
+  const idlePosters = Object.fromEntries(states.map((state) => [state, null]));
+  const stills = Object.fromEntries(states.map((state) => [state, []]));
+  const clips = new Map();
+  const ignored = [];
+
+  const clipFor = (from, to) => {
+    const key = `${from}\0${to}`;
+    if (!clips.has(key)) clips.set(key, { from, to, file: null, poster: null });
+    return clips.get(key);
+  };
+
   for (const file of files) {
-    const ext = extname(file).toLowerCase();
-    const stem = file.slice(0, file.length - ext.length);
+    const { ext, stem } = splitName(file);
     if (IMAGE.has(ext)) {
+      if (stem.endsWith('-poster')) {
+        const base = stem.slice(0, -'-poster'.length);
+        const idle = base.match(/^idle-(.+)$/);
+        if (idle && idle[1] in idlePosters) {
+          idlePosters[idle[1]] = file;
+          continue;
+        }
+        const ends = transitionEnds(base);
+        if (ends && states.includes(ends.from) && states.includes(ends.to)) {
+          clipFor(ends.from, ends.to).poster = file;
+          continue;
+        }
+        ignored.push(file);
+        continue;
+      }
       const numbered = stem.match(/^(\d+)-(.+)$/);
       const state = numbered ? numbered[2] : stem;
-      if (state in posters) posters[state] = file;
+      if (state in stills) stills[state].push(file);
+      else if (!FRAME_NAMES.includes(file) && !MASK_NAMES.includes(file)) ignored.push(file);
       continue;
     }
     if (ext === '.mp4') {
@@ -73,27 +118,20 @@ function parseAssets(files, states) {
         idles[idle[1]] = file;
         continue;
       }
-      const transition = stem.match(/^t?\d*-?(.+)-to-(.+)$/) || stem.match(/^(.+)-to-(.+)$/);
-      if (transition) {
-        const from = transition[1];
-        const to = transition[2];
-        if (states.includes(from) && states.includes(to)) transitions.push({ from, to, file });
+      const ends = transitionEnds(stem);
+      if (ends && states.includes(ends.from) && states.includes(ends.to)) {
+        clipFor(ends.from, ends.to).file = file;
+        continue;
       }
+      ignored.push(file);
     }
   }
-  // Prefer the numbered poster when several match; the scan above keeps the last.
-  // Re-scan so 01-state wins over a bare name if both exist, and lower numbers win.
   for (const state of states) {
-    const matches = files.filter((file) => {
-      const ext = extname(file).toLowerCase();
-      if (!IMAGE.has(ext)) return false;
-      const stem = file.slice(0, file.length - ext.length);
-      return stem === state || stem.endsWith(`-${state}`);
-    });
-    matches.sort();
+    const matches = stills[state].slice().sort();
     if (matches.length) posters[state] = matches[0];
   }
-  return { posters, idles, transitions };
+  const transitions = [...clips.values()].filter((item) => item.file);
+  return { posters, idles, idlePosters, transitions, ignored };
 }
 
 async function gather(slug) {
@@ -122,9 +160,20 @@ async function gatherHall() {
   return listFiles(servedHall);
 }
 
-function findLayer(files, layer, phase) {
-  const found = LAYER_EXT.map((ext) => `${layer}-${phase}${ext}`).find((name) => files.includes(name));
-  return found ? `/magic-registry/bestiary/hall/${found}` : null;
+function findNamed(files, names, suffix) {
+  for (const name of names) {
+    for (const ext of LAYER_EXT) {
+      const file = `${name}${suffix}${ext}`;
+      if (files.includes(file)) return `/magic-registry/bestiary/hall/${file}`;
+    }
+  }
+  return null;
+}
+
+function resolvePlate(files, names) {
+  const day = findNamed(files, names, '-day') ?? findNamed(files, names, '');
+  const night = findNamed(files, names, '-night') ?? day;
+  return { day, night };
 }
 
 const slugs = Object.keys(catalogue);
@@ -139,6 +188,11 @@ for (const slug of slugs) {
   await ensurePlaceholder(slug, spec.frame);
   const files = await gather(slug);
   const parsed = parseAssets(files, spec.states);
+  // Keep the delivered filenames. A catalogue state with no still borrows another
+  // state's still in the manifest (the wisp's decoy is the shimmer plate).
+  if (!parsed.posters.decoy && parsed.posters.shimmer && spec.states.includes('decoy') && spec.states.includes('shimmer')) {
+    parsed.posters.decoy = parsed.posters.shimmer;
+  }
   const entity = JSON.parse(await readFile(join(entityDir, `${slug}.json`), 'utf8'));
   const plates = {};
   for (const plate of entity.plates ?? []) plates[plate.name] = { almanac: plate.almanac, cipher: plate.cipher };
@@ -158,10 +212,14 @@ for (const slug of slugs) {
     idles: Object.fromEntries(
       spec.states.map((state) => [state, parsed.idles[state] ? urlFor(slug, parsed.idles[state]) : null]),
     ),
+    idlePosters: Object.fromEntries(
+      spec.states.map((state) => [state, parsed.idlePosters[state] ? urlFor(slug, parsed.idlePosters[state]) : null]),
+    ),
     transitions: parsed.transitions.map((item) => ({
       from: item.from,
       to: item.to,
       src: urlFor(slug, item.file),
+      poster: item.poster ? urlFor(slug, item.poster) : null,
     })),
     plates,
     frame: {
@@ -170,26 +228,36 @@ for (const slug of slugs) {
       mask: maskFile ? urlFor(slug, maskFile) : `${base}/mask.svg`,
     },
   };
+  const missing = spec.states.filter((state) => !parsed.posters[state]);
+  if (missing.length || parsed.ignored.length) {
+    console.log(`${slug}: missing [${missing.join(', ')}] ignored [${parsed.ignored.join(', ')}]`);
+  }
   void indexOfState;
 }
 
 const hallFiles = await gatherHall();
-const layers = Object.fromEntries(
-  HALL_LAYERS.map((layer) => [layer, { day: findLayer(hallFiles, layer, 'day'), night: findLayer(hallFiles, layer, 'night') }]),
-);
+const layers = Object.fromEntries(HALL_PLATES.map(([key, names]) => [key, resolvePlate(hallFiles, names)]));
+const archDay = layers.arch.day ?? '/magic-registry/bestiary/frames/hall/frame.svg';
+const archNight = layers.arch.night ?? archDay;
 
 manifest.hall = {
   shape: 'round',
   material: 'limestone',
   ornament: 'leaf',
   sill: 'Limestone',
-  overlay: '/magic-registry/bestiary/frames/hall/frame.svg',
-  mask: '/magic-registry/bestiary/frames/hall/mask.svg',
+  overlay: archDay,
+  overlayNight: archNight,
+  mask: HALL_MASK,
+  hole: HALL_HOLE,
   layers,
 };
 
 await mkdir(dirname(join(root, 'src/data/manifest.json')), { recursive: true });
 await writeFile(join(root, 'src/data/manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 const withArt = slugs.filter((slug) => Object.values(manifest.creatures[slug].posters).some(Boolean));
-const withHall = HALL_LAYERS.filter((layer) => layers[layer].day || layers[layer].night);
+const withHall = HALL_PLATES.map(([key]) => key).filter((layer) => layers[layer].day || layers[layer].night);
 console.log(`manifest: ${slugs.length} creatures, ${withArt.length} with posters, hall layers: ${withHall.join(', ') || 'none yet'}`);
+for (const [key] of HALL_PLATES) {
+  const plate = layers[key];
+  console.log(`  ${key}: day ${plate.day ? 'yes' : 'no'}, night ${plate.night && plate.night !== plate.day ? 'own' : plate.night ? 'stand-in' : 'no'}`);
+}

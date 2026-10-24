@@ -1,3 +1,4 @@
+import { bayMetrics } from '../data/house';
 import { reducedMotion } from './smooth';
 import { notifyHall } from './windows';
 
@@ -5,38 +6,34 @@ const stackedQuery = '(max-width: 1099px), (max-height: 699px)';
 
 export function mountHall(root: HTMLElement) {
   const world = root.querySelector<HTMLElement>('.nave-world');
-  const bays = [...root.querySelectorAll<HTMLAnchorElement>('[data-bay]')];
+  const dolly = root.querySelector<HTMLElement>('.nave-dolly');
+  const bays = [...root.querySelectorAll<HTMLAnchorElement>('[data-bay]')].sort(
+    (a, b) => Number(a.dataset.seq) - Number(b.dataset.seq),
+  );
   if (!world || bays.length === 0) return () => {};
-  const depths = [...new Set(bays.map((bay) => Number(bay.dataset.depth)))].sort((a, b) => a - b);
   let cursor = 0;
   const reduced = reducedMotion();
   const stacked = () => matchMedia(stackedQuery).matches;
+  const origin = bayMetrics(0, 'north').along;
 
   const layout = () => {
     const stack = stacked();
     root.classList.toggle('is-stacked', stack);
+    const shift = stack ? 0 : bayMetrics(cursor, 'north').along - origin;
+    (dolly ?? world).style.setProperty('--dolly', shift.toFixed(1));
     for (const bay of bays) {
-      const depth = Number(bay.dataset.depth) - cursor;
+      const rel = Number(bay.dataset.depth) - cursor;
       if (stack) {
-        bay.style.setProperty('--fade', '1');
         bay.style.setProperty('--name', '1');
         bay.tabIndex = 0;
+        bay.removeAttribute('data-gone');
         continue;
       }
-      const t = Math.min(Math.max(depth, 0) / 3.2, 1);
-      const e = t * t * (3 - 2 * t);
-      const height = 58 + (15 - 58) * e;
-      const bottom = 15 + (38 - 15) * e;
-      const inset = 1.2 + (31 - 1.2) * e;
-      const fade = depth <= -0.55 || depth >= 3.45 ? 0 : depth < 0 ? Math.max(0, 1 + depth / 0.55) : 1;
-      bay.style.setProperty('--h', height.toFixed(2));
-      bay.style.setProperty('--bottom', bottom.toFixed(2));
-      bay.style.setProperty('--inset', inset.toFixed(2));
-      bay.style.setProperty('--z', String(Math.round(40 - depth * 6)));
-      bay.style.setProperty('--fade', fade.toFixed(2));
-      bay.style.setProperty('--name', depth < 1.25 && depth > -0.2 ? '1' : '0');
-      bay.tabIndex = fade > 0.15 ? 0 : -1;
-      bay.toggleAttribute('data-near', depth < 0.6 && depth > -0.2);
+      const gone = rel < -0.35;
+      bay.style.setProperty('--name', rel < 1.15 && rel > -0.2 ? '1' : '0');
+      bay.tabIndex = gone ? -1 : 0;
+      bay.toggleAttribute('data-gone', gone);
+      bay.toggleAttribute('data-near', rel < 1.2 && rel > -0.2);
     }
     notifyHall();
   };
@@ -129,6 +126,5 @@ export function mountHall(root: HTMLElement) {
     root.removeEventListener('pointermove', onPointer);
     media.removeEventListener('change', onMedia);
     window.removeEventListener('pagereveal', reveal);
-    void depths;
   };
 }
