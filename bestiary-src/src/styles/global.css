@@ -98,6 +98,7 @@ a { color: var(--gold-dim); }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  flex-shrink: 0;
   gap: 0.45rem 1.1rem;
   padding: 0.7rem 1.1rem;
   background: rgb(243 234 215 / 0.94);
@@ -361,7 +362,7 @@ body:has(.hall) {
   top: 6%;
   transform: translateX(-50%);
   width: min(28rem, 34vw);
-  z-index: 8;
+  z-index: 24;
   text-align: center;
   pointer-events: none;
   color: #f6f0e4;
@@ -437,9 +438,8 @@ body:has(.hall) {
   font-size: clamp(0.58rem, calc(var(--h) * 0.022 * 1vh), 0.92rem);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.25;
+  white-space: normal;
 }
 .bay:focus-visible { outline: none; }
 .bay:focus-visible .window { outline: 2px solid #e2c27a; outline-offset: 3px; }
@@ -453,47 +453,47 @@ body:has(.hall) {
     background: #14110e;
   }
   .nave,
-  .nave-world { height: auto; overflow: visible; transform: none; }
+  .nave-world { display: contents; }
   .vault,
   .floor { display: none; }
-  .apse,
-  .bay {
+  .hall .apse,
+  .hall .bay,
+  .hall .bay[data-wall="north"],
+  .hall .bay[data-wall="south"] {
     position: relative;
-    left: auto;
-    right: auto;
-    top: auto;
-    bottom: auto;
-    transform: none;
-    width: auto;
-    height: auto;
+    inset: auto;
+    width: 100%;
+    height: 100%;
     min-height: 100%;
     opacity: 1;
     z-index: auto;
+    transform: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     scroll-snap-align: start;
     scroll-snap-stop: always;
-    padding: 1.25rem 1rem 2rem;
+    padding: 1.4rem 1rem 1.4rem;
     pointer-events: auto;
+    transition: none;
   }
-  .apse { width: auto; }
   .rose { width: min(42vw, 11rem); }
-  .bay .window {
-    width: min(78vw, calc(58dvh * 640 / 980));
+  .hall .bay .window {
+    width: min(74vw, 22rem);
     height: auto;
+    max-height: 70%;
   }
-  .bay-caption {
+  .hall .bay-caption {
     position: relative;
     left: auto;
     right: auto;
     bottom: auto;
     opacity: 1;
-    width: min(78vw, 24rem);
-    margin-top: 0.85rem;
+    width: min(78vw, 22rem);
+    margin-top: 0.75rem;
   }
-  .bay-name { font-size: 0.95rem; white-space: normal; }
+  .hall .bay-name { font-size: 0.95rem; }
 }
 
 /* ---------- creature page ---------- */
@@ -669,6 +669,18 @@ html[data-cipher] p.epithet [data-layer="cipher"] { display: inline; }
 .fae-echo { margin: 0; font-style: italic; }
 
 @media (max-width: 860px) {
+  .house-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.85rem;
+    padding: 0.55rem 0.8rem;
+  }
+  .house-mark,
+  .house-bar nav,
+  .house-tools { flex: none; }
+  .house-bar nav ul,
+  .house-tools { flex-wrap: nowrap; margin-left: 0; }
+  .house-name { font-size: 0.88rem; }
   .room { grid-template-columns: 1fr; gap: 1.4rem; }
   .window-col { position: static; }
   .specimen .window { width: min(100%, 26rem); margin-inline: auto; }
