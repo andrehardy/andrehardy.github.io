@@ -1,0 +1,127 @@
+import catalogue from './catalogue.json';
+import manifest from './manifest.json';
+
+export type Plate = { almanac: string; cipher: string };
+
+export type Frame = {
+  shape: string;
+  material: string;
+  ornament: string;
+  glow: string;
+  particle: string;
+  sill: string;
+  overlay: string;
+  mask: string;
+};
+
+export type EntityFile = {
+  slug: string;
+  title: string;
+  description: string;
+  og: Record<string, string>;
+  name: string;
+  mark: string;
+  epithet: { almanac: string; cipher: string };
+  input: string;
+  link: string;
+  voice: string;
+  setting: string;
+  accession: string;
+  hooks: string[];
+  sections: string[];
+};
+
+type Spec = (typeof catalogue)[keyof typeof catalogue];
+
+const entities = import.meta.glob('./entities/*.json', {
+  eager: true,
+  import: 'default',
+}) as Record<string, EntityFile>;
+
+const specs = catalogue as Record<string, Spec>;
+type ManifestCreature = (typeof manifest.creatures)[keyof typeof manifest.creatures];
+const creatures = manifest.creatures as Record<string, ManifestCreature>;
+
+export type Creature = {
+  slug: string;
+  entity: EntityFile;
+  spec: Spec;
+  frame: Frame;
+  states: string[];
+  plates: Record<string, Plate>;
+  readout: boolean;
+  depth: number;
+  wall: 'north' | 'south';
+};
+
+export function roster(): Creature[] {
+  return Object.keys(specs).map((slug, index) => {
+    const spec = specs[slug];
+    const entity = entities[`./entities/${slug}.json`];
+    const assets = creatures[slug];
+    if (!entity || !assets) throw new Error(`missing creature data for ${slug}`);
+    return {
+      slug,
+      entity,
+      spec,
+      frame: assets.frame,
+      states: [...assets.states],
+      plates: assets.plates,
+      readout: assets.readout,
+      depth: Math.floor(index / 2),
+      wall: index % 2 === 0 ? 'north' : 'south',
+    };
+  });
+}
+
+export function findCreature(slug: string) {
+  return roster().find((item) => item.slug === slug) ?? null;
+}
+
+/** The nave shares one arch. Glow and motes still belong to the creature. */
+export function hallFrame(glow: string, particle: string): Frame {
+  return {
+    shape: manifest.hall.shape,
+    material: manifest.hall.material,
+    ornament: manifest.hall.ornament,
+    sill: manifest.hall.sill,
+    glow,
+    particle,
+    overlay: manifest.hall.overlay,
+    mask: manifest.hall.mask,
+  };
+}
+
+export function openingCaption(creature: Creature) {
+  const state = creature.states[0] ?? '';
+  return creature.plates[state] ?? { almanac: state, cipher: state };
+}
+
+const PART_ORDER = ['account', 'screen', 'habits', 'neighbour', 'exemplars'];
+
+export function orderedSections(sections: string[]) {
+  return [...sections].sort((a, b) => rank(a) - rank(b));
+}
+
+function rank(html: string) {
+  const part = html.match(/data-part="([^"]+)"/)?.[1] ?? '';
+  const index = PART_ORDER.indexOf(part);
+  return index < 0 ? PART_ORDER.length : index;
+}
+
+/** First-paint geometry for cursor 0. The hall script uses the same curve. */
+export function bayPlace(depth: number) {
+  const t = Math.min(Math.max(depth, 0) / 3.2, 1);
+  const e = t * t * (3 - 2 * t);
+  const fade = depth <= -0.55 || depth >= 3.45 ? 0 : depth < 0 ? Math.max(0, 1 + depth / 0.55) : 1;
+  return {
+    height: 58 + (15 - 58) * e,
+    bottom: 15 + (38 - 15) * e,
+    inset: 1.2 + (31 - 1.2) * e,
+    fade,
+    name: depth < 1.25 && depth > -0.2 ? 1 : 0,
+    z: Math.round(40 - depth * 6),
+    near: depth < 0.6 && depth > -0.2,
+    tab: fade > 0.15,
+  };
+}

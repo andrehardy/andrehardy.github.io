@@ -1,0 +1,84 @@
+---
+import Window from '../components/Window.astro';
+import { findCreature, openingCaption, orderedSections, roster } from '../data/house';
+import House from '../layouts/House.astro';
+
+export function getStaticPaths() {
+  return roster().map((creature) => ({
+    params: { slug: creature.slug },
+    props: { slug: creature.slug },
+  }));
+}
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const creature = findCreature(slug);
+if (!creature) throw new Error(`unknown creature ${slug}`);
+
+const { entity, frame, spec } = creature;
+const state = creature.states[0] ?? '';
+const caption = openingCaption(creature);
+const sections = orderedSections(entity.sections);
+const vessel = entity.hooks.find((hook) => hook.includes('data-vessel'));
+const lichScript = entity.hooks.find((hook) => hook.includes('data-lich-script'));
+const ring = `${import.meta.env.BASE_URL}instruments/iron-ring.svg`;
+---
+
+<House title={entity.title} description={entity.description} og={entity.og} room={slug}>
+  <article class="creature">
+    <header class="creature-head">
+      <p class="label mark">{entity.mark}</p>
+      <h1>{entity.name}</h1>
+      <p class="epithet">
+        <span data-layer="almanac">{entity.epithet.almanac}</span>
+        <span data-layer="cipher">{entity.epithet.cipher}</span>
+      </p>
+    </header>
+    <div class="room">
+      <div class="window-col">
+        <figure
+          class="specimen"
+          data-specimen={slug}
+          data-input={entity.input}
+          data-link={entity.link}
+          data-voice={entity.voice}
+          data-setting={entity.setting}
+          data-state={state}
+          data-dead-script={slug === 'lich' ? true : undefined}
+          tabindex="0"
+          aria-label={`${entity.name}. ${spec.hint}`}
+        >
+          <Window slug={slug} mode="specimen" frame={frame} state={state} name={entity.name}>
+            {entity.input === 'iron-lens' && <img slot="world" class="iron-ring" src={ring} alt="" />}
+            {slug === 'will-o-the-wisp' && <span slot="world" class="wisp-light" aria-hidden="true"></span>}
+            {
+              creature.readout && (
+                <p slot="face" class="readout" data-readout aria-hidden="true">
+                  0.00
+                </p>
+              )
+            }
+            {vessel && <div slot="face" class="vessel-mount" set:html={vessel} />}
+          </Window>
+          <figcaption>
+            <p class="plate" data-caption-almanac data-layer="almanac">{caption.almanac}</p>
+            <p class="plate" data-caption-cipher data-layer="cipher">{caption.cipher}</p>
+            <p class="hint">{spec.hint}</p>
+            <p class="frame-note label">{frame.sill} · {frame.shape} · {frame.material}</p>
+          </figcaption>
+          {lichScript && <div class="script-mount" set:html={lichScript} />}
+        </figure>
+      </div>
+      <div class="prose" id="text">
+        <div set:html={entity.accession} />
+        {sections.map((section) => <div class="passage" set:html={section} />)}
+      </div>
+    </div>
+    <footer class="colophon">
+      <p class="label">The Bestiary of the Magic Registry</p>
+    </footer>
+  </article>
+</House>

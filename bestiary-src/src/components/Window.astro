@@ -1,0 +1,41 @@
+---
+import type { Frame } from '../data/house';
+
+interface Props {
+  slug: string;
+  mode: 'hall' | 'specimen';
+  frame: Frame;
+  state: string;
+  name: string;
+}
+
+const { slug, mode, frame, state, name } = Astro.props;
+---
+
+<div
+  class="window is-empty"
+  data-window
+  data-slug={slug}
+  data-mode={mode}
+  data-state={state}
+  data-shape={frame.shape}
+  data-material={frame.material}
+  data-ornament={frame.ornament}
+  style={`--glow:${frame.glow};--mask:url("${frame.mask}")`}
+>
+  <div class="window-world">
+    <div class="window-stage">
+      <img class="window-poster is-show" alt="" decoding="async" />
+      <img class="window-poster" alt="" decoding="async" />
+      <video class="window-motion" muted playsinline preload="none" disablepictureinpicture></video>
+      <canvas class="window-dust" aria-hidden="true"></canvas>
+      <p class="window-placeholder" aria-hidden="true">{name}</p>
+    </div>
+    <slot name="world" />
+  </div>
+  <img class="window-frame" src={frame.overlay} alt="" draggable="false" />
+  <div class="window-spill" aria-hidden="true"></div>
+  <div class="window-face">
+    <slot name="face" />
+  </div>
+</div>

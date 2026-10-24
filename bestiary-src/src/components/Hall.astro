@@ -1,0 +1,59 @@
+---
+import Window from './Window.astro';
+import { bayPlace, hallFrame, roster } from '../data/house';
+
+const creatures = roster();
+const rose = `${import.meta.env.BASE_URL}frames/hall/rose.svg`;
+---
+
+<div class="hall" data-hall>
+  <div class="nave">
+    <div class="nave-world">
+      <div class="vault" aria-hidden="true"></div>
+      <div class="apse">
+        <img class="rose" src={rose} alt="" />
+        <p class="edition label">Edition II</p>
+        <h1>The Bestiary</h1>
+        <p class="epithet">
+          <span data-layer="almanac">Sixteen windows open on the nave, and in each a world is kept.</span>
+          <span data-layer="cipher">Sixteen non-human entities, accessioned, each behind its own arch.</span>
+        </p>
+        <p class="walk walk-keys">Arrow keys walk the nave. Enter opens a window.</p>
+        <p class="walk walk-touch">Scroll the nave. Tap a window.</p>
+      </div>
+      <div class="floor" aria-hidden="true"></div>
+      {
+        creatures.map((creature) => {
+          const place = bayPlace(creature.depth);
+          const frame = hallFrame(creature.frame.glow, creature.frame.particle);
+          const style = `--h:${place.height.toFixed(2)};--bottom:${place.bottom.toFixed(2)};--inset:${place.inset.toFixed(2)};--z:${place.z};--fade:${place.fade.toFixed(2)};--name:${place.name}`;
+          return (
+            <a
+              class="bay"
+              href={`${import.meta.env.BASE_URL}${creature.slug}/`}
+              data-bay
+              data-slug={creature.slug}
+              data-wall={creature.wall}
+              data-depth={creature.depth}
+              data-near={place.near ? '' : undefined}
+              tabindex={place.tab ? 0 : -1}
+              style={style}
+            >
+              <Window
+                slug={creature.slug}
+                mode="hall"
+                frame={frame}
+                state={creature.states[0] ?? ''}
+                name={creature.entity.name}
+              />
+              <span class="bay-caption">
+                <span class="bay-mark label">{creature.entity.mark}</span>
+                <span class="bay-name">{creature.entity.name}</span>
+              </span>
+            </a>
+          );
+        })
+      }
+    </div>
+  </div>
+</div>

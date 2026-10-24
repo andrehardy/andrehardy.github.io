@@ -1,0 +1,662 @@
+{
+  "hall": {
+    "shape": "round",
+    "material": "limestone",
+    "ornament": "leaf",
+    "sill": "Limestone",
+    "overlay": "/magic-registry/bestiary/frames/hall/frame.svg",
+    "mask": "/magic-registry/bestiary/frames/hall/mask.svg"
+  },
+  "creatures": {
+    "lycanthrope": {
+      "states": [
+        "man",
+        "wolf"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "man": null,
+        "wolf": null
+      },
+      "idles": {
+        "man": null,
+        "wolf": null
+      },
+      "transitions": [],
+      "plates": {
+        "man": {
+          "almanac": "The man, with the wolf folded in him.",
+          "cipher": "Plate I: base form."
+        },
+        "wolf": {
+          "almanac": "The wolf, with the man still in it.",
+          "cipher": "Plate II: dense form."
+        }
+      },
+      "frame": {
+        "shape": "round",
+        "material": "iron-oak",
+        "ornament": "moon",
+        "glow": "#d9c58f",
+        "particle": "dust",
+        "sill": "Oak and iron",
+        "overlay": "/magic-registry/bestiary/frames/lycanthrope/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/lycanthrope/mask.svg"
+      }
+    },
+    "vampire": {
+      "states": [
+        "cold",
+        "waking",
+        "flushed"
+      ],
+      "captionAlias": {},
+      "readout": true,
+      "posters": {
+        "cold": null,
+        "waking": null,
+        "flushed": null
+      },
+      "idles": {
+        "cold": null,
+        "waking": null,
+        "flushed": null
+      },
+      "transitions": [],
+      "plates": {
+        "flushed": {
+          "almanac": "Flushed, its head turned toward the warmth that came near.",
+          "cipher": "Plate I: thermal response to a nearby heat source."
+        },
+        "cold": {
+          "almanac": "Cold, and nearly not there at all: a dim outline in the black.",
+          "cipher": "At rest, near ambient temperature. Barely visible to the instrument."
+        },
+        "waking": {
+          "almanac": "Awake in the small hours, when it takes more and takes it faster.",
+          "cipher": "Active state, from midnight to first light. Faster and wider heat draw."
+        }
+      },
+      "frame": {
+        "shape": "ogee",
+        "material": "black-marble",
+        "ornament": "thorn",
+        "glow": "#ff5850",
+        "particle": "ember",
+        "sill": "Black marble",
+        "overlay": "/magic-registry/bestiary/frames/vampire/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/vampire/mask.svg"
+      }
+    },
+    "sidhe": {
+      "states": [
+        "winter",
+        "spring",
+        "summer",
+        "autumn",
+        "recoil"
+      ],
+      "captionAlias": {
+        "recoil": "blistered"
+      },
+      "readout": false,
+      "posters": {
+        "winter": null,
+        "spring": null,
+        "summer": null,
+        "autumn": null,
+        "recoil": null
+      },
+      "idles": {
+        "winter": null,
+        "spring": null,
+        "summer": null,
+        "autumn": null,
+        "recoil": null
+      },
+      "transitions": [],
+      "plates": {
+        "blistered": {
+          "almanac": "Drawn aside from the iron, the blister rising where it touched.",
+          "cipher": "Plate I: recoil from iron; contact lesion visible."
+        },
+        "winter": {
+          "almanac": "Winter in the hill, with its light low and its people sleeping.",
+          "cipher": "Dormant. Low luminescence."
+        },
+        "spring": {
+          "almanac": "Spring, and the hawthorn in flower, and the door of the hill thrown wide.",
+          "cipher": "Most active. Peak luminescence."
+        },
+        "summer": {
+          "almanac": "Summer, at the long dusk, with the court at its fullest.",
+          "cipher": "Full activity."
+        },
+        "autumn": {
+          "almanac": "Autumn, when the light in the hill begins to go.",
+          "cipher": "Waning activity."
+        },
+        "recoil": {
+          "almanac": "Turned aside from the iron, with its light gone out where the iron came.",
+          "cipher": "Withdrawal from iron; luminescence suppressed at the point of contact."
+        }
+      },
+      "frame": {
+        "shape": "horseshoe",
+        "material": "moonstone",
+        "ornament": "leaf",
+        "glow": "#b9a3e3",
+        "particle": "pollen",
+        "sill": "Pale stone",
+        "overlay": "/magic-registry/bestiary/frames/sidhe/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/sidhe/mask.svg"
+      }
+    },
+    "kitsune": {
+      "states": [
+        "one-tail",
+        "unfurled"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "one-tail": null,
+        "unfurled": null
+      },
+      "idles": {
+        "one-tail": null,
+        "unfurled": null
+      },
+      "transitions": [],
+      "plates": {
+        "one-tail": {
+          "almanac": "One tail, as the fox is first seen.",
+          "cipher": "Plate I: single tail; at rest."
+        },
+        "unfurled": {
+          "almanac": "Nine tails, to a reader who has come back and kept still.",
+          "cipher": "Plate II: nine tails; fully unfurled."
+        }
+      },
+      "frame": {
+        "shape": "torii",
+        "material": "cinnabar",
+        "ornament": "spark",
+        "glow": "#e25a45",
+        "particle": "ember",
+        "sill": "Cedar",
+        "overlay": "/magic-registry/bestiary/frames/kitsune/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/kitsune/mask.svg"
+      }
+    },
+    "orc": {
+      "states": [
+        "pod",
+        "grown"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "pod": null,
+        "grown": null
+      },
+      "idles": {
+        "pod": null,
+        "grown": null
+      },
+      "transitions": [],
+      "plates": {
+        "pod": {
+          "almanac": "The pod in the clay, its threads spreading out through the soil.",
+          "cipher": "Plate I: dormant pod; mycelial growth in progress."
+        },
+        "grown": {
+          "almanac": "Grown in full, and standing up out of the broken ground.",
+          "cipher": "Plate II: emergence complete."
+        }
+      },
+      "frame": {
+        "shape": "round",
+        "material": "fungal-soil",
+        "ornament": "mycelium",
+        "glow": "#e39a55",
+        "particle": "spore",
+        "sill": "Packed earth",
+        "overlay": "/magic-registry/bestiary/frames/orc/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/orc/mask.svg"
+      }
+    },
+    "troll": {
+      "states": [
+        "breathing",
+        "stone"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "breathing": null,
+        "stone": null
+      },
+      "idles": {
+        "breathing": null,
+        "stone": null
+      },
+      "transitions": [],
+      "plates": {
+        "stone": {
+          "almanac": "By day: stone, with lichen on its shoulders and a bird on its head.",
+          "cipher": "Plate I: mineralized, under direct sunlight."
+        },
+        "breathing": {
+          "almanac": "By night: breathing among the stones, its breath steaming.",
+          "cipher": "Plate II: active at night; respiration visible."
+        }
+      },
+      "frame": {
+        "shape": "trilithon",
+        "material": "granite",
+        "ornament": "lichen",
+        "glow": "#a3b06a",
+        "particle": "dust",
+        "sill": "Lichen stone",
+        "overlay": "/magic-registry/bestiary/frames/troll/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/troll/mask.svg"
+      }
+    },
+    "golem": {
+      "states": [
+        "asleep",
+        "awake",
+        "sabbath"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "asleep": null,
+        "awake": null,
+        "sabbath": null
+      },
+      "idles": {
+        "asleep": null,
+        "awake": null,
+        "sabbath": null
+      },
+      "transitions": [],
+      "plates": {
+        "asleep": {
+          "almanac": "Asleep, grey, with its eyes shut and the word dark on its brow.",
+          "cipher": "Plate I: dormant; inscription intact."
+        },
+        "awake": {
+          "almanac": "Awake, with the word burning on its brow and its eyes open.",
+          "cipher": "Plate II: active; inscription lit."
+        },
+        "sabbath": {
+          "almanac": "At rest for the Sabbath, and not to be woken.",
+          "cipher": "Held dormant for the weekly rest."
+        }
+      },
+      "frame": {
+        "shape": "shouldered",
+        "material": "brass",
+        "ornament": "meander",
+        "glow": "#e0b15a",
+        "particle": "dust",
+        "sill": "Beaten brass",
+        "overlay": "/magic-registry/bestiary/frames/golem/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/golem/mask.svg"
+      }
+    },
+    "unicorn": {
+      "states": [
+        "hidden",
+        "revealed",
+        "glaring"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "hidden": null,
+        "revealed": null,
+        "glaring": null
+      },
+      "idles": {
+        "hidden": null,
+        "revealed": null,
+        "glaring": null
+      },
+      "transitions": [],
+      "plates": {
+        "revealed": {
+          "almanac": "Out at the water, with its horn in the stream.",
+          "cipher": "Plate I: revealed and drinking."
+        },
+        "hidden": {
+          "almanac": "Hidden in the trees, with only the spring to see.",
+          "cipher": "Concealed."
+        },
+        "glaring": {
+          "almanac": "Startled, with its head down and the horn turned outward.",
+          "cipher": "Agitated; defensive posture."
+        }
+      },
+      "frame": {
+        "shape": "lancet",
+        "material": "limestone",
+        "ornament": "leaf",
+        "glow": "#d7e7cf",
+        "particle": "pollen",
+        "sill": "Spring stone",
+        "overlay": "/magic-registry/bestiary/frames/unicorn/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/unicorn/mask.svg"
+      }
+    },
+    "minotaur": {
+      "states": [
+        "agitated",
+        "contained"
+      ],
+      "captionAlias": {},
+      "readout": true,
+      "posters": {
+        "agitated": null,
+        "contained": null
+      },
+      "idles": {
+        "agitated": null,
+        "contained": null
+      },
+      "transitions": [],
+      "plates": {
+        "contained": {
+          "almanac": "Every wall drawn, and the mark at the centre still.",
+          "cipher": "Plate I: full containment; no tremor."
+        },
+        "agitated": {
+          "almanac": "Agitated, shaking the walls of its case.",
+          "cipher": "Tremor building."
+        }
+      },
+      "frame": {
+        "shape": "round",
+        "material": "labyrinth",
+        "ornament": "horn",
+        "glow": "#6aa4c8",
+        "particle": "dust",
+        "sill": "Cyclopean stone",
+        "overlay": "/magic-registry/bestiary/frames/minotaur/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/minotaur/mask.svg"
+      }
+    },
+    "fae": {
+      "states": [
+        "waiting",
+        "bound"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "waiting": null,
+        "bound": null
+      },
+      "idles": {
+        "waiting": null,
+        "bound": null
+      },
+      "transitions": [],
+      "plates": {
+        "waiting": {
+          "almanac": "Waiting: the lattice fine and still, and no term struck.",
+          "cipher": "Plate I: no agreement in force."
+        },
+        "bound": {
+          "almanac": "Bound: the lattice drawn tight toward the words that were taken.",
+          "cipher": "Plate II: agreement in force."
+        }
+      },
+      "frame": {
+        "shape": "trefoil",
+        "material": "gilt-thorn",
+        "ornament": "thorn",
+        "glow": "#e2c14a",
+        "particle": "pollen",
+        "sill": "Gilt thorn",
+        "overlay": "/magic-registry/bestiary/frames/fae/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/fae/mask.svg"
+      }
+    },
+    "will-o-the-wisp": {
+      "states": [
+        "lit",
+        "shimmer",
+        "decoy"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "lit": null,
+        "shimmer": null,
+        "decoy": null
+      },
+      "idles": {
+        "lit": null,
+        "shimmer": null,
+        "decoy": null
+      },
+      "transitions": [],
+      "plates": {
+        "lit": {
+          "almanac": "Lit, over the farthest pool.",
+          "cipher": "Plate I: active, at night."
+        },
+        "shimmer": {
+          "almanac": "By day, a shimmer on the water and nothing more.",
+          "cipher": "Plate II: daytime; minimal visibility."
+        }
+      },
+      "frame": {
+        "shape": "horseshoe",
+        "material": "bog-oak",
+        "ornament": "reed",
+        "glow": "#7fd1c1",
+        "particle": "mote",
+        "sill": "Bog oak",
+        "overlay": "/magic-registry/bestiary/frames/will-o-the-wisp/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/will-o-the-wisp/mask.svg"
+      }
+    },
+    "ophanim": {
+      "states": [
+        "watching",
+        "blazing",
+        "attending"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "watching": null,
+        "blazing": null,
+        "attending": null
+      },
+      "idles": {
+        "watching": null,
+        "blazing": null,
+        "attending": null
+      },
+      "transitions": [],
+      "plates": {
+        "blazing": {
+          "almanac": "At noon, the rims blazing and every eye looking out.",
+          "cipher": "Plate I: full intensity; all eyes forward."
+        },
+        "watching": {
+          "almanac": "At night, the rims dark and only the eyes alight.",
+          "cipher": "Plate II: rings dark; eyes lit, forward."
+        },
+        "attending": {
+          "almanac": "Attending, every eye on the rims turned on whoever comes near.",
+          "cipher": "Observer present; every eye oriented on it."
+        }
+      },
+      "frame": {
+        "shape": "wheel",
+        "material": "fire-gold",
+        "ornament": "eye",
+        "glow": "#ff9f1c",
+        "particle": "ember",
+        "sill": "Burnished gold",
+        "overlay": "/magic-registry/bestiary/frames/ophanim/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/ophanim/mask.svg"
+      }
+    },
+    "djinn": {
+      "states": [
+        "sealed",
+        "cracked"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "sealed": null,
+        "cracked": null
+      },
+      "idles": {
+        "sealed": null,
+        "cracked": null
+      },
+      "transitions": [],
+      "plates": {
+        "cracked": {
+          "almanac": "The sealed vessel, with its crack drawn in.",
+          "cipher": "Plate: the vessel at the extent of a held press."
+        },
+        "sealed": {
+          "almanac": "Sealed, the brass warm and the lead whole.",
+          "cipher": "Contained."
+        }
+      },
+      "frame": {
+        "shape": "mihrab",
+        "material": "brass-smoke",
+        "ornament": "meander",
+        "glow": "#7eb6ff",
+        "particle": "ember",
+        "sill": "Smoked brass",
+        "overlay": "/magic-registry/bestiary/frames/djinn/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/djinn/mask.svg"
+      }
+    },
+    "lich": {
+      "states": [
+        "decoy",
+        "found"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "decoy": null,
+        "found": null
+      },
+      "idles": {
+        "decoy": null,
+        "found": null
+      },
+      "transitions": [],
+      "plates": {
+        "decoy": {
+          "almanac": "The body in its reliquary, and the stone unregarded in the margin.",
+          "cipher": "Plate I: attention on the husk; vessel not located."
+        },
+        "found": {
+          "almanac": "The stone found, and its light come up.",
+          "cipher": "Plate II: vessel located."
+        }
+      },
+      "frame": {
+        "shape": "lancet",
+        "material": "tomb",
+        "ornament": "knot",
+        "glow": "#3fbfb8",
+        "particle": "dust",
+        "sill": "Tomb marble",
+        "overlay": "/magic-registry/bestiary/frames/lich/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/lich/mask.svg"
+      }
+    },
+    "wraith": {
+      "states": [
+        "playing",
+        "torn"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "playing": null,
+        "torn": null
+      },
+      "idles": {
+        "playing": null,
+        "torn": null
+      },
+      "transitions": [],
+      "plates": {
+        "playing": {
+          "almanac": "The moment playing on the wall, the figure taking its few steps.",
+          "cipher": "Plate I: impression in playback."
+        },
+        "torn": {
+          "almanac": "The wire torn, and the moment jumping on the wall.",
+          "cipher": "Plate II: playback disrupted."
+        }
+      },
+      "frame": {
+        "shape": "lancet",
+        "material": "ice",
+        "ornament": "frost",
+        "glow": "#d5e6f2",
+        "particle": "frost",
+        "sill": "Ice",
+        "overlay": "/magic-registry/bestiary/frames/wraith/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/wraith/mask.svg"
+      }
+    },
+    "succubus": {
+      "states": [
+        "sleeping",
+        "pressed"
+      ],
+      "captionAlias": {},
+      "readout": false,
+      "posters": {
+        "sleeping": null,
+        "pressed": null
+      },
+      "idles": {
+        "sleeping": null,
+        "pressed": null
+      },
+      "transitions": [],
+      "plates": {
+        "sleeping": {
+          "almanac": "The sleeper breathing, and the trace long and even on the drum.",
+          "cipher": "Plate I: normal respiration."
+        },
+        "pressed": {
+          "almanac": "The weight come, the trace gone flat, and the dark closing in.",
+          "cipher": "Plate II: respiration suppressed; vignette closed."
+        }
+      },
+      "frame": {
+        "shape": "ogee",
+        "material": "rose-stone",
+        "ornament": "thorn",
+        "glow": "#e06a96",
+        "particle": "mote",
+        "sill": "Rose stone",
+        "overlay": "/magic-registry/bestiary/frames/succubus/frame.svg",
+        "mask": "/magic-registry/bestiary/frames/succubus/mask.svg"
+      }
+    }
+  }
+}

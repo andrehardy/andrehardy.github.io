@@ -1,0 +1,73 @@
+{
+  "slug": "minotaur",
+  "order": 8,
+  "title": "The Minotaur · The Bestiary",
+  "description": "The Minotaur, The Bull Walled in by Art: a specimen of the Bestiary of the Magic Registry.",
+  "og": {
+    "og:type": "website",
+    "og:site_name": "The Magic Registry",
+    "og:title": "The Minotaur · The Bestiary",
+    "og:description": "The Minotaur, The Bull Walled in by Art: a specimen of the Bestiary of the Magic Registry.",
+    "og:url": "https://andrehardy.github.io/magic-registry/bestiary/minotaur/",
+    "og:image": "https://andrehardy.github.io/magic-registry/og/bestiary-minotaur.jpg",
+    "og:image:width": "1200",
+    "og:image:height": "630",
+    "og:image:alt": "The Minotaur in its room: the plan of the Labyrinth on Daedalus's drawing board"
+  },
+  "name": "The Minotaur",
+  "mark": "F.9",
+  "epithet": {
+    "almanac": "The Bull Walled in by Art",
+    "cipher": "A failed graft of man and bull, held in a cooling house of stone"
+  },
+  "input": "reading-walls",
+  "link": "sun-in-taurus",
+  "voice": "low-bellow-heavy-breath",
+  "setting": "instrument",
+  "ariaLabel": "The Minotaur, under glass. The arrow keys lower the fluoroscope and move it over the specimen; Escape lifts it.",
+  "colors": {
+    "--c-ground": "#e8dcb5",
+    "--c-ground-raised": "#dccd9e",
+    "--c-ink": "#2a1d12",
+    "--c-ink-soft": "#56422c",
+    "--r-accent": "#1f5f8b",
+    "--r-accent-2": "#a8442a",
+    "--r-light": "#fffaf0",
+    "--c-brass": "#6f531b",
+    "--c-brass-dim": "#94763c",
+    "--c-glass": "rgb(30 45 45 / 0.05)",
+    "--c-glass-edge": "rgb(30 45 45 / 0.32)"
+  },
+  "plates": [
+    {
+      "name": "contained",
+      "almanac": "Every wall drawn, and the mark at the centre still.",
+      "cipher": "Plate I: full containment; no tremor."
+    }
+  ],
+  "stateNotes": [
+    {
+      "name": "contained",
+      "almanac": "Contained at the centre, its breath slowing.",
+      "cipher": "Stable within full containment."
+    },
+    {
+      "name": "agitated",
+      "almanac": "Agitated, shaking the walls of its case.",
+      "cipher": "Tremor building."
+    }
+  ],
+  "neighbour": {
+    "href": "/magic-registry/bestiary/golem/",
+    "name": "The Golem"
+  },
+  "accession": "<div class=\"accession\"><h2 class=\"label\" id=\"accession-title\">Accession</h2><p class=\"mark\">F.9</p><dl><div><dt class=\"label\">Being</dt><dd><span data-layer=\"almanac\">The Grafted</span><span data-layer=\"cipher\">Tier III Gamma</span></dd></div><div><dt class=\"label\">Source</dt><dd><span data-layer=\"almanac\">The Threshold</span><span data-layer=\"cipher\">The Unaligned</span></dd></div><div><dt class=\"label\">Locality</dt><dd>Knossos in Crete</dd></div><div><dt class=\"label\">Authority</dt><dd>Apollodorus, Bibliotheca 3.1.4 and 3.15.8; Ovid, Metamorphoses VIII; Borges, La casa de Asterión (1947)</dd></div><div><dt class=\"label\">Condition</dt><dd><span data-layer=\"almanac\">Walled in and restless; it is never wholly still.</span><span data-layer=\"cipher\">Contained; persistent low tremor.</span></dd></div></dl></div>",
+  "hooks": [],
+  "sections": [
+    "<section aria-labelledby=\"account-title\" class=\"text\" data-frame=\"cell\" data-part=\"account\" data-room-text=\"\"><h2 id=\"account-title\">The Account</h2><div class=\"thesis\"><div class=\"lensed\" data-lens=\"true\"><p data-layer=\"almanac\">The Minotaur is a man with the head of a bull, born of a queen's unnatural passion and shut by her husband in a house of passages that the craftsman Daedalus built to hold it.</p><p data-layer=\"cipher\">A Grafted body joining human and bovine tissue, made by human craft rather than drawn from either Source, which is unstable and must be held in a structure that takes up its heat.</p></div></div><div class=\"account\" data-layer=\"almanac\"><span aria-hidden=\"true\" class=\"initial\" data-initial=\"minotaur\" data-on-view=\"\"><svg focusable=\"false\" viewbox=\"0 0 100 100\"><rect class=\"i-ground\" height=\"96\" width=\"96\" x=\"2\" y=\"2\"></rect><path class=\"i-key\" d=\"M6 94V6h88v88H18V18h64v64H30V30h40v40H42V42h16v16\" pathlength=\"1\"></path></svg><span class=\"initial-letter\">M</span></span><p>Minos, king of Crete, asked Poseidon for a bull out of the sea to prove his right to the throne, and vowed to sacrifice it. The bull came, white and beautiful, and Minos kept it and sacrificed another. Poseidon’s revenge fell on the queen, Pasiphaë, who was made to desire the bull. The craftsman Daedalus built her a hollow cow of wood, and the child she bore was a man with a bull’s head. They called him Asterion, the starry one, but he is known by the name of the queen’s husband: the bull of Minos.</p><p>Of its kind there was only one, and the Registry counts it alone.</p><p>It was found at Knossos, in Crete, in the house of passages that Daedalus built to hold it. The house was so made that whoever entered it could never find the way out. Into it, every ninth year as Ovid tells it, Athens sent seven youths and seven maidens as tribute, and none of them came out until Theseus went in with Ariadne’s thread.</p><p>Of its body this much is certain: it was not meant. It was made by craft, from a passion that the gods sent, and it ran hot and wild, at war with itself. The walls were its keeping as much as its prison. Borges, who gave it its own voice in 1947, has it live alone in a house with no locks, and wait for the one who will come to free it.</p><p>It is not to be approached inside its walls, nor let out. The thread is the only safe road in. The Labyrinth is not cruel to it, for the walls are the only thing that keeps it calm.</p></div><div class=\"account\" data-layer=\"cipher\"><p>Body: human trunk and limbs with a bull's head and neck; great strength. Source: neither Tier; the graft is the work of craft (Daedalus's device), and nothing sustains it but its own metabolism. Mechanism: the graft does not settle. The body runs hot and the joined tissues are at war; agitation shows as tremor that builds to a violent fit. Containment: a structure of many thick stone walls, which bleeds off its heat and confines its movement; the deeper the plan, the calmer the body. Diet: recorded as human, every nine years. Hazard to the observer: lethal inside the walls; nil outside them.</p></div></section>",
+    "<section aria-labelledby=\"anatomy-title\" class=\"text\" data-frame=\"cell\" data-part=\"screen\" data-room-text=\"\"><h2 id=\"anatomy-title\">Under the Screen</h2><dl class=\"anatomy\"><dt>The seam</dt><dd><div class=\"lensed\" data-lens=\"true\"><p data-layer=\"almanac\">Where the bull's neck meets the man's shoulders there is a seam, raised and red, which never heals.</p><p data-layer=\"cipher\">The junction of the two tissues is chronically inflamed.</p></div></dd><dt>The horns</dt><dd><div class=\"lensed\" data-lens=\"true\"><p data-layer=\"almanac\">The horns are a bull's horns, long and forward-curving, and worn at the tips from the walls.</p><p data-layer=\"cipher\">Bovine horns, abraded from contact with stone.</p></div></dd><dt>The blood</dt><dd><div class=\"lensed\" data-lens=\"true\"><p data-layer=\"almanac\">The blood runs hot, hotter than a man's or a bull's, and the walls nearest the centre are warm to the touch.</p><p data-layer=\"cipher\">Elevated core temperature; heat is absorbed by surrounding masonry.</p></div></dd></dl></section>",
+    "<section aria-labelledby=\"habits-title\" class=\"text\" data-frame=\"cell\" data-part=\"habits\" data-room-text=\"\"><h2 id=\"habits-title\">Its Habits</h2><p><span data-layer=\"almanac\">Reading is building. Each passage read lays down another course of the Labyrinth, and the more walls there are, the quieter the thing at the centre. A narrow page holds it best.</span><span data-layer=\"cipher\">Reading progress draws the walls of the plan. More walls, less tremor. A narrow view counts as tighter containment. The tremor stays inside the case.</span></p><p><span data-layer=\"almanac\">While the sun is in the Bull, from about the twentieth of April to the twentieth of May, it is restless, and the trembling is quicker to start.</span><span data-layer=\"cipher\">While the sun's ecliptic longitude is between 30 and 60 degrees, tremor onset is faster. Its amplitude does not change.</span></p><p class=\"calm\"><span data-layer=\"almanac\">Nothing need be done but read; the walls rise of themselves.</span><span data-layer=\"cipher\">Keyboard and touch readers build the walls by reading. With reduced motion the walls are drawn complete and there is no tremor.</span></p><ul class=\"states\"><li data-state=\"contained\"><span data-layer=\"almanac\">Contained at the centre, its breath slowing.</span><span data-layer=\"cipher\">Stable within full containment.</span></li><li data-state=\"agitated\"><span data-layer=\"almanac\">Agitated, shaking the walls of its case.</span><span data-layer=\"cipher\">Tremor building.</span></li></ul></section>",
+    "<section aria-labelledby=\"neighbour-title\" class=\"text\" data-frame=\"cell\" data-part=\"neighbour\" data-room-text=\"\"><h2 id=\"neighbour-title\">Its Nearest Neighbour</h2><p><a href=\"/magic-registry/bestiary/golem/\">The Golem</a>. <span data-layer=\"almanac\">The Golem is also the work of a maker's hands, but it obeys. The Minotaur was a graft that failed, and could only be walled in.</span><span data-layer=\"cipher\">Both are human work. The Golem is obedient and stoppable; the Minotaur is unstable and must be contained.</span></p></section>",
+    "<section aria-labelledby=\"exemplars-title\" class=\"exemplars\" data-astro-cid-sivqvdxl=\"\" data-exemplars=\"\" data-frame=\"exit\" data-part=\"exemplars\"><h2 id=\"exemplars-title\">Exemplars</h2><p class=\"lede\"><span data-layer=\"almanac\">How the Minotaur has been shown, truly and falsely. Those that wore the wrong name are set out first.</span><span data-layer=\"cipher\">Portrayals filed under this entity. Rejected labels first, then the reference portrayals.</span></p><ol class=\"reports\"><li data-report=\"morbius\" data-verdict-kind=\"misfiled\"><p class=\"marks\"><span class=\"verdict\" data-verdict=\"misfiled\"><svg aria-hidden=\"true\" focusable=\"false\" height=\"24\" viewbox=\"0 0 24 24\" width=\"24\"><circle class=\"ring\" cx=\"12\" cy=\"12\" r=\"10.5\"></circle><circle class=\"pane\" cx=\"12\" cy=\"12\" r=\"8.5\"></circle><path class=\"cut\" d=\"M7 9.5h10M7 14.5h10\"></path><path class=\"strike\" d=\"M8 17 16 7\"></path></svg><span class=\"label\"><span data-layer=\"almanac\">Misfiled</span><span data-layer=\"cipher\">Label rejected</span></span></span></p><h3>Michael Morbius <span class=\"work\">in The Amazing Spider-Man #101</span></h3><p class=\"meta label\">Roy Thomas and Gil Kane, 1971 · comic · called “the Living Vampire”</p><p class=\"thesis\"><span data-layer=\"almanac\">Michael Morbius is called a vampire, but he is filed with the Minotaurs, for he made himself what he is in a laboratory, out of a bat, and is not dead at all.</span><span data-layer=\"cipher\">Michael Morbius is labelled a vampire, which names the Vampire, but he is filed as a Minotaur because he is a living graft of human and animal produced by human craft.</span></p></li><li data-rank=\"exemplar\" data-report=\"the-minotaur\" data-verdict-kind=\"true-to-label\"><p class=\"marks\"><span class=\"verdict\" data-verdict=\"true-to-label\"><svg aria-hidden=\"true\" focusable=\"false\" height=\"24\" viewbox=\"0 0 24 24\" width=\"24\"><circle class=\"ring\" cx=\"12\" cy=\"12\" r=\"10.5\"></circle><circle class=\"pane\" cx=\"12\" cy=\"12\" r=\"8.5\"></circle><path class=\"cut\" d=\"M12 6.5 17.5 12 12 17.5 6.5 12Z\"></path></svg><span class=\"label\"><span data-layer=\"almanac\">True to its name</span><span data-layer=\"cipher\">Label confirmed</span></span></span><span class=\"rank label\"><span data-layer=\"almanac\">Model example</span><span data-layer=\"cipher\">Reference portrayal</span></span></p><h3>The Minotaur <span class=\"work\">in Bibliotheca</span></h3><p class=\"meta label\">Apollodorus, 100 · myth · called “Minotaur”</p><p class=\"thesis\"><span data-layer=\"almanac\">The Minotaur of the old handbook of myths is the model of the Minotaur, a queen's son with a bull's face, made by a craftsman's art and shut in the house of passages the same craftsman built.</span><span data-layer=\"cipher\">The Minotaur of Apollodorus is the model Minotaur because he is a graft of human and bull produced by human craft and held only by a structure built to contain him.</span></p></li><li data-rank=\"runner-up\" data-report=\"asterion\" data-verdict-kind=\"true-to-label\"><p class=\"marks\"><span class=\"verdict\" data-verdict=\"true-to-label\"><svg aria-hidden=\"true\" focusable=\"false\" height=\"24\" viewbox=\"0 0 24 24\" width=\"24\"><circle class=\"ring\" cx=\"12\" cy=\"12\" r=\"10.5\"></circle><circle class=\"pane\" cx=\"12\" cy=\"12\" r=\"8.5\"></circle><path class=\"cut\" d=\"M12 6.5 17.5 12 12 17.5 6.5 12Z\"></path></svg><span class=\"label\"><span data-layer=\"almanac\">True to its name</span><span data-layer=\"cipher\">Label confirmed</span></span></span><span class=\"rank label\"><span data-layer=\"almanac\">Runner-up</span><span data-layer=\"cipher\">Secondary reference</span></span></p><h3>Asterion <span class=\"work\">in La casa de Asterión</span></h3><p class=\"meta label\">Jorge Luis Borges, 1947 · book · called “Minotaur”</p><p class=\"thesis\"><span data-layer=\"almanac\">Asterion stands second among the Minotaurs, the creature in the house of endless galleries speaking for himself, who waits for the one who will come and free him.</span><span data-layer=\"cipher\">Asterion is the runner-up Minotaur because he is the contained graft seen from inside his containment, which he takes for the whole world.</span></p></li></ol><p class=\"more\"><a href=\"/magic-registry/bestiary/field-reports/\"><span data-layer=\"almanac\">The whole register of field reports</span><span data-layer=\"cipher\">All field reports</span></a></p></section>"
+  ]
+}
