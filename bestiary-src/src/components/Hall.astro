@@ -1,17 +1,40 @@
 ---
 import Window from './Window.astro';
-import { bayPlace, hallFrame, roster } from '../data/house';
+import { bayPlace, hallFrame, hallLayers, roster } from '../data/house';
 
 const creatures = roster();
+const layers = hallLayers();
 const rose = `${import.meta.env.BASE_URL}frames/hall/rose.svg`;
+const roseDay = layers.rose.day ?? rose;
+const roseNight = layers.rose.night;
+const plates = ['stone', 'floor', 'gilt', 'shafts'] as const;
 ---
 
 <div class="hall" data-hall>
   <div class="nave">
     <div class="nave-world">
+      {
+        plates.flatMap((name) => {
+          const plate = layers[name];
+          return [
+            plate.day && (
+              <img class="hall-layer hall-layer-day" data-layer-name={name} src={plate.day} alt="" draggable="false" />
+            ),
+            plate.night && (
+              <img class="hall-layer hall-layer-night" data-layer-name={name} src={plate.night} alt="" draggable="false" />
+            ),
+          ];
+        })
+      }
       <div class="vault" aria-hidden="true"></div>
+      <div class="hall-gilt" aria-hidden="true"></div>
+      <div class="hall-shafts" aria-hidden="true"></div>
+      <canvas class="hall-dust" data-hall-dust aria-hidden="true"></canvas>
       <div class="apse">
-        <img class="rose" src={rose} alt="" />
+        <div class="rose-mount">
+          <img class="rose rose-day" src={roseDay} alt="" />
+          {roseNight && <img class="rose rose-night" src={roseNight} alt="" />}
+        </div>
         <p class="edition label">Edition II</p>
         <h1>The Bestiary</h1>
         <p class="epithet">
@@ -39,6 +62,7 @@ const rose = `${import.meta.env.BASE_URL}frames/hall/rose.svg`;
               tabindex={place.tab ? 0 : -1}
               style={style}
             >
+              <span class="bay-pool" aria-hidden="true" style={`--glow:${creature.frame.glow}`} />
               <Window
                 slug={creature.slug}
                 mode="hall"

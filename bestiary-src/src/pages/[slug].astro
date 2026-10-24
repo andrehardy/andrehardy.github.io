@@ -28,7 +28,7 @@ const ring = `${import.meta.env.BASE_URL}instruments/iron-ring.svg`;
 ---
 
 <House title={entity.title} description={entity.description} og={entity.og} room={slug}>
-  <article class="creature">
+  <article class="creature" style={`--glow:${frame.glow}`}>
     <header class="creature-head">
       <p class="label mark">{entity.mark}</p>
       <h1>{entity.name}</h1>

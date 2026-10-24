@@ -5,7 +5,29 @@
     "ornament": "leaf",
     "sill": "Limestone",
     "overlay": "/magic-registry/bestiary/frames/hall/frame.svg",
-    "mask": "/magic-registry/bestiary/frames/hall/mask.svg"
+    "mask": "/magic-registry/bestiary/frames/hall/mask.svg",
+    "layers": {
+      "stone": {
+        "day": null,
+        "night": null
+      },
+      "floor": {
+        "day": null,
+        "night": null
+      },
+      "rose": {
+        "day": null,
+        "night": null
+      },
+      "gilt": {
+        "day": null,
+        "night": null
+      },
+      "shafts": {
+        "day": null,
+        "night": null
+      }
+    }
   },
   "creatures": {
     "lycanthrope": {

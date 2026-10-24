@@ -31,6 +31,17 @@ const canonical = og['og:url'] ?? new URL(Astro.url.pathname, Astro.site).toStri
       } catch (error) {
         /* storage refused */
       }
+      try {
+        var storedNight = localStorage.getItem('mr-bestiary-night');
+        if (storedNight === 'on' || storedNight === 'off') {
+          document.documentElement.setAttribute('data-night', storedNight);
+        } else {
+          var hour = new Date().getHours();
+          document.documentElement.setAttribute('data-night', hour >= 19 || hour < 6 ? 'on' : 'off');
+        }
+      } catch (error) {
+        /* leave data-night unset so prefers-color-scheme can stand in */
+      }
     </script>
   </head>
   <body data-room={room}>

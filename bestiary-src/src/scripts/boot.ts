@@ -1,5 +1,6 @@
 import { listen, type InputName } from './input';
 import { mountHall } from './hall';
+import { bindNight } from './night';
 import { createReaction, type Env, type Visit } from './reactions';
 import { mountWindow } from './windows';
 import { a as skyNow, o as rollVisit, r as record } from '../vendor/journal.js';
@@ -133,6 +134,7 @@ function mountSpecimen() {
 export function boot() {
   bindCipher();
   bindSound();
+  bindNight();
   document.querySelectorAll<HTMLElement>('[data-window]').forEach((el) => {
     if (el.dataset.mode === 'hall') mountWindow(el);
   });

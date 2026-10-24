@@ -78,6 +78,11 @@ export function findCreature(slug: string) {
   return roster().find((item) => item.slug === slug) ?? null;
 }
 
+/** Day and night plates for the nave. Null until the painted file is dropped in. */
+export function hallLayers() {
+  return manifest.hall.layers;
+}
+
 /** The nave shares one arch. Glow and motes still belong to the creature. */
 export function hallFrame(glow: string, particle: string): Frame {
   return {

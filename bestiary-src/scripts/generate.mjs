@@ -14,6 +14,12 @@ const dropWindows = join(repo, 'magic-registry/public/bestiary/windows');
 const IMAGE = new Set(['.webp', '.png', '.jpg', '.jpeg']);
 const FRAME_NAMES = ['frame.webp', 'frame.png', 'frame.jpg', 'frame.jpeg', 'frame.svg'];
 const MASK_NAMES = ['mask.webp', 'mask.png', 'mask.jpg', 'mask.jpeg', 'mask.svg'];
+// Painted hall plates the owner drops in. Each layer has a day and a night file:
+// <layer>-day.webp and <layer>-night.webp (png, jpg, jpeg, and svg accepted).
+const HALL_LAYERS = ['stone', 'floor', 'rose', 'gilt', 'shafts'];
+const LAYER_EXT = ['.webp', '.png', '.jpg', '.jpeg', '.svg'];
+const servedHall = join(repo, 'magic-registry/bestiary/hall');
+const dropHall = join(repo, 'magic-registry/public/bestiary/hall');
 
 async function exists(path) {
   try {
@@ -106,6 +112,21 @@ function urlFor(slug, file) {
   return `/magic-registry/bestiary/windows/${slug}/${file}`;
 }
 
+async function gatherHall() {
+  await mkdir(servedHall, { recursive: true });
+  await mkdir(dropHall, { recursive: true });
+  for (const name of await listFiles(dropHall)) {
+    if (name.startsWith('.')) continue;
+    await copyFile(join(dropHall, name), join(servedHall, name));
+  }
+  return listFiles(servedHall);
+}
+
+function findLayer(files, layer, phase) {
+  const found = LAYER_EXT.map((ext) => `${layer}-${phase}${ext}`).find((name) => files.includes(name));
+  return found ? `/magic-registry/bestiary/hall/${found}` : null;
+}
+
 const slugs = Object.keys(catalogue);
 if (slugs.length !== 16) throw new Error(`expected 16 creatures, found ${slugs.length}`);
 
@@ -152,6 +173,11 @@ for (const slug of slugs) {
   void indexOfState;
 }
 
+const hallFiles = await gatherHall();
+const layers = Object.fromEntries(
+  HALL_LAYERS.map((layer) => [layer, { day: findLayer(hallFiles, layer, 'day'), night: findLayer(hallFiles, layer, 'night') }]),
+);
+
 manifest.hall = {
   shape: 'round',
   material: 'limestone',
@@ -159,9 +185,11 @@ manifest.hall = {
   sill: 'Limestone',
   overlay: '/magic-registry/bestiary/frames/hall/frame.svg',
   mask: '/magic-registry/bestiary/frames/hall/mask.svg',
+  layers,
 };
 
 await mkdir(dirname(join(root, 'src/data/manifest.json')), { recursive: true });
 await writeFile(join(root, 'src/data/manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 const withArt = slugs.filter((slug) => Object.values(manifest.creatures[slug].posters).some(Boolean));
-console.log(`manifest: ${slugs.length} creatures, ${withArt.length} with posters`);
+const withHall = HALL_LAYERS.filter((layer) => layers[layer].day || layers[layer].night);
+console.log(`manifest: ${slugs.length} creatures, ${withArt.length} with posters, hall layers: ${withHall.join(', ') || 'none yet'}`);

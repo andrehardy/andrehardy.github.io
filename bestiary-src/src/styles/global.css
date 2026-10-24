@@ -41,19 +41,32 @@
   font-display: swap;
 }
 
+@property --night {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 :root {
-  --parchment: #f3ead7;
-  --parchment-deep: #e7dcc6;
-  --ink: #241c14;
-  --ink-soft: #5c4e3d;
+  --night: 0;
+  --parchment: color-mix(in srgb, #f3ead7 calc((1 - var(--night)) * 100%), #0c1018 calc(var(--night) * 100%));
+  --parchment-deep: color-mix(in srgb, #e7dcc6 calc((1 - var(--night)) * 100%), #141a28 calc(var(--night) * 100%));
+  --ink: color-mix(in srgb, #241c14 calc((1 - var(--night)) * 100%), #f3ead7 calc(var(--night) * 100%));
+  --ink-soft: color-mix(in srgb, #5c4e3d calc((1 - var(--night)) * 100%), #cbbfa8 calc(var(--night) * 100%));
   --gold: #c6a15a;
-  --gold-dim: #8a6a32;
-  --stone: #14110e;
-  --nave: #1a1612;
+  --gold-dim: color-mix(in srgb, #8a6a32 calc((1 - var(--night)) * 100%), #e2c27a calc(var(--night) * 100%));
+  --stone: color-mix(in srgb, #14110e calc((1 - var(--night)) * 100%), #070b14 calc(var(--night) * 100%));
+  --nave: color-mix(in srgb, #1a1612 calc((1 - var(--night)) * 100%), #0a1020 calc(var(--night) * 100%));
+  --bar: color-mix(in srgb, rgb(243 234 215 / 0.94) calc((1 - var(--night)) * 100%), rgb(7 11 20 / 0.94) calc(var(--night) * 100%));
   color-scheme: light;
   background: var(--parchment);
   color: var(--ink);
 }
+html[data-night="on"] { --night: 1; color-scheme: dark; }
+@media (prefers-color-scheme: dark) {
+  html:not([data-night]) { --night: 1; color-scheme: dark; }
+}
+html.is-night-ready { transition: --night 0.7s ease; }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; }
@@ -63,7 +76,8 @@ body {
   font-size: 1.2rem;
   line-height: 1.45;
   background:
-    radial-gradient(ellipse at 50% -10%, rgb(255 248 230 / 0.7), transparent 46%),
+    radial-gradient(ellipse at 50% -10%, rgb(255 248 230 / calc(0.7 - var(--night) * 0.7)), transparent 46%),
+    radial-gradient(ellipse at 50% -18%, rgb(28 40 72 / calc(var(--night) * 0.55)), transparent 52%),
     var(--parchment);
 }
 img { max-width: 100%; }
@@ -73,7 +87,7 @@ a { color: var(--gold-dim); }
   outline: 2px solid var(--gold);
   outline-offset: 3px;
 }
-::selection { background: #e2c27a; color: var(--ink); }
+::selection { background: #e2c27a; color: #241c14; }
 
 .label {
   font-family: Cinzel, serif;
@@ -101,7 +115,7 @@ a { color: var(--gold-dim); }
   flex-shrink: 0;
   gap: 0.45rem 1.1rem;
   padding: 0.7rem 1.1rem;
-  background: rgb(243 234 215 / 0.94);
+  background: var(--bar);
   color: var(--ink);
   border-bottom: 1px solid var(--gold);
   position: relative;
@@ -141,6 +155,27 @@ a { color: var(--gold-dim); }
   cursor: pointer;
 }
 .house-tools button[aria-pressed="true"] { color: var(--gold-dim); }
+.house-tools .night-switch {
+  width: 1.7rem;
+  height: 1.7rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.night-switch svg { width: 0.95rem; height: 0.95rem; display: none; }
+html[data-night="off"] .night-moon,
+html[data-night="on"] .night-sun { display: block; }
+@media (prefers-color-scheme: dark) {
+  html:not([data-night]) .night-sun { display: block; }
+}
+@media (prefers-color-scheme: light) {
+  html:not([data-night]) .night-moon { display: block; }
+}
 
 /* ---------- the window ---------- */
 .window {
@@ -220,17 +255,18 @@ a { color: var(--gold-dim); }
   z-index: 2;
   pointer-events: none;
   user-select: none;
+  filter: sepia(calc(var(--night) * 0.28)) saturate(calc(1 + var(--night) * 0.4)) brightness(calc(1 + var(--night) * 0.06));
 }
 .window-spill {
   position: absolute;
   left: 6%;
   right: 6%;
   bottom: 0;
-  height: 24%;
+  height: calc(24% + var(--night) * 12%);
   z-index: 3;
   pointer-events: none;
   background: radial-gradient(ellipse at 50% 100%, var(--glow), transparent 70%);
-  opacity: 0.42;
+  opacity: calc(0.42 + var(--night) * 0.5);
   mix-blend-mode: screen;
 }
 .window.is-hot .window-spill,
@@ -315,8 +351,13 @@ body:has(.hall) {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(ellipse at 50% 18%, #3a3024 0%, transparent 42%),
-    linear-gradient(180deg, #2a241c 0%, #14110e 58%, #0c0a08 100%);
+    radial-gradient(ellipse at 50% 18%, color-mix(in srgb, #3a3024 calc((1 - var(--night)) * 100%), #15203a calc(var(--night) * 100%)), transparent 42%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, #2a241c calc((1 - var(--night)) * 100%), #10182a calc(var(--night) * 100%)) 0%,
+      color-mix(in srgb, #14110e calc((1 - var(--night)) * 100%), #070b14 calc(var(--night) * 100%)) 58%,
+      color-mix(in srgb, #0c0a08 calc((1 - var(--night)) * 100%), #04060d calc(var(--night) * 100%)) 100%
+    );
 }
 .nave,
 .nave-world { height: 100%; }
@@ -330,9 +371,11 @@ body:has(.hall) {
 .vault {
   position: absolute;
   inset: 0 8% 30%;
+  z-index: 1;
   background:
-    repeating-linear-gradient(90deg, rgb(243 234 215 / 0.045) 0 1px, transparent 1px 9%),
-    radial-gradient(ellipse at 50% 100%, rgb(198 161 90 / 0.16), transparent 55%);
+    repeating-linear-gradient(90deg, rgb(210 220 235 / calc(0.045 - var(--night) * 0.015)) 0 1px, transparent 1px 9%),
+    radial-gradient(ellipse at 50% 100%, rgb(198 161 90 / calc(0.16 - var(--night) * 0.1)), transparent 55%),
+    radial-gradient(ellipse at 50% 0%, rgb(90 120 180 / calc(var(--night) * 0.2)), transparent 60%);
   pointer-events: none;
 }
 .floor {
@@ -341,9 +384,15 @@ body:has(.hall) {
   right: 0;
   bottom: 0;
   height: 28%;
+  z-index: 2;
   background:
-    linear-gradient(180deg, transparent, rgb(12 10 8 / 0.2) 18%, #0e0c0a 70%),
-    repeating-linear-gradient(90deg, rgb(226 194 122 / 0.05) 0 1px, transparent 1px 72px);
+    linear-gradient(
+      180deg,
+      transparent,
+      rgb(8 10 16 / calc(0.2 + var(--night) * 0.2)) 18%,
+      color-mix(in srgb, #0e0c0a calc((1 - var(--night)) * 100%), #05070e calc(var(--night) * 100%)) 70%
+    ),
+    repeating-linear-gradient(90deg, rgb(226 194 122 / calc(0.05 - var(--night) * 0.02)) 0 1px, transparent 1px 72px);
   pointer-events: none;
 }
 .floor::after {
@@ -355,6 +404,7 @@ body:has(.hall) {
   height: 28%;
   transform: translateX(-50%);
   background: radial-gradient(ellipse, rgb(226 194 122 / 0.28), transparent 70%);
+  opacity: calc(1 - var(--night) * 0.72);
 }
 .apse {
   position: absolute;
@@ -362,17 +412,39 @@ body:has(.hall) {
   top: 6%;
   transform: translateX(-50%);
   width: min(28rem, 34vw);
-  z-index: 24;
+  z-index: 50;
   text-align: center;
   pointer-events: none;
   color: #f6f0e4;
 }
-.rose {
+.rose-mount {
+  position: relative;
   width: min(22vh, 11rem);
+  margin: 0 auto 0.4rem;
+}
+.rose {
+  width: 100%;
   height: auto;
   display: block;
-  margin: 0 auto 0.4rem;
+  margin: 0;
   filter: drop-shadow(0 12px 18px rgb(0 0 0 / 0.45));
+}
+.rose-night {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  opacity: var(--night);
+}
+.rose-mount::after {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 214 140 / 0.9), rgb(198 130 40 / 0.28) 42%, transparent 70%);
+  opacity: var(--night);
+  mix-blend-mode: screen;
+  filter: blur(6px);
+  pointer-events: none;
 }
 .edition { margin: 0; color: var(--gold); }
 .apse h1,
@@ -419,7 +491,20 @@ body:has(.hall) {
 .bay[data-wall="north"] { left: calc(var(--inset) * 1%); }
 .bay[data-wall="south"] { right: calc(var(--inset) * 1%); }
 .bay[tabindex="0"] { pointer-events: auto; }
-.bay .window { width: 100%; height: 100%; }
+.bay .window { position: relative; z-index: 1; width: 100%; height: 100%; }
+.bay-pool {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 58%;
+  width: 200%;
+  height: 95%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at 50% 0%, var(--glow), transparent 68%);
+  opacity: calc(0.08 + var(--night) * 0.82);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
 .bay-caption {
   position: absolute;
   left: 8%;
@@ -450,8 +535,12 @@ body:has(.hall) {
   .hall {
     overflow-y: auto;
     scroll-snap-type: y mandatory;
-    background: #14110e;
+    background: var(--stone);
   }
+  .hall-layer,
+  .hall-gilt,
+  .hall-shafts,
+  .hall-dust { display: none; }
   .nave,
   .nave-world { display: contents; }
   .vault,
@@ -478,7 +567,13 @@ body:has(.hall) {
     pointer-events: auto;
     transition: none;
   }
-  .rose { width: min(42vw, 11rem); }
+  .rose-mount { width: min(42vw, 11rem); }
+  .hall .bay-pool {
+    top: auto;
+    bottom: 16%;
+    width: min(86vw, 26rem);
+    height: 34%;
+  }
   .hall .bay .window {
     width: min(74vw, 22rem);
     height: auto;
@@ -517,7 +612,24 @@ body:has(.hall) {
   align-items: start;
 }
 .window-col { position: sticky; top: 1rem; }
-.specimen { margin: 0; }
+.specimen { position: relative; margin: 0; }
+.specimen::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 36%;
+  width: 150%;
+  height: 88%;
+  transform: translate(-50%, -42%);
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--glow) 78%, transparent), transparent 68%);
+  opacity: calc(var(--night) * 0.85);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.specimen .window,
+.specimen figcaption,
+.specimen .script-mount { position: relative; z-index: 1; }
 .specimen .window {
   width: min(100%, calc((100dvh - 8.5rem) * 640 / 980));
   view-transition-name: creature-arch;
@@ -701,11 +813,72 @@ html[data-cipher] p.epithet [data-layer="cipher"] { display: inline; }
   object-fit: cover;
 }
 
+/* Painted hall plates crossfade with --night. CSS stone, shafts, and gilt stand in while a file is absent. */
+.hall-layer,
+.hall-gilt,
+.hall-shafts,
+.hall-dust {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.hall-layer {
+  z-index: 0;
+  object-fit: cover;
+}
+.hall-layer-day { opacity: calc(1 - var(--night)); }
+.hall-layer-night { opacity: var(--night); }
+.hall-layer[data-layer-name="floor"] { z-index: 3; }
+.hall-layer[data-layer-name="gilt"],
+.hall-layer[data-layer-name="shafts"] {
+  z-index: 44;
+  mix-blend-mode: screen;
+}
+.hall:has(.hall-layer-day[data-layer-name="stone"]) .vault { opacity: var(--night); }
+.hall:has(.hall-layer-night[data-layer-name="stone"]) .vault { opacity: calc(1 - var(--night)); }
+.hall:has(.hall-layer-day[data-layer-name="stone"]):has(.hall-layer-night[data-layer-name="stone"]) .vault { opacity: 0; }
+.hall:has(.hall-layer-day[data-layer-name="floor"]) .floor { opacity: var(--night); }
+.hall:has(.hall-layer-night[data-layer-name="floor"]) .floor { opacity: calc(1 - var(--night)); }
+.hall:has(.hall-layer-day[data-layer-name="floor"]):has(.hall-layer-night[data-layer-name="floor"]) .floor { opacity: 0; }
+.hall:has(.hall-layer-night[data-layer-name="gilt"]) .hall-gilt,
+.hall:has(.hall-layer-night[data-layer-name="shafts"]) .hall-shafts { opacity: 0; }
+.hall:has(.rose-night) .rose-mount::after { opacity: calc(var(--night) * 0.35); }
+.hall-gilt {
+  z-index: 4;
+  opacity: calc(var(--night) * 0.75);
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(ellipse at 14% 60%, rgb(255 214 140 / 0.42), transparent 18%),
+    radial-gradient(ellipse at 86% 60%, rgb(255 214 140 / 0.42), transparent 18%),
+    radial-gradient(ellipse at 50% 22%, rgb(255 206 120 / 0.2), transparent 28%);
+}
+.hall-shafts {
+  z-index: 5;
+  opacity: calc(var(--night) * 0.9);
+  mix-blend-mode: screen;
+  background:
+    linear-gradient(180deg, rgb(255 220 160 / 0.2), transparent 64%) 18% 0 / 8% 72% no-repeat,
+    linear-gradient(180deg, rgb(255 214 140 / 0.34), transparent 74%) 50% 0 / 16% 86% no-repeat,
+    linear-gradient(180deg, rgb(255 220 160 / 0.2), transparent 64%) 82% 0 / 8% 72% no-repeat;
+}
+.hall-dust {
+  z-index: 36;
+  opacity: var(--night);
+  mix-blend-mode: screen;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html.is-night-ready { transition: none; }
   .window-poster,
   .bay,
-  .nave-world { transition: none; }
+  .nave-world,
+  .hall-layer-day,
+  .hall-layer-night,
+  .rose-night { transition: none; }
   .nave-world { transform: none; }
+  .hall-dust { display: none; }
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*) { animation: none; }
