@@ -564,7 +564,7 @@
             line-height: 1.15;
         }
         .frontispiece-kicker {
-            color: #8a5a12;
+            color: #7f1d1d;
             margin: 0;
         }
         .frontispiece-title,
@@ -752,6 +752,9 @@
             content: " · ";
             color: #8a6840;
         }
+        .folio-seeds br + .rubric-seed::before {
+            content: none;
+        }
         #folioRectoSection {
             position: relative;
         }
@@ -777,12 +780,17 @@
             color: #4a3020;
         }
         .folio-kicker .pyro-word.settled,
+        .frontispiece-kicker .pyro-word.settled,
         .folio-notes-label .pyro-word.settled,
         .folio-note strong .pyro-word.settled {
             color: #7f1d1d;
         }
-        .folio-title .pyro-word.settled {
+        .folio-title .pyro-word.settled,
+        .frontispiece-title .pyro-word.settled {
             color: #2a1a10;
+        }
+        .frontispiece-invite .pyro-word.settled {
+            color: #4a3424;
         }
         .folio-body > .pyro-word:first-child {
             font-family: inherit;
@@ -963,7 +971,7 @@
                     <button type="button" class="rubric-seed" onclick="triggerConcordanceSeed('witch')">Witch</button>
                     <button type="button" class="rubric-seed" onclick="triggerConcordanceSeed('ghost')">Ghost</button>
                     <button type="button" class="rubric-seed" onclick="triggerConcordanceSeed('vampire')">Vampire</button>
-                    <button type="button" class="rubric-seed" onclick="triggerConcordanceSeed('curse')">Curse</button>
+                    <button type="button" class="rubric-seed" onclick="triggerConcordanceSeed('curse')">Curse</button><br>
                     <button type="button" class="rubric-seed" onclick="triggerConcordanceSeed('spell')">Spell</button>
                     <button type="button" class="rubric-seed" onclick="triggerConcordanceSeed('charm')">Protection charm</button>
                     <button type="button" class="rubric-seed" onclick="triggerConcordanceSeed('psychic')">Psychic</button>
@@ -1783,10 +1791,11 @@
             canvas.width = 128;
             canvas.height = 128;
             const ctx = canvas.getContext("2d");
-            const grad = ctx.createRadialGradient(64, 64, 6, 64, 64, 64);
-            grad.addColorStop(0, "rgba(18, 10, 6, 0.62)");
-            grad.addColorStop(0.42, "rgba(18, 10, 6, 0.28)");
-            grad.addColorStop(1, "rgba(18, 10, 6, 0)");
+            const grad = ctx.createRadialGradient(64, 64, 4, 64, 64, 64);
+            grad.addColorStop(0, "rgba(42, 24, 12, 0.58)");
+            grad.addColorStop(0.42, "rgba(42, 24, 12, 0.34)");
+            grad.addColorStop(0.78, "rgba(42, 24, 12, 0.16)");
+            grad.addColorStop(1, "rgba(42, 24, 12, 0)");
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, 128, 128);
             return new THREE.CanvasTexture(canvas);
@@ -3853,15 +3862,96 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             armillaryRest.gutter.z = armillaryRest.position.z;
             const rx = Math.max(0.2, (maxX - minX) / 2);
             const ry = Math.max(0.2, (maxY - minY) / 2);
-            armillaryRest.shadowScale = { x: (rx / 1.15) * 1.14, y: (ry / 1.15) * 1.14 };
+            armillaryRest.half = { x: rx, y: ry };
+            // Soft ellipse a little smaller than the cage, so the falloff
+            // reads as a pool and not a second silhouette.
+            armillaryRest.shadowScale = { x: (rx / 1.15) * 1.42, y: (ry / 1.15) * 1.22 };
+            nudgeArmillaryIntoWell();
             layoutArmillaryShadow(armillaryShadow && armillaryShadow.material.opacity > 0.02 ? armillaryShadow.material.opacity : 0);
         }
 
+        const _nudge = new THREE.Vector3();
+        function leafPointToScreen(x, y, z) {
+            _nudge.set(x, y, z);
+            leftLeafMesh.localToWorld(_nudge);
+            _nudge.project(coverCamera);
+            return {
+                x: (_nudge.x * 0.5 + 0.5) * window.innerWidth,
+                y: (-_nudge.y * 0.5 + 0.5) * window.innerHeight
+            };
+        }
+
+        // The tilted cage's silhouette is not centred on its anchor. Shift the
+        // anchor until that silhouette sits in the middle of the well.
+        function nudgeArmillaryIntoWell() {
+            if (!coverCamera || !leftLeafMesh || !armillaryAnchor || !armillaryRest) return;
+            const well = document.getElementById("astrolabe3DViewport");
+            if (!well) return;
+            const wr = well.getBoundingClientRect();
+            if (wr.width < 20 || wr.height < 20) return;
+            // Ring boxes have empty corners that fly toward the camera and
+            // stretch a corner-box far past the metal. The mesh centres sit
+            // on the cage, so their screen box is the one to centre.
+            let minX = Infinity;
+            let maxX = -Infinity;
+            let minY = Infinity;
+            let maxY = -Infinity;
+            let samples = 0;
+            armillaryAnchor.updateWorldMatrix(true, true);
+            armillaryAnchor.traverse((obj) => {
+                if (!obj.isMesh) return;
+                obj.getWorldPosition(_nudge);
+                _nudge.project(coverCamera);
+                if (!isFinite(_nudge.x) || !isFinite(_nudge.y)) return;
+                const sx = (_nudge.x * 0.5 + 0.5) * window.innerWidth;
+                const sy = (-_nudge.y * 0.5 + 0.5) * window.innerHeight;
+                samples += 1;
+                if (sx < minX) minX = sx;
+                if (sx > maxX) maxX = sx;
+                if (sy < minY) minY = sy;
+                if (sy > maxY) maxY = sy;
+            });
+            if (!samples) return;
+            const errX = (wr.left + wr.width / 2) - (minX + maxX) / 2;
+            const errY = (wr.top + wr.height / 2) - (minY + maxY) / 2;
+            if (Math.abs(errX) < 1.5 && Math.abs(errY) < 1.5) return;
+            const p = armillaryAnchor.position;
+            const o = leafPointToScreen(p.x, p.y, p.z);
+            const ax = leafPointToScreen(p.x + 0.12, p.y, p.z);
+            const ay = leafPointToScreen(p.x, p.y + 0.12, p.z);
+            const m00 = (ax.x - o.x) / 0.12;
+            const m01 = (ay.x - o.x) / 0.12;
+            const m10 = (ax.y - o.y) / 0.12;
+            const m11 = (ay.y - o.y) / 0.12;
+            const det = m00 * m11 - m01 * m10;
+            if (Math.abs(det) < 1e-3) return;
+            const gain = 0.65;
+            const du = Math.max(-0.35, Math.min(0.35, gain * (errX * m11 - errY * m01) / det));
+            const dv = Math.max(-0.35, Math.min(0.35, gain * (m00 * errY - m10 * errX) / det));
+            armillaryAnchor.position.x += du;
+            armillaryAnchor.position.y += dv;
+            armillaryRest.position.copy(armillaryAnchor.position);
+        }
+
+        const _shadowRay = new THREE.Vector3();
+        const _shadowQuat = new THREE.Quaternion();
         function layoutArmillaryShadow(opacity) {
-            if (!armillaryShadow || !armillaryRest) return;
+            if (!armillaryShadow || !armillaryRest || !leftLeafMesh) return;
             const base = armillaryRest.shadowScale || { x: 1, y: 1 };
+            const half = armillaryRest.half || { x: 0.45, y: 0.45 };
+            // The lectern lamp throws a short way up and toward the fore-edge.
+            // The step is a fraction of the cage, so the pool stays under it.
+            _shadowRay.set(-4.5, -6.2, -6.5).normalize();
+            leftLeafMesh.getWorldQuaternion(_shadowQuat);
+            _shadowRay.applyQuaternion(_shadowQuat.invert());
+            const plane = Math.hypot(_shadowRay.x, _shadowRay.y) || 1;
+            const step = Math.min(half.x, half.y) * 0.16;
             armillaryShadow.visible = opacity > 0.02;
-            armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y - 0.03, -0.004);
+            armillaryShadow.position.set(
+                armillaryRest.position.x + (_shadowRay.x / plane) * step,
+                armillaryRest.position.y + (_shadowRay.y / plane) * step,
+                -0.006
+            );
             armillaryShadow.scale.set(base.x, base.y, 1);
             armillaryShadow.material.opacity = opacity;
         }
@@ -3885,7 +3975,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             armillaryRings.forEach((ring) => ring.scale.setScalar(1));
             if (solarCoreMesh) solarCoreMesh.scale.setScalar(1);
             seatArmillaryOnPage();
-            layoutArmillaryShadow(0.46);
+            layoutArmillaryShadow(0.72);
             if (armillaryGlow) armillaryGlow.intensity = 0.65;
             if (solarCoreMat) solarCoreMat.emissiveIntensity = 0.75;
         }
@@ -4103,7 +4193,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 armillaryShadow.visible = grounded > 0.02;
                 armillaryShadow.position.set(armillaryRest.position.x, armillaryRest.position.y - 0.03, -0.004);
                 armillaryShadow.scale.set(base.x * spread, base.y * spread, 1);
-                armillaryShadow.material.opacity = grounded * 0.46 * (1 - Math.sin(clamp01(landT) * Math.PI) * 0.22);
+                armillaryShadow.material.opacity = grounded * 0.72 * (1 - Math.sin(clamp01(landT) * Math.PI) * 0.22);
             }
             if (innerBookGlowLight && pulseT > 0) {
                 innerBookGlowLight.intensity = 2.2 + pulseEnv * 4.8;
@@ -4160,6 +4250,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             snapReadCamera();
             inscriptionHeld = false;
             if (typeof prepareFrontispieceWriting === "function") prepareFrontispieceWriting();
+            settleWords(document.querySelectorAll("#leftFolioLeaf .frontispiece .pyro-word"));
             if (typeof releaseInscription === "function") releaseInscription();
         }
 
@@ -4635,7 +4726,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
             // 5 Concentric Gimbaled 3D Metallic Rings
             gimbalRing1 = new THREE.Mesh(new THREE.TorusGeometry(2.45, 0.06, 22, 96), meridianIronMat);
-            gimbalRing1.castShadow = true;
+            gimbalRing1.castShadow = false;
             gimbalRing1.receiveShadow = true;
             armillaryRoot.add(gimbalRing1);
 
@@ -4653,18 +4744,18 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
             gimbalRing2 = new THREE.Mesh(new THREE.TorusGeometry(2.12, 0.075, 20, 96), zodiacBrassMat);
             gimbalRing2.rotation.x = Math.PI / 2.3;
-            gimbalRing2.castShadow = true;
+            gimbalRing2.castShadow = false;
             armillaryRoot.add(gimbalRing2);
 
             gimbalRing3 = new THREE.Mesh(new THREE.TorusGeometry(1.78, 0.048, 18, 84), eclipticBronzeMat);
             gimbalRing3.rotation.x = Math.PI / 3.2;
             gimbalRing3.rotation.y = Math.PI / 5;
-            gimbalRing3.castShadow = true;
+            gimbalRing3.castShadow = false;
             armillaryRoot.add(gimbalRing3);
 
             gimbalRing4 = new THREE.Mesh(new THREE.TorusGeometry(1.42, 0.038, 16, 72), equinoxSteelMat);
             gimbalRing4.rotation.y = Math.PI / 2.5;
-            gimbalRing4.castShadow = true;
+            gimbalRing4.castShadow = false;
             armillaryRoot.add(gimbalRing4);
 
             gimbalRing5 = new THREE.Mesh(new THREE.TorusGeometry(1.02, 0.032, 16, 64), zodiacBrassMat);
@@ -4712,7 +4803,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                         metalness: 0.25
                     })
                 );
-                planetSphere.castShadow = true;
+                planetSphere.castShadow = false;
                 planetSphere.userData = { bookIndex: idx };
                 planetGroup.add(planetSphere);
                 orbitalPlanetNodes.push(planetSphere);
@@ -4731,6 +4822,10 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 spokeMesh.lookAt(0, 0, 0);
                 spokeMesh.rotateX(Math.PI / 2);
                 armillaryRoot.add(spokeMesh);
+            });
+
+            armillaryAnchor.traverse((obj) => {
+                if (obj.isMesh) obj.castShadow = false;
             });
 
             const well = document.getElementById("astrolabe3DViewport");
@@ -4765,7 +4860,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     }
                     if (isBookOpened && armillaryRest) {
                         seatArmillaryOnPage();
-                        layoutArmillaryShadow(0.46);
+                        layoutArmillaryShadow(0.72);
                     }
                 });
             }
@@ -4957,7 +5052,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                 seatArmillaryOnPage();
                 if (isBookOpened) {
                     armillaryAnchor.visible = true;
-                    layoutArmillaryShadow(0.46);
+                    layoutArmillaryShadow(0.72);
                 }
             }
 
@@ -5090,7 +5185,7 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
         function finishInscription() {
             inscribeToken += 1;
-            document.querySelectorAll("#livingManuscriptContainer .pyro-word, #livingManuscriptContainer3d .pyro-word").forEach((el) => {
+            document.querySelectorAll("#livingManuscriptContainer .pyro-word, #livingManuscriptContainer3d .pyro-word, #leftFolioLeaf .frontispiece .pyro-word").forEach((el) => {
                 el.classList.remove("pending", "burning");
                 el.classList.add("settled");
             });
@@ -5546,6 +5641,33 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     armBox.spanY = Math.round((maxLY - minLY) * 1000) / 1000;
                     armBox.depth = Math.round((maxLeafZ - minLeafZ) * 1000) / 1000;
                 }
+                let shadowBox = null;
+                let casters = 0;
+                if (armillaryAnchor) {
+                    armillaryAnchor.traverse((obj) => { if (obj.isMesh && obj.castShadow) casters += 1; });
+                }
+                if (armillaryShadow && armillaryShadow.visible && coverCamera) {
+                    if (!armillaryShadow.geometry.boundingBox) armillaryShadow.geometry.computeBoundingBox();
+                    const box = armillaryShadow.geometry.boundingBox;
+                    const v = new THREE.Vector3();
+                    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+                    for (let xi = 0; xi < 2; xi++) {
+                        for (let yi = 0; yi < 2; yi++) {
+                            for (let zi = 0; zi < 2; zi++) {
+                                v.set(xi ? box.max.x : box.min.x, yi ? box.max.y : box.min.y, zi ? box.max.z : box.min.z);
+                                armillaryShadow.localToWorld(v);
+                                v.project(coverCamera);
+                                const sx = (v.x * 0.5 + 0.5) * window.innerWidth;
+                                const sy = (-v.y * 0.5 + 0.5) * window.innerHeight;
+                                if (sx < minX) minX = sx;
+                                if (sx > maxX) maxX = sx;
+                                if (sy < minY) minY = sy;
+                                if (sy > maxY) maxY = sy;
+                            }
+                        }
+                    }
+                    shadowBox = { minX: Math.round(minX), maxX: Math.round(maxX), minY: Math.round(minY), maxY: Math.round(maxY) };
+                }
                 return {
                     leftErr: domL ? Math.round(err(leafL, domL) * 10) / 10 : null,
                     rightErr: domR ? Math.round(err(leafR, domR) * 10) / 10 : null,
@@ -5557,6 +5679,8 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
                     arm: arm,
                     astro: astro,
                     armBox: armBox,
+                    shadowBox: shadowBox,
+                    casters: casters,
                     sprites: sprites,
                     scaleZ: armillaryRoot ? Math.round(armillaryRoot.scale.z * 1000) / 1000 : null,
                     dust: emberParticles ? { visible: emberParticles.visible, opacity: Math.round(emberParticles.material.opacity * 100) / 100 } : null,
