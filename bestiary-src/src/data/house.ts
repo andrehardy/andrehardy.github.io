@@ -142,6 +142,12 @@ export function idlePosterUrl(slug: string, state: string) {
   return assets.idlePosters[state] ?? null;
 }
 
+export function idleUrl(slug: string, state: string) {
+  const assets = creatures[slug];
+  if (!assets) return null;
+  return assets.idles[state] ?? null;
+}
+
 /** Distance along a wall to the centre of a bay, and the CSS left of its element. */
 export function bayMetrics(depth: number, wall: 'north' | 'south') {
   const per = HALL.centers.length;

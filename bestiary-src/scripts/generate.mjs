@@ -29,6 +29,8 @@ const HALL_MASK = '/magic-registry/bestiary/frames/hall/opening-mask.png';
 const HALL_HOLE = { x: 0.2488, y: 0.1675, w: 0.4989, h: 0.7301 };
 const servedHall = join(repo, 'magic-registry/bestiary/hall');
 const dropHall = join(repo, 'magic-registry/public/bestiary/hall');
+const servedBays = join(repo, 'magic-registry/bestiary/bays');
+const dropBays = join(repo, 'magic-registry/public/bestiary/bays');
 
 async function exists(path) {
   try {
@@ -160,6 +162,19 @@ async function gatherHall() {
   return listFiles(servedHall);
 }
 
+/** Painted full-scene bays. Day and night are separate files. */
+async function gatherBays() {
+  for (const phase of ['day', 'night']) {
+    const from = join(dropBays, phase);
+    const to = join(servedBays, phase);
+    await mkdir(to, { recursive: true });
+    for (const name of await listFiles(from)) {
+      if (!name.endsWith('.webp')) continue;
+      await copyFile(join(from, name), join(to, name));
+    }
+  }
+}
+
 function findNamed(files, names, suffix) {
   for (const name of names) {
     for (const ext of LAYER_EXT) {
@@ -236,6 +251,7 @@ for (const slug of slugs) {
 }
 
 const hallFiles = await gatherHall();
+await gatherBays();
 const layers = Object.fromEntries(HALL_PLATES.map(([key, names]) => [key, resolvePlate(hallFiles, names)]));
 const archDay = layers.arch.day ?? '/magic-registry/bestiary/frames/hall/frame.svg';
 const archNight = layers.arch.night ?? archDay;
