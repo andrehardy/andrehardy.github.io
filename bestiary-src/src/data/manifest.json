@@ -16,19 +16,19 @@
     "layers": {
       "nave": {
         "day": "/magic-registry/bestiary/hall/nave-back.webp",
-        "night": "/magic-registry/bestiary/hall/nave-back.webp"
+        "night": "/magic-registry/bestiary/hall/nave-back-night.webp"
       },
       "wall": {
         "day": "/magic-registry/bestiary/hall/wall-tile.webp",
-        "night": "/magic-registry/bestiary/hall/wall-tile.webp"
+        "night": "/magic-registry/bestiary/hall/wall-tile-night.webp"
       },
       "floor": {
         "day": "/magic-registry/bestiary/hall/floor.webp",
-        "night": "/magic-registry/bestiary/hall/floor.webp"
+        "night": "/magic-registry/bestiary/hall/floor-night.webp"
       },
       "vault": {
         "day": "/magic-registry/bestiary/hall/vault.webp",
-        "night": "/magic-registry/bestiary/hall/vault.webp"
+        "night": "/magic-registry/bestiary/hall/vault-night.webp"
       },
       "arch": {
         "day": "/magic-registry/bestiary/hall/arch-frame-hall.webp",

@@ -15,6 +15,51 @@ export function mountHall(root: HTMLElement) {
   const reduced = reducedMotion();
   const stacked = () => matchMedia(stackedQuery).matches;
   const origin = bayMetrics(0, 'north').along;
+  const glows = new Map(
+    [...root.querySelectorAll<HTMLElement>('[data-glow]')].map((el) => [el.dataset.glow ?? '', el]),
+  );
+  const farMark = root.querySelector<HTMLElement>('[data-floor-far]');
+  const nearMark = root.querySelector<HTMLElement>('[data-floor-near]');
+  let tracking = 0;
+  let trackUntil = 0;
+
+  const placeGlows = () => {
+    if (glows.size === 0 || !farMark || !nearMark) return;
+    const stack = stacked();
+    const rootRect = root.getBoundingClientRect();
+    const farTop = farMark.getBoundingClientRect().top - rootRect.top;
+    const nearTop = nearMark.getBoundingClientRect().top - rootRect.top;
+    const span = nearTop > farTop + 20 ? nearTop - farTop : rootRect.height * 0.2;
+    for (const bay of bays) {
+      const glow = glows.get(bay.dataset.slug ?? '');
+      if (!glow) continue;
+      if (stack || bay.hasAttribute('data-gone')) {
+        glow.style.setProperty('--strength', '0');
+        continue;
+      }
+      const rect = bay.getBoundingClientRect();
+      if (rect.width < 8 || rect.bottom < rootRect.top || rect.top > rootRect.bottom) {
+        glow.style.setProperty('--strength', '0');
+        continue;
+      }
+      const reach = Math.min(1, Math.max(0.16, rect.height / 340));
+      glow.style.left = `${rect.left + rect.width / 2 - rootRect.left}px`;
+      glow.style.top = `${Math.max(0, farTop)}px`;
+      glow.style.width = `${Math.max(26, rect.width * 1.7)}px`;
+      glow.style.height = `${Math.max(16, span * reach)}px`;
+      glow.style.setProperty('--strength', Math.min(1, 0.42 + rect.height / 420).toFixed(3));
+    }
+  };
+
+  const watchGlows = (ms: number) => {
+    trackUntil = Math.max(trackUntil, performance.now() + ms);
+    if (tracking) return;
+    const tick = (now: number) => {
+      placeGlows();
+      tracking = now < trackUntil ? requestAnimationFrame(tick) : 0;
+    };
+    tracking = requestAnimationFrame(tick);
+  };
 
   const layout = () => {
     const stack = stacked();
@@ -36,6 +81,7 @@ export function mountHall(root: HTMLElement) {
       bay.toggleAttribute('data-near', rel < 1.2 && rel > -0.2);
     }
     notifyHall();
+    watchGlows(reduced || stack ? 32 : 780);
   };
 
   const focusBay = (bay: HTMLAnchorElement, smooth: boolean) => {
@@ -78,6 +124,7 @@ export function mountHall(root: HTMLElement) {
     const py = (event.clientY - rect.top) / rect.height - 0.5;
     world.style.setProperty('--px', px.toFixed(3));
     world.style.setProperty('--py', py.toFixed(3));
+    placeGlows();
   };
 
   const onClick = (event: MouseEvent) => {
@@ -122,6 +169,7 @@ export function mountHall(root: HTMLElement) {
   window.addEventListener('pagereveal', reveal);
 
   return () => {
+    if (tracking) cancelAnimationFrame(tracking);
     document.removeEventListener('keydown', onKey);
     root.removeEventListener('pointermove', onPointer);
     media.removeEventListener('change', onMedia);

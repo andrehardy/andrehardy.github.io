@@ -18,16 +18,17 @@ export type Frame = {
   opening?: Opening;
 };
 
-/** World units for the painted nave. Wall length is three tiles; eight windows use the first eight panels. */
+/** World units for the painted nave. Each tile is two bays; four tiles hold the eight windows. */
 export const HALL = {
-  tileW: 1320,
-  wallH: 743,
+  tileW: 1139,
+  wallH: 979,
   span: 1040,
-  winW: 292,
-  winH: 390,
-  tiles: 3,
-  setback: 980,
-  centers: [0.175, 0.5, 0.825] as const,
+  winW: 340,
+  winH: 453,
+  tiles: 4,
+  baysPerTile: 2,
+  winTop: 0.245,
+  centers: [0.25, 0.75] as const,
 };
 
 export type EntityFile = {
@@ -143,12 +144,18 @@ export function idlePosterUrl(slug: string, state: string) {
 
 /** Distance along a wall to the centre of a bay, and the CSS left of its element. */
 export function bayMetrics(depth: number, wall: 'north' | 'south') {
-  const tile = Math.floor(depth / 3);
-  const slot = depth % 3;
+  const per = HALL.centers.length;
+  const tile = Math.floor(depth / per);
+  const slot = depth % per;
   const along = tile * HALL.tileW + HALL.centers[slot] * HALL.tileW;
   const span = HALL.tileW * HALL.tiles;
   const left = wall === 'north' ? along - HALL.winW / 2 : span - along - HALL.winW / 2;
   return { along, left };
+}
+
+/** Pixels from the bottom of a window down the wall to the floor. */
+export function floorDrop() {
+  return Math.round(HALL.wallH * (1 - HALL.winTop) - HALL.winH);
 }
 
 export function openingCaption(creature: Creature) {

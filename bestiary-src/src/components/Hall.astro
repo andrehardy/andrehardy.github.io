@@ -1,10 +1,11 @@
 ---
 import Window from './Window.astro';
-import { HALL, bayMetrics, hallFrame, hallLayers, roster } from '../data/house';
+import { HALL, bayMetrics, floorDrop, hallFrame, hallLayers, posterUrl, roster } from '../data/house';
 
 const creatures = roster();
 const layers = hallLayers();
-const geometry = `--tile:${HALL.tileW}px;--wall-h:${HALL.wallH}px;--span:${HALL.span}px;--win-w:${HALL.winW}px;--win-h:${HALL.winH}px;--setback:${HALL.setback};--nave-img:url("${layers.nave.day ?? ''}")`;
+const geometry = `--tile:${HALL.tileW}px;--wall-h:${HALL.wallH}px;--tiles:${HALL.tiles};--span:${HALL.span}px;--win-w:${HALL.winW}px;--win-h:${HALL.winH}px;--win-top:${(HALL.winTop * 100).toFixed(1)}%;--drop:${floorDrop()}px;--nave-img:url("${layers.nave.day ?? ''}");--nave-img-night:url("${layers.nave.night ?? layers.nave.day ?? ''}")`;
+const tileCount = Array.from({ length: HALL.tiles }, (_, index) => index);
 const walls = ['north', 'south'] as const;
 
 function row(layer: { day: string | null; night: string | null } | undefined) {
@@ -25,7 +26,8 @@ function row(layer: { day: string | null; night: string | null } | undefined) {
               <div class:list={['plate', `plate-${plate.phase}`]} style={`background-image:url("${plate.src}")`} />
             ))
           }
-          <div class="shade"></div>
+          <span class="floor-sentinel" data-floor-far></span>
+          <span class="floor-sentinel" data-floor-near></span>
         </div>
         <div class="plane vault-plane">
           {
@@ -34,7 +36,6 @@ function row(layer: { day: string | null; night: string | null } | undefined) {
             ))
           }
           <div class="vault-falloff"></div>
-          <div class="shade"></div>
         </div>
         {
           walls.map((wall) => (
@@ -42,12 +43,11 @@ function row(layer: { day: string | null; night: string | null } | undefined) {
               <div class="wall-skin">
                 {row(layers.wall).map((plate) => (
                   <div class:list={['tile-row', `tile-row-${plate.phase}`]}>
-                    <img src={plate.src} alt="" draggable="false" />
-                    <img src={plate.src} alt="" draggable="false" />
-                    <img src={plate.src} alt="" draggable="false" />
+                    {tileCount.map(() => (
+                      <img src={plate.src} alt="" draggable="false" />
+                    ))}
                   </div>
                 ))}
-                <div class="shade"></div>
               </div>
               {creatures.map((creature, index) => {
                 if (creature.wall !== wall) return null;
@@ -97,10 +97,19 @@ function row(layer: { day: string | null; night: string | null } | undefined) {
               <img class:list={['rose-img', `plate-${plate.phase}`]} src={plate.src} alt="" draggable="false" />
             ))
           }
-          <div class="shade"></div>
         </div>
       </div>
     </div>
+  </div>
+  <div class="floor-glows" aria-hidden="true">
+    {creatures.map((creature) => {
+      const poster = posterUrl(creature.slug, creature.states[0] ?? '');
+      return (
+        <span class="floor-glow" data-glow={creature.slug} style={`--glow:${creature.frame.glow}`}>
+          {poster ? <i style={`background-image:url("${poster}")`} /> : null}
+        </span>
+      );
+    })}
   </div>
   <div class="hall-copy">
     <p class="edition label">Edition II</p>

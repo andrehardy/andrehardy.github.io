@@ -419,7 +419,7 @@ body:has(.hall) {
 }
 .floor-plane,
 .vault-plane {
-  width: calc(var(--tile) * 3 + 900px);
+  width: calc(var(--tile) * var(--tiles) + 900px);
   height: calc(var(--span) * 2 + 700px);
   left: calc(var(--span) * -1 - 450px);
 }
@@ -444,38 +444,41 @@ body:has(.hall) {
 .plate-day { opacity: calc(1 - var(--night)); }
 .plate-night { opacity: var(--night); }
 .vault-plane .plate {
-  background-size: 560px 560px;
-  filter: sepia(0.62) saturate(1.45) brightness(0.9) hue-rotate(-12deg);
+  background-size: 640px 640px;
+  filter: brightness(0.38) saturate(0.78) contrast(0.9);
 }
 .vault-falloff {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgb(42 24 10 / 0.05), rgb(18 10 4 / 0.55));
+  background:
+    linear-gradient(180deg, rgb(6 5 4 / 0.55), rgb(2 2 3 / 0.9)),
+    radial-gradient(ellipse at 50% 28%, transparent 18%, rgb(0 0 0 / 0.5) 76%);
   pointer-events: none;
 }
-.shade {
+.floor-sentinel {
   position: absolute;
-  inset: 0;
-  background: #10182c;
-  opacity: calc(var(--night) * 0.58);
-  mix-blend-mode: multiply;
+  left: 50%;
+  width: 2px;
+  height: 2px;
   pointer-events: none;
 }
+.floor-sentinel[data-floor-far] { top: 28px; }
+.floor-sentinel[data-floor-near] { top: 520px; }
 .wall {
   left: 0;
   top: 0;
-  width: calc(var(--tile) * 3);
+  width: calc(var(--tile) * var(--tiles));
   height: var(--wall-h);
   margin-top: calc(var(--wall-h) * -0.7);
 }
 .wall-north {
   transform-origin: left center;
-  transform: translate3d(-860px, 0, -40px) rotateY(66deg);
+  transform: translate3d(-860px, 0, -40px) rotateY(80deg);
 }
 .wall-south {
-  margin-left: calc(var(--tile) * -3);
+  margin-left: calc(var(--tile) * var(--tiles) * -1);
   transform-origin: right center;
-  transform: translate3d(860px, 0, -40px) rotateY(-66deg);
+  transform: translate3d(860px, 0, -40px) rotateY(-80deg);
 }
 .wall-skin {
   position: absolute;
@@ -487,7 +490,7 @@ body:has(.hall) {
   position: absolute;
   inset: 0;
   display: flex;
-  width: calc(var(--tile) * 3);
+  width: calc(var(--tile) * var(--tiles));
 }
 .tile-row img {
   width: var(--tile);
@@ -503,29 +506,32 @@ body:has(.hall) {
   height: calc(var(--wall-h) + 420px);
   left: calc(var(--span) * -1 - 80px);
   top: calc(var(--wall-h) * -0.86);
-  transform: translateZ(calc(var(--tile) * -3 + 2px));
+  transform: translateZ(calc(var(--tile) * var(--tiles) * -1 + 2px));
   overflow: hidden;
   background: #1a140f;
 }
 .nave-img {
   position: absolute;
-  inset: -2%;
-  width: 104%;
-  height: 104%;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
   max-width: none;
   object-fit: cover;
-  transform: scale(1.42);
-  transform-origin: center 42%;
+  transform: scale(1.96);
+  transform-origin: center 34%;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 16%, #000 84%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 16%, #000 84%, transparent 100%);
 }
 .rose-img {
   position: absolute;
   left: 50%;
-  top: 27%;
-  width: 27%;
+  top: 30%;
+  width: 30%;
   height: auto;
   max-width: none;
   transform: translate(-50%, -50%);
   pointer-events: none;
+  filter: brightness(calc(1 - var(--night) * 0.55)) saturate(calc(1 - var(--night) * 0.2));
 }
 .hall-copy {
   position: absolute;
@@ -578,10 +584,55 @@ body:has(.hall) {
 }
 .walk-touch { display: none; }
 
+.bay .window-frame {
+  filter: brightness(calc(1 - var(--night) * 0.55)) saturate(calc(1 - var(--night) * 0.2));
+}
+.floor-glows {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+}
+.floor-glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  --strength: 0;
+  transform: translate(-50%, 0);
+  opacity: calc(var(--night) * var(--strength));
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.floor-glow i {
+  position: absolute;
+  inset: -8% -6% auto;
+  height: 92%;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: 100% auto;
+  transform: scaleY(-1);
+  transform-origin: center center;
+  filter: blur(16px) saturate(1.7) brightness(3.4) contrast(1.05);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 0.55) 38%, transparent 82%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 0.55) 38%, transparent 82%);
+}
+.floor-glow::after {
+  content: "";
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  top: 0;
+  height: 78%;
+  background: radial-gradient(ellipse at 50% 0%, var(--glow), transparent 72%);
+  filter: blur(6px);
+}
 .bay {
   position: absolute;
   left: var(--x);
-  top: 18%;
+  top: var(--win-top, 24%);
   width: var(--win-w);
   height: var(--win-h);
   color: #f6f0e4;
@@ -645,7 +696,8 @@ body:has(.hall) {
   .plane,
   .wall-skin,
   .hall-shafts,
-  .hall-dust { display: none; }
+  .hall-dust,
+  .floor-glows { display: none; }
   .hall-copy,
   .hall .bay,
   .hall .bay[data-wall="north"],
@@ -680,6 +732,11 @@ body:has(.hall) {
     background:
       linear-gradient(180deg, rgb(8 6 4 / 0.15), rgb(8 6 4 / 0.78)),
       var(--nave-img) center 34% / cover no-repeat;
+  }
+  html[data-night="on"] .hall-copy {
+    background:
+      linear-gradient(180deg, rgb(6 8 18 / 0.2), rgb(6 8 18 / 0.8)),
+      var(--nave-img-night, var(--nave-img)) center 34% / cover no-repeat;
   }
   .hall-copy .walk {
     position: static;
