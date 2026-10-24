@@ -255,7 +255,7 @@ html[data-night="on"] .night-sun { display: block; }
   z-index: 2;
   pointer-events: none;
   user-select: none;
-  filter: sepia(calc(var(--night) * 0.28)) saturate(calc(1 + var(--night) * 0.4)) brightness(calc(1 + var(--night) * 0.06));
+  filter: brightness(calc(1 - var(--night) * 0.05)) sepia(calc(var(--night) * 0.14));
 }
 .window-spill {
   position: absolute;
@@ -618,12 +618,12 @@ body:has(.hall) {
   position: absolute;
   z-index: 0;
   left: 50%;
-  top: 36%;
-  width: 150%;
-  height: 88%;
-  transform: translate(-50%, -42%);
-  background: radial-gradient(ellipse, color-mix(in srgb, var(--glow) 78%, transparent), transparent 68%);
-  opacity: calc(var(--night) * 0.85);
+  top: 34%;
+  width: 168%;
+  height: 96%;
+  transform: translate(-50%, -40%);
+  background: radial-gradient(ellipse at 50% 42%, var(--glow), transparent 64%);
+  opacity: calc(var(--night) * 0.62);
   mix-blend-mode: screen;
   pointer-events: none;
 }
@@ -794,7 +794,7 @@ html[data-cipher] p.epithet [data-layer="cipher"] { display: inline; }
   .house-tools { flex-wrap: nowrap; margin-left: 0; }
   .house-name { font-size: 0.88rem; }
   .room { grid-template-columns: 1fr; gap: 1.4rem; }
-  .window-col { position: static; }
+  .window-col { position: static; overflow: hidden; }
   .specimen .window { width: min(100%, 26rem); margin-inline: auto; }
   .prose { font-size: 1.15rem; }
   .creature { padding-inline: 1rem; }
