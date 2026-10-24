@@ -378,7 +378,7 @@ body:has(.hall) {
   color: #f3ead7;
 }
 .hall {
-  --persp: 2300px;
+  --persp: 1400px;
   flex: 1;
   min-height: 0;
   position: relative;
@@ -389,14 +389,14 @@ body:has(.hall) {
   position: absolute;
   inset: 0;
   perspective: var(--persp);
-  perspective-origin: 50% 42%;
+  perspective-origin: 50% 40%;
   overflow: hidden;
 }
 .nave-world,
 .nave-dolly {
   position: absolute;
   left: 50%;
-  top: 46%;
+  top: 48%;
   width: 0;
   height: 0;
   transform-style: preserve-3d;
@@ -410,7 +410,7 @@ body:has(.hall) {
   left: 0;
   top: 0;
   --dolly: 0;
-  transform: translateZ(calc(var(--dolly) * 1px));
+  transform: translateZ(calc(var(--dolly) * 1px - 280px));
 }
 .plane,
 .wall {
@@ -445,7 +445,7 @@ body:has(.hall) {
 .plate-night { opacity: var(--night); }
 .vault-plane .plate {
   background-size: 560px 560px;
-  filter: sepia(0.48) saturate(1.32) brightness(0.86) hue-rotate(-8deg);
+  filter: sepia(0.62) saturate(1.45) brightness(0.9) hue-rotate(-12deg);
 }
 .vault-falloff {
   position: absolute;
@@ -470,12 +470,12 @@ body:has(.hall) {
 }
 .wall-north {
   transform-origin: left center;
-  transform: translateX(calc(var(--span) * -1)) rotateY(90deg);
+  transform: translate3d(-860px, 0, -40px) rotateY(66deg);
 }
 .wall-south {
   margin-left: calc(var(--tile) * -3);
   transform-origin: right center;
-  transform: translateX(var(--span)) rotateY(-90deg);
+  transform: translate3d(860px, 0, -40px) rotateY(-66deg);
 }
 .wall-skin {
   position: absolute;
@@ -581,7 +581,7 @@ body:has(.hall) {
 .bay {
   position: absolute;
   left: var(--x);
-  top: 27%;
+  top: 18%;
   width: var(--win-w);
   height: var(--win-h);
   color: #f6f0e4;

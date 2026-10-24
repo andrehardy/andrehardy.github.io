@@ -20,12 +20,13 @@ export type Frame = {
 
 /** World units for the painted nave. Wall length is three tiles; eight windows use the first eight panels. */
 export const HALL = {
-  tileW: 1500,
-  wallH: 844,
-  span: 700,
-  winW: 280,
-  winH: 373,
+  tileW: 1320,
+  wallH: 743,
+  span: 1040,
+  winW: 292,
+  winH: 390,
   tiles: 3,
+  setback: 980,
   centers: [0.175, 0.5, 0.825] as const,
 };
 

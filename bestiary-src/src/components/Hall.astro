@@ -4,7 +4,7 @@ import { HALL, bayMetrics, hallFrame, hallLayers, roster } from '../data/house';
 
 const creatures = roster();
 const layers = hallLayers();
-const geometry = `--tile:${HALL.tileW}px;--wall-h:${HALL.wallH}px;--span:${HALL.span}px;--win-w:${HALL.winW}px;--win-h:${HALL.winH}px;--nave-img:url("${layers.nave.day ?? ''}")`;
+const geometry = `--tile:${HALL.tileW}px;--wall-h:${HALL.wallH}px;--span:${HALL.span}px;--win-w:${HALL.winW}px;--win-h:${HALL.winH}px;--setback:${HALL.setback};--nave-img:url("${layers.nave.day ?? ''}")`;
 const walls = ['north', 'south'] as const;
 
 function row(layer: { day: string | null; night: string | null } | undefined) {
