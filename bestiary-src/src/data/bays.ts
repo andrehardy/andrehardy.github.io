@@ -28,13 +28,15 @@ type RawOpening = {
   depth: number | null;
   polygon: number[][];
   arch?: { sillY?: number };
+  /** Stained glass painted in the foreground. The hole is not an opening. */
+  glazed?: boolean;
 };
 
 type RawBay = {
   width: number;
   height: number;
   openings: RawOpening[];
-  doorway?: { center?: number[] } | null;
+  doorway?: { center?: number[]; innerBbox?: number[] } | null;
 };
 
 export type SceneSlot = {
@@ -49,6 +51,8 @@ export type SceneSlot = {
   poster: string | null;
   idle: string | null;
   glow: string;
+  /** Painted glass in the foreground plate. Do not punch this opening. */
+  glazed: boolean;
   day: BayBox;
   night: BayBox;
 };
@@ -60,6 +64,10 @@ export type SceneBay = {
   nightSrc: string;
   doorDay: [number, number] | null;
   doorNight: [number, number] | null;
+  /** Width of the bright passage, as a fraction of the plate. */
+  doorDayW: number | null;
+  doorNightW: number | null;
+  /** Night tracery overlay. Null when the rose is already painted into the plate. */
   roseNight: BayBox | null;
   slots: SceneSlot[];
 };
@@ -85,22 +93,33 @@ const PORTALS = [
   },
 ];
 
-/** Bounding box plus a clip-path. The clip sits just inside the polygon so paint covers the seam. */
+const PLATE_W = 2048;
+const PLATE_H = 1152;
+/** The keyed hole sits outside the traced polygon. Grow the clip so paint covers the seam. */
+const COVER_PX = 20;
+
+function coveredPolygon(polygon: BayPoint[]): BayPoint[] {
+  const cx = polygon.reduce((sum, point) => sum + point[0], 0) / polygon.length;
+  const cy = polygon.reduce((sum, point) => sum + point[1], 0) / polygon.length;
+  return polygon.map((point) => {
+    const px = (point[0] - cx) * PLATE_W;
+    const py = (point[1] - cy) * PLATE_H;
+    const mag = Math.hypot(px, py) || 1;
+    return [point[0] + (px / mag) * (COVER_PX / PLATE_W), point[1] + (py / mag) * (COVER_PX / PLATE_H)];
+  });
+}
+
+/** Bounding box plus a clip-path. The clip runs under the stone so the page does not show through the key. */
 export function openingFrame(polygon: BayPoint[]): BayBox {
-  const xs = polygon.map((point) => point[0]);
-  const ys = polygon.map((point) => point[1]);
+  const covered = coveredPolygon(polygon);
+  const xs = covered.map((point) => point[0]);
+  const ys = covered.map((point) => point[1]);
   const x = Math.min(...xs);
   const y = Math.min(...ys);
   const w = Math.max(Math.max(...xs) - x, 0.001);
   const h = Math.max(Math.max(...ys) - y, 0.001);
-  const cx = xs.reduce((sum, value) => sum + value, 0) / xs.length;
-  const cy = ys.reduce((sum, value) => sum + value, 0) / ys.length;
-  const clip = polygon
-    .map((point) => {
-      const ix = point[0] + (cx - point[0]) * 0.02;
-      const iy = point[1] + (cy - point[1]) * 0.02;
-      return `${(((ix - x) / w) * 100).toFixed(2)}% ${(((iy - y) / h) * 100).toFixed(2)}%`;
-    })
+  const clip = covered
+    .map((point) => `${(((point[0] - x) / w) * 100).toFixed(2)}% ${(((point[1] - y) / h) * 100).toFixed(2)}%`)
     .join(', ');
   return { x, y, w, h, clip };
 }
@@ -109,6 +128,13 @@ function doorOf(raw: RawBay): [number, number] | null {
   const center = raw.doorway?.center;
   if (!center || center.length < 2) return null;
   return [center[0], center[1]];
+}
+
+function doorWidth(raw: RawBay): number | null {
+  const box = raw.doorway?.innerBbox;
+  if (!box || box.length < 4) return null;
+  const width = box[2] - box[0];
+  return width > 0 ? Math.round(width * 10000) / 10000 : null;
 }
 
 function isPortal(bay: number, opening: RawOpening) {
@@ -143,6 +169,7 @@ export function sceneBays(): SceneBay[] {
           poster: null,
           idle: null,
           glow: '#e2c27a',
+          glazed: Boolean(opening.glazed),
           day: dayBox,
           night: nightBox,
         };
@@ -161,6 +188,7 @@ export function sceneBays(): SceneBay[] {
           poster: null,
           idle: null,
           glow: gate.glow,
+          glazed: false,
           day: dayBox,
           night: nightBox,
         };
@@ -180,6 +208,7 @@ export function sceneBays(): SceneBay[] {
         poster: creature ? posterUrl(creature.slug, state) : null,
         idle: creature ? idleUrl(creature.slug, state) : null,
         glow: found?.frame.glow ?? '#e2c27a',
+        glazed: false,
         day: dayBox,
         night: nightBox,
       };
@@ -192,7 +221,9 @@ export function sceneBays(): SceneBay[] {
       nightSrc: `${BAY_SRC}/night/bay${n}.webp`,
       doorDay: doorOf(day),
       doorNight: doorOf(night),
-      roseNight: rose?.night ?? null,
+      doorDayW: doorWidth(day),
+      doorNightW: doorWidth(night),
+      roseNight: rose && !rose.glazed ? rose.night : null,
       slots,
     };
   });

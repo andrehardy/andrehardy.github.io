@@ -38,12 +38,15 @@ function floorStyle(box: BayBox, glow: string) {
                 class:list={['scene-variant', `variant-${phase}`]}
                 data-door-x={phase === 'day' ? bay.doorDay?.[0] : bay.doorNight?.[0]}
                 data-door-y={phase === 'day' ? bay.doorDay?.[1] : bay.doorNight?.[1]}
+                data-door-w={phase === 'day' ? bay.doorDayW : bay.doorNightW}
               >
                 <div class="scene-media">
                   {bay.slots.map((slot) => {
                     const box = phase === 'day' ? slot.day : slot.night;
                     const href = slot.href ? `${base}${slot.href}` : null;
                     if (slot.kind === 'rose') {
+                      // Glazed roses are stained glass in the foreground plate.
+                      if (slot.glazed) return null;
                       return (
                         <div class="scene-aperture" data-side="center" data-for={slot.id} style={`--glow:${slot.glow};${boxStyle(box)}`}>
                           <div class="scene-window scene-rose" role="img" aria-label="Rose window" style={`clip-path:polygon(${box.clip})`}>
@@ -87,6 +90,7 @@ function floorStyle(box: BayBox, glow: string) {
                   {bay.slots.map((slot) => {
                     const box = phase === 'day' ? slot.day : slot.night;
                     if (slot.kind === 'rose') {
+                      if (slot.glazed) return null;
                       return (
                         <span class="scene-halo is-rose" data-for={slot.id} style={`--glow:${slot.glow};${boxStyle(box)}`} />
                       );
