@@ -107,7 +107,15 @@ export function mountHall(root: HTMLElement) {
     const x = Number(variant?.dataset.doorX);
     const y = Number(variant?.dataset.doorY);
     if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
-    return { x, y };
+    const w = Number(variant?.dataset.doorW);
+    return { x, y, w: Number.isFinite(w) && w > 0 ? w : 0.0488 };
+  };
+
+  /** Zoom until the bright passage is about as wide as bay 1's door at scale 2.55. */
+  const doorScale = (door: { w: number } | null, reverse = false) => {
+    const width = door?.w ?? 0.0488;
+    const scale = Math.min(4.8, Math.max(2.2, (0.0488 * 2.55) / width));
+    return reverse ? scale * (2.45 / 2.55) : scale;
   };
 
   const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -149,11 +157,13 @@ export function mountHall(root: HTMLElement) {
         el.style.transform = end.transform;
       };
       if (dir > 0) {
-        cue(from, { opacity: '1', transform: 'scale(1)', origin }, { opacity: '0', transform: 'scale(2.55)' }, ms);
+        const scale = doorScale(door).toFixed(3);
+        cue(from, { opacity: '1', transform: 'scale(1)', origin }, { opacity: '0', transform: `scale(${scale})` }, ms);
         cue(to, { opacity: '0', transform: 'scale(1.14)', origin: '50% 54%' }, { opacity: '1', transform: 'scale(1)' }, Math.round(ms * 0.78));
       } else {
+        const scale = doorScale(door, true).toFixed(3);
         cue(from, { opacity: '1', transform: 'scale(1)', origin: '50% 50%' }, { opacity: '0', transform: 'scale(0.9)' }, Math.round(ms * 0.75));
-        cue(to, { opacity: '0', transform: 'scale(2.45)', origin }, { opacity: '1', transform: 'scale(1)' }, ms);
+        cue(to, { opacity: '0', transform: `scale(${scale})`, origin }, { opacity: '1', transform: 'scale(1)' }, ms);
       }
       await wait(ms + 40);
     }

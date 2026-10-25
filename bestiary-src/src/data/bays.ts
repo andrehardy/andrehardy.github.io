@@ -28,13 +28,15 @@ type RawOpening = {
   depth: number | null;
   polygon: number[][];
   arch?: { sillY?: number };
+  /** Stained glass painted in the foreground. The hole is not an opening. */
+  glazed?: boolean;
 };
 
 type RawBay = {
   width: number;
   height: number;
   openings: RawOpening[];
-  doorway?: { center?: number[] } | null;
+  doorway?: { center?: number[]; innerBbox?: number[] } | null;
 };
 
 export type SceneSlot = {
@@ -49,6 +51,8 @@ export type SceneSlot = {
   poster: string | null;
   idle: string | null;
   glow: string;
+  /** Painted glass in the foreground plate. Do not punch this opening. */
+  glazed: boolean;
   day: BayBox;
   night: BayBox;
 };
@@ -60,6 +64,10 @@ export type SceneBay = {
   nightSrc: string;
   doorDay: [number, number] | null;
   doorNight: [number, number] | null;
+  /** Width of the bright passage, as a fraction of the plate. */
+  doorDayW: number | null;
+  doorNightW: number | null;
+  /** Night tracery overlay. Null when the rose is already painted into the plate. */
   roseNight: BayBox | null;
   slots: SceneSlot[];
 };
@@ -111,6 +119,13 @@ function doorOf(raw: RawBay): [number, number] | null {
   return [center[0], center[1]];
 }
 
+function doorWidth(raw: RawBay): number | null {
+  const box = raw.doorway?.innerBbox;
+  if (!box || box.length < 4) return null;
+  const width = box[2] - box[0];
+  return width > 0 ? Math.round(width * 10000) / 10000 : null;
+}
+
 function isPortal(bay: number, opening: RawOpening) {
   return bay === 3 && opening.kind === 'window' && opening.depth === 2;
 }
@@ -143,6 +158,7 @@ export function sceneBays(): SceneBay[] {
           poster: null,
           idle: null,
           glow: '#e2c27a',
+          glazed: Boolean(opening.glazed),
           day: dayBox,
           night: nightBox,
         };
@@ -161,6 +177,7 @@ export function sceneBays(): SceneBay[] {
           poster: null,
           idle: null,
           glow: gate.glow,
+          glazed: false,
           day: dayBox,
           night: nightBox,
         };
@@ -180,6 +197,7 @@ export function sceneBays(): SceneBay[] {
         poster: creature ? posterUrl(creature.slug, state) : null,
         idle: creature ? idleUrl(creature.slug, state) : null,
         glow: found?.frame.glow ?? '#e2c27a',
+        glazed: false,
         day: dayBox,
         night: nightBox,
       };
@@ -192,7 +210,9 @@ export function sceneBays(): SceneBay[] {
       nightSrc: `${BAY_SRC}/night/bay${n}.webp`,
       doorDay: doorOf(day),
       doorNight: doorOf(night),
-      roseNight: rose?.night ?? null,
+      doorDayW: doorWidth(day),
+      doorNightW: doorWidth(night),
+      roseNight: rose && !rose.glazed ? rose.night : null,
       slots,
     };
   });
