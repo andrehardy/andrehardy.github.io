@@ -93,22 +93,33 @@ const PORTALS = [
   },
 ];
 
-/** Bounding box plus a clip-path. The clip sits just inside the polygon so paint covers the seam. */
+const PLATE_W = 2048;
+const PLATE_H = 1152;
+/** The keyed hole sits outside the traced polygon. Grow the clip so paint covers the seam. */
+const COVER_PX = 20;
+
+function coveredPolygon(polygon: BayPoint[]): BayPoint[] {
+  const cx = polygon.reduce((sum, point) => sum + point[0], 0) / polygon.length;
+  const cy = polygon.reduce((sum, point) => sum + point[1], 0) / polygon.length;
+  return polygon.map((point) => {
+    const px = (point[0] - cx) * PLATE_W;
+    const py = (point[1] - cy) * PLATE_H;
+    const mag = Math.hypot(px, py) || 1;
+    return [point[0] + (px / mag) * (COVER_PX / PLATE_W), point[1] + (py / mag) * (COVER_PX / PLATE_H)];
+  });
+}
+
+/** Bounding box plus a clip-path. The clip runs under the stone so the page does not show through the key. */
 export function openingFrame(polygon: BayPoint[]): BayBox {
-  const xs = polygon.map((point) => point[0]);
-  const ys = polygon.map((point) => point[1]);
+  const covered = coveredPolygon(polygon);
+  const xs = covered.map((point) => point[0]);
+  const ys = covered.map((point) => point[1]);
   const x = Math.min(...xs);
   const y = Math.min(...ys);
   const w = Math.max(Math.max(...xs) - x, 0.001);
   const h = Math.max(Math.max(...ys) - y, 0.001);
-  const cx = xs.reduce((sum, value) => sum + value, 0) / xs.length;
-  const cy = ys.reduce((sum, value) => sum + value, 0) / ys.length;
-  const clip = polygon
-    .map((point) => {
-      const ix = point[0] + (cx - point[0]) * 0.02;
-      const iy = point[1] + (cy - point[1]) * 0.02;
-      return `${(((ix - x) / w) * 100).toFixed(2)}% ${(((iy - y) / h) * 100).toFixed(2)}%`;
-    })
+  const clip = covered
+    .map((point) => `${(((point[0] - x) / w) * 100).toFixed(2)}% ${(((point[1] - y) / h) * 100).toFixed(2)}%`)
     .join(', ');
   return { x, y, w, h, clip };
 }
