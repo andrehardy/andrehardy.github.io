@@ -893,8 +893,9 @@
                 <span class="px-2.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/35 font-semibold tracking-wider">
                     CODEX MAGNUS // THE MAGIC CODEX
                 </span>
+                <span class="text-amber-200/80 italic" style="font-family: 'Cormorant Garamond', serif;">The book</span>
                 <span class="text-slate-400 hidden md:inline">
-                    3D Leather, Cedar & Forged Iron Master Tome • Orbital Armillary Astrolabe
+                    3D Leather, Cedar & Forged Iron Master Tome
                 </span>
             </div>
 
@@ -1135,8 +1136,8 @@
                 fullTitle: "Book VI: The Mappa Mundi of Thin Places & Sanctuaries",
                 latinSubtitle: "Cosmographia Locorum Sacrorum",
                 catalogueCode: "HEX-TOM-06 // SANCTUARIES",
-                status: "IN CODIFICATION",
-                liveUrl: null,
+                status: "SEED",
+                liveUrl: "../ChronoMythos/cosmographia/",
                 accentHex: "#f97316",
                 icon: "ph-globe-hemisphere-east",
                 epochTie: "Sunken Doggerland to the Golden Lane of Prague",
@@ -5091,7 +5092,12 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
 
             const footer = folioFooter();
             if (!footer) return;
-            if (book.liveUrl) {
+            if (book.id === "cosmographia" && book.liveUrl) {
+                footer.innerHTML = `
+                    <span>The seed is open. The gazetteer is still being written.</span>
+                    <a href="${book.liveUrl}">Enter the Cosmographia</a>
+                `;
+            } else if (book.liveUrl) {
                 footer.innerHTML = `
                     <span>This volume is open.</span>
                     <a href="${book.liveUrl}">Enter ${esc(book.shortTitle)}</a>

@@ -80,8 +80,12 @@
                 <a href="../magic-codex/" class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 font-semibold hover:bg-amber-500/25 transition" title="Return to the cover of The Magic Codex">
                     MAGIC CODEX LIBER III // CHRONOMYTHOS-01
                 </a>
+                <span class="text-amber-200/80 italic" style="font-family: 'Cormorant Garamond', serif; letter-spacing: 0.01em;">The chronicon</span>
                 <a href="./lineage/" class="text-slate-300 hover:text-amber-400 transition" title="Part II of this ledger: the family tree">
                     Part II · The Lineage
+                </a>
+                <a href="./cosmographia/" class="text-slate-300 hover:text-amber-400 transition" title="Liber VI, the seed of the gazetteer">
+                    Liber VI · Cosmographia
                 </a>
                 <button id="sanctuarySightBtn" type="button" aria-pressed="false" class="text-slate-300 hover:text-amber-400 flex items-center gap-1.5 transition" title="Draw the page back and leave the realm of the age in view">
                     <i class="ph-fill ph-eye text-amber-400" aria-hidden="true"></i>
@@ -124,7 +128,7 @@
                         </span>
                     </div>
                     <p class="text-slate-400 hidden sm:block font-editorial italic text-sm">
-                        A tactile ledger of world history, mythic transitions, and living era magic (20,000 BCE – 1600 CE)
+                        The ledger of ages. One leaf for each age, and the realm behind it.
                     </p>
                 </div>
             </div>
@@ -199,7 +203,16 @@
         </div>
     </div>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+    <div id="chronicon" class="chronicon">
+        <aside class="chronicon-gutter" aria-hidden="true">
+            <div class="age-glass" id="ageGlass">
+                <div class="bulb bulb-top"><span class="sand"></span></div>
+                <span class="neck"></span>
+                <div class="bulb bulb-bottom"><span class="sand"></span></div>
+            </div>
+        </aside>
+        <div id="chroniconLeaf" class="chronicon-leaf">
+    <main class="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6 space-y-8">
 
         <!-- The age itself -->
         <section id="eraHeroBanner" class="glass-panel relative rounded-2xl overflow-hidden p-6 sm:p-8 shadow-2xl">
@@ -450,6 +463,8 @@
             </div>
         </section>
     </main>
+        </div>
+    </div>
 
     <!-- A tale, opened -->
     <div id="mediaDetailModal" role="dialog" aria-modal="true" aria-labelledby="modalMediaTitle" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -4363,13 +4378,32 @@
             }).join("");
         }
 
+        function measureAge() {
+            const era = TIMELINE_DATA[currentEraIndex];
+            const count = era && era.centuries ? era.centuries.length : 1;
+            const sand = count <= 1 ? 1 : currentCenturyIndex / (count - 1);
+            const glass = document.getElementById("ageGlass");
+            if (glass) glass.style.setProperty("--age-sand", String(sand));
+        }
+
+        function turnChroniconLeaf(direction) {
+            const leaf = document.getElementById("chroniconLeaf");
+            if (!leaf || !direction) return;
+            if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+            leaf.classList.remove("turn-next", "turn-prev");
+            void leaf.offsetWidth;
+            leaf.classList.add(direction > 0 ? "turn-next" : "turn-prev");
+        }
+
         function selectEra(index) {
             const direction = Math.sign(index - currentEraIndex);
             currentEraIndex = index;
             currentCenturyIndex = 0;
             currentNodeIndex = 0;
+            turnChroniconLeaf(direction);
             renderEraRibbon();
             renderAllForCurrentEra(direction);
+            measureAge();
             triggerEraMagicInvocation(canvasW * 0.5, canvasH * 0.32, true);
             if (direction === 0) return;
             const $ = (id) => document.getElementById(id);
@@ -4482,6 +4516,7 @@
             document.getElementById("mediaSectionEraName").textContent = era.name;
             renderMediaVault(direction);
             stirEraMagic();
+            measureAge();
         }
 
         function renderTemporalDrillDown() {
@@ -4570,6 +4605,7 @@
             const anchor = origin && origin.getBoundingClientRect ? origin.getBoundingClientRect() : null;
             currentCenturyIndex = idx;
             currentNodeIndex = 0;
+            measureAge();
             renderTemporalDrillDown();
             turn(document.getElementById("yearNodesList").children, direction, 0, 0.05);
             turn([document.getElementById("yearDetailInspector")], direction, 0.1);
