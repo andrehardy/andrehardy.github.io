@@ -26,7 +26,9 @@
       background:
         radial-gradient(ellipse 60% 40% at 50% 18%, rgba(231, 197, 106, 0.14), transparent 70%),
         var(--iron);
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Ccircle cx='14' cy='14' r='11' fill='none' stroke='%23e7c56a' stroke-width='1.4'/%3E%3Cpath stroke='%23e7c56a' stroke-width='1.2' d='M14 3v4M14 21v4M3 14h4M21 14h4'/%3E%3Ccircle cx='14' cy='14' r='2' fill='%23e7c56a'/%3E%3C/svg%3E") 14 14, crosshair;
     }
+    a, button, input { cursor: pointer; }
     a { color: inherit; }
     .bar {
       display: flex;
@@ -36,6 +38,7 @@
       gap: 0.75rem 1.25rem;
       padding: 0.85rem 1.25rem;
       border-bottom: 1px solid rgba(231, 197, 106, 0.28);
+      z-index: 3;
     }
     .mark { text-decoration: none; display: grid; }
     .mark strong {
@@ -54,49 +57,95 @@
       min-height: 0;
     }
     canvas { width: 100%; height: 100%; display: block; touch-action: none; }
-    .ages {
-      position: absolute;
-      left: 50%;
-      bottom: 1.25rem;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 0.4rem;
-      z-index: 2;
-    }
-    .ages button {
-      font-family: Cinzel, serif;
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
-      color: var(--ink-soft);
-      background: rgba(20, 17, 13, 0.72);
-      border: 1px solid rgba(231, 197, 106, 0.28);
-      padding: 0.45rem 0.7rem;
-      cursor: pointer;
-    }
-    .ages button[aria-pressed="true"] {
-      color: #1a140c;
-      background: var(--amber);
-      border-color: var(--amber);
-    }
     .plaque {
       position: absolute;
       left: 1rem;
       top: 1rem;
-      width: min(22rem, calc(100% - 2rem));
+      width: min(26rem, calc(100% - 2rem));
       z-index: 2;
       pointer-events: none;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.75);
     }
     .plaque h1 {
       font-family: Cinzel, serif;
       font-weight: 400;
-      font-size: 1.35rem;
-      margin: 0 0 0.2rem;
+      font-size: 1.25rem;
+      margin: 0 0 0.25rem;
     }
-    .plaque p { margin: 0.15rem 0; color: var(--ink-soft); font-size: 1.15rem; }
+    .plaque p { margin: 0.12rem 0; color: var(--ink-soft); font-size: 1.12rem; }
     .plaque .where { color: var(--ink); }
+    .plaque .meta { font-size: 0.95rem; opacity: 0.85; }
+    .dock {
+      position: absolute;
+      left: 50%;
+      bottom: 1rem;
+      transform: translateX(-50%);
+      width: min(42rem, calc(100% - 1.5rem));
+      z-index: 2;
+      display: grid;
+      gap: 0.55rem;
+      padding: 0.7rem 0.85rem 0.8rem;
+      background: rgba(20, 17, 13, 0.82);
+      border: 1px solid rgba(231, 197, 106, 0.28);
+      backdrop-filter: blur(6px);
+    }
+    .dock-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.4rem 1rem;
+    }
+    .dock-top strong {
+      font-family: Cinzel, serif;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      font-size: 0.72rem;
+      color: var(--amber);
+    }
+    .dock-top span { color: var(--ink-soft); font-size: 1.05rem; }
+    .ages {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+    .ages button, .play {
+      font-family: Cinzel, serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: var(--ink-soft);
+      background: transparent;
+      border: 1px solid rgba(231, 197, 106, 0.28);
+      padding: 0.35rem 0.55rem;
+    }
+    .ages button[aria-pressed="true"], .play[aria-pressed="true"] {
+      color: #1a140c;
+      background: var(--amber);
+      border-color: var(--amber);
+    }
+    .scrub {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.55rem;
+      align-items: center;
+    }
+    .scrub input[type="range"] {
+      width: 100%;
+      accent-color: var(--amber);
+    }
+    .scrub-index {
+      font-family: Cinzel, serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: var(--amber);
+      white-space: nowrap;
+    }
     @media (max-width: 640px) {
-      .plaque h1 { font-size: 1.05rem; }
-      .ages { width: calc(100% - 1rem); justify-content: center; flex-wrap: wrap; }
+      .plaque h1 { font-size: 1.02rem; }
+      .dock { bottom: 0.5rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .play { display: none; }
     }
   </style>
 </head>
@@ -117,72 +166,99 @@
     <canvas id="globe" aria-label="The Cosmographia, a globe of the ages"></canvas>
     <div class="plaque" id="plaque">
       <h1 id="placeTitle">The known world</h1>
-      <p id="placeWhere">Turn the globe. Choose an age. The shores of that age are the ones the stories touch.</p>
+      <p class="where" id="placeWhere">Turn the globe. Scrub the ages. The shores that burn are the ones the stories touch.</p>
       <p id="placeYear"></p>
+      <p class="meta" id="placeMeta"></p>
     </div>
-    <div class="ages" role="group" aria-label="Ages of the Cosmographia">
-      <button type="button" data-act="ACT_I" aria-pressed="true">Act I</button>
-      <button type="button" data-act="ACT_II" aria-pressed="false">Act II</button>
-      <button type="button" data-act="ACT_III" aria-pressed="false">Act III</button>
-      <button type="button" data-act="ACT_IV" aria-pressed="false">Act IV</button>
+    <div class="dock">
+      <div class="dock-top">
+        <strong id="epochTitle">All ages</strong>
+        <span id="yearLabel">Mythic Egypt</span>
+        <div class="ages" role="group" aria-label="Filter by act">
+          <button type="button" data-act="ALL" aria-pressed="true">All</button>
+          <button type="button" data-act="ACT_I" aria-pressed="false">Act I</button>
+          <button type="button" data-act="ACT_II" aria-pressed="false">Act II</button>
+          <button type="button" data-act="ACT_III" aria-pressed="false">Act III</button>
+          <button type="button" data-act="ACT_IV" aria-pressed="false">Act IV</button>
+          <button type="button" class="play" id="play" aria-pressed="false">Play</button>
+        </div>
+      </div>
+      <div class="scrub">
+        <button type="button" class="play" id="prev" aria-label="Previous entry">‹</button>
+        <input id="scrubber" type="range" min="0" max="85" value="0" aria-label="Chronology scrubber">
+        <button type="button" class="play" id="next" aria-label="Next entry">›</button>
+      </div>
+      <div class="scrub-index" id="scrubIndex">1 / 86</div>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
   <script>
-    const ACTS = {
-      ACT_I: "Egypt, Olympus, and Rome",
-      ACT_II: "The dark ages and the north",
-      ACT_III: "Renaissance, Tudors, and witch trials",
-      ACT_IV: "Enlightenment, gothic, and the modern night"
-    };
-    const LAND = [
-      [[-9,36],[-8,43],[-5,48],[-2,51],[2,51],[8,54],[12,55],[18,60],[24,66],[30,70],[40,68],[48,60],[60,55],[80,55],[100,50],[120,55],[140,60],[160,62],[180,66],[180,70],[140,72],[100,75],[40,72],[10,62],[-5,58],[-8,51],[-10,44],[-9,36]],
-      [[-10,36],[-8,32],[0,32],[10,32],[20,32],[32,31],[35,22],[42,12],[40,0],[30,-10],[20,-20],[15,-30],[18,-35],[25,-34],[32,-28],[35,-20],[40,-15],[43,-12],[40,0],[32,10],[20,15],[10,5],[0,5],[-5,15],[-15,20],[-17,15],[-16,12],[-10,5],[-15,10],[-17,21],[-10,30],[-10,36]],
-      [[30,32],[35,28],[45,25],[55,27],[65,25],[75,22],[80,10],[90,22],[100,15],[105,0],[110,-8],[120,-8],[130,-5],[140,-15],[150,-20],[145,-35],[140,-38],[115,-35],[110,-25],[100,-5],[95,15],[80,8],[70,22],[50,12],[42,15],[35,30],[30,32]],
-      [[-168,66],[-140,70],[-100,73],[-80,70],[-60,60],[-55,52],[-70,48],[-90,48],[-125,48],[-125,40],[-115,32],[-105,22],[-90,16],[-80,8],[-90,15],[-105,22],[-110,30],[-125,40],[-130,50],[-150,60],[-165,60],[-168,66]],
-      [[-80,10],[-70,12],[-60,8],[-50,0],[-35,-5],[-40,-15],[-50,-22],[-60,-30],[-70,-40],[-75,-50],[-70,-55],[-65,-50],[-70,-40],[-75,-20],[-80,-5],[-78,5],[-80,10]],
-      [[112,-12],[125,-14],[140,-12],[150,-18],[153,-28],[145,-38],[130,-35],[115,-34],[114,-25],[112,-12]]
-    ];
-
-    const data = window.COSMOGRAPHIA || { places: [], shores: [] };
+    const data = window.COSMOGRAPHIA || { places: [], shores: [], regions: [], seas: [], cities: [], chains: {} };
     const sites = window.COSMOGRAPHIA_SITES || [];
+    const placesChrono = [...(data.places || [])].sort((a, b) => a.year - b.year || a.id - b.id);
     const canvas = document.getElementById("globe");
     const ctx = canvas.getContext("2d");
-    let act = "ACT_I";
-    let yaw = 18;
-    let tilt = 0.35;
+    const scrubber = document.getElementById("scrubber");
+    const playBtn = document.getElementById("play");
+
+    let act = "ALL";
+    let index = 0;
+    let yaw = 20;
+    let pitch = -12;
     let dragging = false;
     let downX = 0;
     let downY = 0;
     let lastX = 0;
     let lastY = 0;
-    let selected = null;
+    let landFeatures = [];
+    let playing = false;
+    let playTimer = 0;
+    let landReady = false;
 
-    function spanOf(id) {
-      const years = data.places.filter((p) => p.act === id).map((p) => p.year);
-      if (!years.length) return { min: 0, max: 0 };
-      return { min: Math.min(...years), max: Math.max(...years) };
+    scrubber.max = Math.max(0, placesChrono.length - 1);
+
+    function filtered() {
+      if (act === "ALL") return placesChrono;
+      return placesChrono.filter((p) => p.act === act);
+    }
+
+    function activePlace() {
+      const list = filtered();
+      if (!list.length) return null;
+      index = Math.max(0, Math.min(index, list.length - 1));
+      return list[index];
+    }
+
+    function yearOf() {
+      return activePlace()?.year ?? -3100;
+    }
+
+    function formatYear(y) {
+      if (y == null) return "";
+      return y < 0 ? `${Math.abs(y)} BCE` : `${y} CE`;
     }
 
     function project(lat, lng, radius, cx, cy) {
-      const la = lat * Math.PI / 180;
-      const lo = (lng - yaw) * Math.PI / 180;
-      let x = Math.cos(la) * Math.sin(lo);
-      let y = Math.sin(la);
-      let z = Math.cos(la) * Math.cos(lo);
-      const c = Math.cos(tilt);
-      const s = Math.sin(tilt);
+      const λ = (lng - yaw) * Math.PI / 180;
+      const φ = lat * Math.PI / 180;
+      const x = Math.cos(φ) * Math.sin(λ);
+      const y = Math.sin(φ);
+      const z = Math.cos(φ) * Math.cos(λ);
+      const pr = pitch * Math.PI / 180;
+      const c = Math.cos(pr);
+      const s = Math.sin(pr);
       const y2 = y * c - z * s;
       const z2 = y * s + z * c;
-      return { x: cx + x * radius, y: cy - y2 * radius, z: z2, front: z2 > 0.02 };
+      return { x: cx + x * radius, y: cy - y2 * radius, z: z2, front: z2 > -0.02 };
     }
 
-    function ringPath(ring, radius, cx, cy) {
-      const pts = ring.map(([lng, lat]) => project(lat, lng, radius, cx, cy));
-      if (!pts.some((p) => p.front)) return null;
-      return pts;
+    function pathRing(ring, radius, cx, cy) {
+      return ring.map(([lng, lat]) => project(lat, lng, radius, cx, cy));
     }
 
-    function strokeRing(pts, style) {
+    function fillPoly(pts, fill) {
+      if (!pts.length || !pts.some((p) => p.front)) return;
       ctx.beginPath();
       let open = false;
       for (const p of pts) {
@@ -190,20 +266,55 @@
         if (!open) { ctx.moveTo(p.x, p.y); open = true; }
         else ctx.lineTo(p.x, p.y);
       }
-      ctx.strokeStyle = style;
+      ctx.fillStyle = fill;
+      ctx.fill();
+    }
+
+    function strokePoly(pts, stroke, width) {
+      if (!pts.length) return;
+      ctx.beginPath();
+      let open = false;
+      for (const p of pts) {
+        if (!p.front) { open = false; continue; }
+        if (!open) { ctx.moveTo(p.x, p.y); open = true; }
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = width;
       ctx.stroke();
     }
 
-    function fillRing(pts, style) {
-      ctx.beginPath();
-      let started = false;
-      for (const p of pts) {
-        if (!started) { ctx.moveTo(p.x, p.y); started = true; }
-        else ctx.lineTo(p.x, p.y);
+    function drawFeature(feature, radius, cx, cy, fill, stroke, width) {
+      const geom = feature.type === "Feature" ? feature.geometry : feature;
+      if (!geom) return;
+      const polys = geom.type === "Polygon" ? [geom.coordinates]
+        : geom.type === "MultiPolygon" ? geom.coordinates : [];
+      for (const poly of polys) {
+        const outer = pathRing(poly[0], radius, cx, cy);
+        fillPoly(outer, fill);
+        if (stroke) strokePoly(outer, stroke, width || 1);
       }
-      ctx.closePath();
+    }
+
+    function liveShores(year) {
+      return (data.shores || []).filter((s) => year >= s.start && year <= s.end);
+    }
+
+    function regionName(reg, year) {
+      const eras = reg.eras || [];
+      for (const era of eras) {
+        if (year <= era.maxYear) return era.name;
+      }
+      return reg.modern || reg.id;
+    }
+
+    function labelAt(lat, lng, radius, cx, cy, text, style) {
+      const p = project(lat, lng, radius, cx, cy);
+      if (!p.front) return;
       ctx.fillStyle = style;
-      ctx.fill();
+      ctx.font = "600 11px Cinzel, serif";
+      ctx.textAlign = "center";
+      ctx.fillText(text, p.x, p.y);
     }
 
     function resize() {
@@ -219,49 +330,116 @@
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       ctx.clearRect(0, 0, w, h);
-      const radius = Math.min(w, h) * 0.36;
-      const cx = w * 0.56;
-      const cy = h * 0.46;
-      const grd = ctx.createRadialGradient(cx - radius * 0.35, cy - radius * 0.4, radius * 0.1, cx, cy, radius);
-      grd.addColorStop(0, "#3a3428");
-      grd.addColorStop(1, "#100e0c");
+      const radius = Math.min(w, h) * 0.38;
+      const cx = w * 0.55;
+      const cy = h * 0.44;
+      const place = activePlace();
+      const year = yearOf();
+
+      const ocean = ctx.createRadialGradient(cx - radius * 0.3, cy - radius * 0.35, radius * 0.05, cx, cy, radius);
+      ocean.addColorStop(0, "#2a3a48");
+      ocean.addColorStop(0.55, "#152028");
+      ocean.addColorStop(1, "#0a0c10");
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.fillStyle = grd;
+      ctx.fillStyle = ocean;
       ctx.fill();
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "rgba(231,197,106,0.35)";
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = "rgba(231,197,106,0.4)";
       ctx.stroke();
 
       ctx.save();
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
       ctx.clip();
-      for (const land of LAND) {
-        const pts = ringPath(land, radius, cx, cy);
-        if (pts) fillRing(pts, "rgba(88, 78, 62, 0.55)");
-      }
-      const span = spanOf(act);
-      for (const shore of data.shores) {
-        const live = shore.end >= span.min && shore.start <= span.max;
-        if (!live) continue;
-        const pts = ringPath(shore.ring, radius, cx, cy);
-        if (!pts) continue;
-        fillRing(pts, "rgba(231,197,106,0.16)");
-        ctx.lineWidth = 1.4;
-        strokeRing(pts, "rgba(231,197,106,0.85)");
-      }
-      ctx.restore();
 
-      const marks = data.places.filter((p) => p.act === act);
-      for (const place of marks) {
-        const p = project(place.lat, place.lng, radius, cx, cy);
+      if (landFeatures.length) {
+        for (const f of landFeatures) {
+          drawFeature(f, radius, cx, cy, "rgba(92, 82, 64, 0.92)", "rgba(20,17,13,0.35)", 0.6);
+        }
+      } else {
+        // Fallback crude continents while land loads
+        const FALLBACK = [
+          [[-9,36],[-8,43],[-5,48],[-2,51],[2,51],[8,54],[12,55],[18,60],[24,66],[30,70],[40,68],[48,60],[60,55],[80,55],[100,50],[120,55],[140,60],[160,62],[180,66],[180,70],[140,72],[100,75],[40,72],[10,62],[-5,58],[-8,51],[-10,44],[-9,36]],
+          [[-10,36],[-8,32],[0,32],[10,32],[20,32],[32,31],[35,22],[42,12],[40,0],[30,-10],[20,-20],[15,-30],[18,-35],[25,-34],[32,-28],[35,-20],[40,-15],[43,-12],[40,0],[32,10],[20,15],[10,5],[0,5],[-5,15],[-15,20],[-17,15],[-16,12],[-10,5],[-15,10],[-17,21],[-10,30],[-10,36]],
+          [[30,32],[35,28],[45,25],[55,27],[65,25],[75,22],[80,10],[90,22],[100,15],[105,0],[110,-8],[120,-8],[130,-5],[140,-15],[150,-20],[145,-35],[140,-38],[115,-35],[110,-25],[100,-5],[95,15],[80,8],[70,22],[50,12],[42,15],[35,30],[30,32]],
+          [[-168,66],[-140,70],[-100,73],[-80,70],[-60,60],[-55,52],[-70,48],[-90,48],[-125,48],[-125,40],[-115,32],[-105,22],[-90,16],[-80,8],[-90,15],[-105,22],[-110,30],[-125,40],[-130,50],[-150,60],[-165,60],[-168,66]],
+          [[-80,10],[-70,12],[-60,8],[-50,0],[-35,-5],[-40,-15],[-50,-22],[-60,-30],[-70,-40],[-75,-50],[-70,-55],[-65,-50],[-70,-40],[-75,-20],[-80,-5],[-78,5],[-80,10]],
+          [[112,-12],[125,-14],[140,-12],[150,-18],[153,-28],[145,-38],[130,-35],[115,-34],[114,-25],[112,-12]]
+        ];
+        for (const ring of FALLBACK) fillPoly(pathRing(ring, radius, cx, cy), "rgba(88,78,62,0.85)");
+      }
+
+      for (const shore of liveShores(year)) {
+        if (!shore.ring?.length) continue;
+        const pts = pathRing(shore.ring, radius, cx, cy);
+        const alpha = shore.fillOpacity ?? 0.16;
+        fillPoly(pts, hexAlpha(shore.color || "#e7c56a", alpha));
+        strokePoly(pts, shore.color || "#e7c56a", 1.5);
+      }
+
+      // Graticule
+      ctx.globalAlpha = 0.18;
+      for (let lat = -60; lat <= 60; lat += 30) {
+        const pts = [];
+        for (let lng = -180; lng <= 180; lng += 6) pts.push(project(lat, lng, radius, cx, cy));
+        strokePoly(pts, "#e7c56a", 0.6);
+      }
+      for (let lng = -150; lng <= 180; lng += 30) {
+        const pts = [];
+        for (let lat = -80; lat <= 80; lat += 4) pts.push(project(lat, lng, radius, cx, cy));
+        strokePoly(pts, "#e7c56a", 0.6);
+      }
+      ctx.globalAlpha = 1;
+
+      for (const sea of data.seas || []) {
+        const [lng, lat] = sea.coords;
+        labelAt(lat, lng, radius, cx, cy, sea.name, "rgba(170,200,220,0.55)");
+      }
+      for (const reg of data.regions || []) {
+        const [lng, lat] = reg.coords;
+        labelAt(lat, lng, radius, cx, cy, regionName(reg, year), "rgba(243,234,215,0.72)");
+      }
+      for (const city of data.cities || []) {
+        if (year < (city.minYear ?? -9999) || year > (city.maxYear ?? 9999)) continue;
+        const [lng, lat] = city.coords;
+        const p = project(lat, lng, radius, cx, cy);
         if (!p.front) continue;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, place === selected ? 5.5 : 3.2, 0, Math.PI * 2);
-        ctx.fillStyle = place === selected ? "#fff4d2" : "#e7c56a";
+        ctx.arc(p.x, p.y, 1.6, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(243,234,215,0.7)";
         ctx.fill();
+        ctx.font = "italic 11px 'Cormorant Garamond', serif";
+        ctx.fillStyle = "rgba(243,234,215,0.65)";
+        ctx.textAlign = "left";
+        ctx.fillText(city.name, p.x + 4, p.y - 2);
       }
+
+      const list = filtered();
+      for (const mark of list) {
+        const p = project(mark.lat, mark.lng, radius, cx, cy);
+        if (!p.front) continue;
+        const on = place && mark.id === place.id;
+        const past = place && mark.year <= place.year;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, on ? 5.5 : past ? 3.2 : 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = on ? "#fff4d2" : past ? "#e7c56a" : "rgba(231,197,106,0.28)";
+        ctx.fill();
+        if (on && place.chainId && data.chains) {
+          const siblings = list.filter((q) => q.chainId === place.chainId && q.id !== place.id);
+          for (const sib of siblings) {
+            const q = project(sib.lat, sib.lng, radius, cx, cy);
+            if (!q.front) continue;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(q.x, q.y);
+            ctx.strokeStyle = "rgba(231,197,106,0.35)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+
       for (const site of sites) {
         if (!site || typeof site.lat !== "number") continue;
         const p = project(site.lat, site.lng, radius, cx, cy);
@@ -271,56 +449,88 @@
         ctx.strokeStyle = "#f4f0e6";
         ctx.stroke();
       }
+
+      // Atmosphere limb
+      const atm = ctx.createRadialGradient(cx, cy, radius * 0.82, cx, cy, radius);
+      atm.addColorStop(0, "rgba(0,0,0,0)");
+      atm.addColorStop(1, "rgba(0,0,0,0.35)");
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fillStyle = atm;
+      ctx.fill();
+      ctx.restore();
     }
 
-    function aimAtAct() {
-      const marks = data.places.filter((p) => p.act === act);
-      if (!marks.length) return;
-      const lng = marks.reduce((s, p) => s + p.lng, 0) / marks.length;
-      const lat = marks.reduce((s, p) => s + p.lat, 0) / marks.length;
-      yaw = lng;
-      tilt = Math.max(-0.6, Math.min(0.8, lat * Math.PI / 180));
+    function hexAlpha(hex, a) {
+      const h = hex.replace("#", "");
+      const n = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+      const r = parseInt(n.slice(0, 2), 16);
+      const g = parseInt(n.slice(2, 4), 16);
+      const b = parseInt(n.slice(4, 6), 16);
+      return `rgba(${r},${g},${b},${a})`;
     }
 
-    function read(place) {
-      selected = place;
+    function aimAt(place) {
+      if (!place) return;
+      yaw = place.lng;
+      pitch = Math.max(-55, Math.min(55, -place.lat * 0.55));
+    }
+
+    function paintPlaque() {
+      const place = activePlace();
+      const list = filtered();
+      scrubber.max = Math.max(0, list.length - 1);
+      scrubber.value = String(index);
+      document.getElementById("scrubIndex").textContent = `${list.length ? index + 1 : 0} / ${list.length}`;
+      const shores = liveShores(yearOf());
+      document.getElementById("epochTitle").textContent = shores[0]?.epochTitle || (act === "ALL" ? "All ages" : act.replace("_", " "));
+      document.getElementById("yearLabel").textContent = place
+        ? (place.dateStr || formatYear(place.year))
+        : "—";
       document.getElementById("placeTitle").textContent = place ? place.title : "The known world";
-      document.getElementById("placeWhere").textContent = place ? place.where : ACTS[act];
+      document.getElementById("placeWhere").textContent = place ? place.where : "Turn the globe. Scrub the ages.";
       document.getElementById("placeYear").textContent = place
-        ? (place.year < 0 ? `${Math.abs(place.year)} BCE` : `${place.year} CE`)
+        ? `${formatYear(place.year)}${place.mediaType ? " · " + place.mediaType : ""}`
+        : "";
+      const chain = place && data.chains ? data.chains[place.chainId] : null;
+      document.getElementById("placeMeta").textContent = place
+        ? [chain, place.magic ? `Magic: ${place.magic}` : ""].filter(Boolean).join(" · ")
         : "";
       draw();
     }
 
-    function pick(event) {
-      const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const radius = Math.min(rect.width, rect.height) * 0.36;
-      const cx = rect.width * 0.56;
-      const cy = rect.height * 0.46;
-      let best = null;
-      let bestD = 18;
-      for (const place of data.places.filter((p) => p.act === act)) {
-        const p = project(place.lat, place.lng, radius, cx, cy);
-        if (!p.front) continue;
-        const d = Math.hypot(p.x - x, p.y - y);
-        if (d < bestD) { best = place; bestD = d; }
-      }
-      if (best) read(best);
+    function go(i, aim) {
+      const list = filtered();
+      if (!list.length) return;
+      index = ((i % list.length) + list.length) % list.length;
+      if (aim !== false) aimAt(list[index]);
+      paintPlaque();
     }
 
-    document.querySelectorAll(".ages button").forEach((button) => {
+    document.querySelectorAll(".ages button[data-act]").forEach((button) => {
       button.addEventListener("click", () => {
         act = button.dataset.act;
-        document.querySelectorAll(".ages button").forEach((b) => {
+        document.querySelectorAll(".ages button[data-act]").forEach((b) => {
           b.setAttribute("aria-pressed", b === button ? "true" : "false");
         });
-        selected = null;
-        aimAtAct();
-        read(null);
-        document.getElementById("placeWhere").textContent = ACTS[act];
+        index = 0;
+        go(0);
       });
+    });
+
+    scrubber.addEventListener("input", () => {
+      go(Number(scrubber.value), true);
+    });
+    document.getElementById("prev").addEventListener("click", () => go(index - 1));
+    document.getElementById("next").addEventListener("click", () => go(index + 1));
+    playBtn.addEventListener("click", () => {
+      playing = !playing;
+      playBtn.setAttribute("aria-pressed", String(playing));
+      playBtn.textContent = playing ? "Pause" : "Play";
+      if (playing) {
+        clearInterval(playTimer);
+        playTimer = setInterval(() => go(index + 1), 1600);
+      } else clearInterval(playTimer);
     });
 
     canvas.addEventListener("pointerdown", (event) => {
@@ -332,20 +542,50 @@
     canvas.addEventListener("pointerup", (event) => {
       const moved = Math.hypot(event.clientX - downX, event.clientY - downY);
       dragging = false;
-      if (moved < 4) pick(event);
+      if (moved < 5) pick(event);
     });
     canvas.addEventListener("pointermove", (event) => {
       if (!dragging) return;
       yaw -= (event.clientX - lastX) * 0.35;
-      tilt = Math.max(-1, Math.min(1, tilt + (event.clientY - lastY) * 0.005));
+      pitch = Math.max(-80, Math.min(80, pitch + (event.clientY - lastY) * 0.25));
       lastX = event.clientX;
       lastY = event.clientY;
       draw();
     });
 
-    aimAtAct();
-    read(null);
-    document.getElementById("placeWhere").textContent = ACTS[act];
+    function pick(event) {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const radius = Math.min(rect.width, rect.height) * 0.38;
+      const cx = rect.width * 0.55;
+      const cy = rect.height * 0.44;
+      let best = null;
+      let bestD = 16;
+      const list = filtered();
+      for (let i = 0; i < list.length; i++) {
+        const place = list[i];
+        const p = project(place.lat, place.lng, radius, cx, cy);
+        if (!p.front) continue;
+        const d = Math.hypot(p.x - x, p.y - y);
+        if (d < bestD) { best = i; bestD = d; }
+      }
+      if (best != null) go(best, false);
+    }
+
+    fetch("./land-110m.json")
+      .then((r) => r.json())
+      .then((topo) => {
+        const land = topojson.feature(topo, topo.objects.land);
+        landFeatures = land.type === "FeatureCollection" ? land.features : [land];
+        landReady = true;
+        draw();
+      })
+      .catch(() => {
+        landReady = false;
+      });
+
+    go(0);
     window.addEventListener("resize", resize);
     resize();
   </script>

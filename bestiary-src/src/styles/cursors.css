@@ -1,0 +1,187 @@
+/* Ported from Edition II room cursors — fine pointer; controls reset. */
+@media (pointer: fine) {
+  body.cursor-seal-ring[data-room='djinn'],
+  body.cursor-seal-ring[data-room='djinn'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='14' cy='15' r='7' stroke='%23100d1a' stroke-width='4'/%3E%3Ccircle cx='14' cy='15' r='7' stroke='%23d0a14c' stroke-width='2'/%3E%3Cpath d='M1 1l5 2-2 3z' fill='%23d0a14c' stroke='%23100d1a' stroke-width='.8'/%3E%3Cpath d='M9 4l2 2h3v3l2 2-2 2v3h-3l-2 2-2-2H4v-3l-2-2 2-2V6h3z' transform='translate(-1 -1) scale(.7)' fill='%236fb7ff' stroke='%23100d1a' stroke-width='.8'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+  }
+  body.cursor-seal-ring[data-room='djinn'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-seal-ring[data-room='djinn'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-quill[data-room='fae'],
+  body.cursor-quill[data-room='fae'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1 1l4 1c6 3 12 9 17 20-8-3-15-9-19-16z' fill='%23eae6df' stroke='%230b0b10' stroke-width='1'/%3E%3Cpath d='M1 1l6 6M9 9l9 9' stroke='%230b0b10' stroke-width='.7'/%3E%3Cpath d='M1 1l3 1-2 2z' fill='%23d4af37'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+  }
+  body.cursor-quill[data-room='fae'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-quill[data-room='fae'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-stylus[data-room='golem'],
+  body.cursor-stylus[data-room='golem'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1 1l5 2 16 16-3 3L3 6z' fill='%23d9c08a' stroke='%231d1a16' stroke-width='1.1' stroke-linejoin='round'/%3E%3Cpath d='M1 1l5 2-3 3z' fill='%238c6a2f'/%3E%3Cpath d='M9 9l2-2M14 14l2-2' stroke='%238c6a2f' stroke-width='.8'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+  }
+  body.cursor-stylus[data-room='golem'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-stylus[data-room='golem'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-foxfire[data-room='kitsune'],
+  body.cursor-foxfire[data-room='kitsune'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='26' viewBox='0 0 20 26'%3E%3Cpath d='M3 2c5 3 13 8 13 15a6.5 6.5 0 0 1-13 0c0-4 3-5 3-9 0-2-1-4-3-6z' fill='%233d6fc4' stroke='%231c2923' stroke-width='1.1'/%3E%3Cpath d='M8 12c3 2 5 4 5 7a3 3 0 0 1-6 0c0-2 1-3 1-7z' fill='%23eaf2ff'/%3E%3C/svg%3E")
+      3 2,
+    auto;
+  }
+  body.cursor-foxfire[data-room='kitsune'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-foxfire[data-room='kitsune'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-candle[data-room='lich'],
+  body.cursor-candle[data-room='lich'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 1c-2 3-2 6 0 8 2-2 2-5 0-8z' fill='%23ffc478' stroke='%230b1614' stroke-width='.8'/%3E%3Cpath d='M3 9v2' stroke='%230b1614' stroke-width='1'/%3E%3Crect x='0.5' y='11' width='5' height='11' rx='1' fill='%23ddd3bd' stroke='%230b1614' stroke-width='.8'/%3E%3C/svg%3E")
+      3 1,
+    auto;
+  }
+  body.cursor-candle[data-room='lich'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-candle[data-room='lich'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-probe[data-room='lycanthrope'],
+  body.cursor-probe[data-room='lycanthrope'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1.5 1.5L15 15' stroke='%23121618' stroke-width='2.6' stroke-linecap='round'/%3E%3Cpath d='M1.5 1.5L15 15' stroke='%23dfe5e8' stroke-width='1.1' stroke-linecap='round'/%3E%3Cpath d='M14 14l7.5 7.5' stroke='%23121618' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M14 14l7.5 7.5' stroke='%23b08a52' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+  }
+  body.cursor-probe[data-room='lycanthrope'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-probe[data-room='lycanthrope'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-clew[data-room='minotaur'],
+  body.cursor-clew[data-room='minotaur'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M1 1c3 2 5 6 6 9' stroke='%23a8442a' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='14' cy='14' r='7' fill='%23a8442a' stroke='%232a1d12' stroke-width='1'/%3E%3Cpath d='M8.5 11c3 1 8 1 11-1M7.5 15c4 1 9 1 13-1M10 19c3 0 6-1 8-2' stroke='%23e8dcb5' stroke-width='.8' stroke-linecap='round'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+  }
+  body.cursor-clew[data-room='minotaur'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-clew[data-room='minotaur'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-reticle[data-room='ophanim'],
+  body.cursor-reticle[data-room='ophanim'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='8' stroke='%230a1030' stroke-width='3'/%3E%3Ccircle cx='12' cy='12' r='8' stroke='%23f2e6c4' stroke-width='1.2'/%3E%3Cpath d='M12 1v7M12 16v7M1 12h7M16 12h7' stroke='%230a1030' stroke-width='3'/%3E%3Cpath d='M12 1v7M12 16v7M1 12h7M16 12h7' stroke='%23ff9f1c' stroke-width='1.2'/%3E%3C/svg%3E")
+      12 12,
+    crosshair;
+  }
+  body.cursor-reticle[data-room='ophanim'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-reticle[data-room='ophanim'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-trowel[data-room='orc'],
+  body.cursor-trowel[data-room='orc'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M2 2l9 3 3 6-3 3-6-3z' fill='%23bfc3c6' stroke='%231e150d' stroke-width='1.1' stroke-linejoin='round'/%3E%3Cpath d='M12 12l9 9' stroke='%231e150d' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M12 12l9 9' stroke='%23a0682e' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E")
+      2 2,
+    auto;
+  }
+  body.cursor-trowel[data-room='orc'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-trowel[data-room='orc'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-iron[data-room='sidhe'],
+  body.cursor-iron[data-room='sidhe'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M2 22L16 8' stroke='%230d0a14' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M2 22L16 8' stroke='%235b5f66' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M3.5 20.5L15 9' stroke='%23a6abb5' stroke-width='.7'/%3E%3Cpath d='M13 5l6 6' stroke='%230d0a14' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M13 5l6 6' stroke='%236b7078' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E")
+      2 22,
+    auto;
+  }
+  body.cursor-iron[data-room='sidhe'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-iron[data-room='sidhe'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-ember[data-room='succubus'],
+  body.cursor-ember[data-room='succubus'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M2 2l18 18' stroke='%230c0a0b' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M2 2l18 18' stroke='%23e9e4dc' stroke-width='1.2' stroke-linecap='round'/%3E%3Ccircle cx='3' cy='3' r='2.4' fill='%23f3c66b' stroke='%239e1b32' stroke-width='.8'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+  }
+  body.cursor-ember[data-room='succubus'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-ember[data-room='succubus'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-chisel[data-room='troll'],
+  body.cursor-chisel[data-room='troll'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1 4l3-3 9 9-3 3z' fill='%23c9d0d6' stroke='%23101b33' stroke-width='1' stroke-linejoin='round'/%3E%3Cpath d='M11 11l10 10' stroke='%23101b33' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M11 11l10 10' stroke='%238a6a44' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E")
+      1 3,
+    auto;
+  }
+  body.cursor-chisel[data-room='troll'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-chisel[data-room='troll'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-needle[data-room='unicorn'],
+  body.cursor-needle[data-room='unicorn'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1.5 1.5L19 19' stroke='%231d2a20' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M1.5 1.5L19 19' stroke='%23c7d3d6' stroke-width='1.4' stroke-linecap='round'/%3E%3Cellipse cx='17.5' cy='17.5' rx='1' ry='2.2' transform='rotate(-45 17.5 17.5)' fill='%231d2a20'/%3E%3Cpath d='M18 18c3 1 4 3 3 5' stroke='%23b3263e' stroke-width='1.2' fill='none'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+  }
+  body.cursor-needle[data-room='unicorn'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-needle[data-room='unicorn'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-thermopile[data-room='vampire'],
+  body.cursor-thermopile[data-room='vampire'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 3l18 7-11 11z' fill='%23c9a45c' stroke='%23170709' stroke-width='1.2' stroke-linejoin='round'/%3E%3Cpath d='M9 6l9 3.5-8.5 8.5z' fill='%238a7140'/%3E%3Ccircle cx='3' cy='3' r='2.4' fill='%23ff5850' stroke='%23170709' stroke-width='1'/%3E%3C/svg%3E")
+      2 2,
+    auto;
+  }
+  body.cursor-thermopile[data-room='vampire'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-thermopile[data-room='vampire'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-reed[data-room='will-o-the-wisp'],
+  body.cursor-reed[data-room='will-o-the-wisp'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M1 1l21 21' stroke='%230f0d09' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M1 1l21 21' stroke='%23a88d64' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M7 7l2-1M13 13l2-1M19 19l2-1' stroke='%234b3a26' stroke-width='1'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+  }
+  body.cursor-reed[data-room='will-o-the-wisp'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-reed[data-room='will-o-the-wisp'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.cursor-playhead[data-room='wraith'],
+  body.cursor-playhead[data-room='wraith'] * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 1v22' stroke='%231a140c' stroke-width='3'/%3E%3Cpath d='M12 1v22' stroke='%23ffb347' stroke-width='1.2'/%3E%3Cpath d='M6 1h12l-6 6z' fill='%23c8d6e3' stroke='%231a140c' stroke-width='.8'/%3E%3C/svg%3E")
+      12 1,
+    auto;
+  }
+  body.cursor-playhead[data-room='wraith'] :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.cursor-playhead[data-room='wraith'] :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+
+  body.hall-cursor:not([data-room]),
+  body.hall-cursor:not([data-room]) * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath fill='none' stroke='%23c9a45c' stroke-width='1.5' d='M4 24 L14 4 L24 24'/%3E%3Cpath stroke='%23c9a45c' stroke-width='1' d='M8 18h12'/%3E%3C/svg%3E") 14 14, pointer;
+  }
+  body.hall-cursor:not([data-room]) :is(a, button, summary, label, [role='button'], input, select, textarea),
+  body.hall-cursor:not([data-room]) :is(a, button, summary, label, [role='button'], input, select, textarea) * {
+    cursor: pointer;
+  }
+}

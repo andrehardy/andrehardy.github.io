@@ -131,10 +131,57 @@ function mountSpecimen() {
   start();
 }
 
+const ROOM_CURSORS: Record<string, string> = {
+  djinn: 'cursor-seal-ring',
+  fae: 'cursor-quill',
+  golem: 'cursor-stylus',
+  kitsune: 'cursor-foxfire',
+  lich: 'cursor-candle',
+  lycanthrope: 'cursor-probe',
+  minotaur: 'cursor-clew',
+  ophanim: 'cursor-reticle',
+  orc: 'cursor-trowel',
+  sidhe: 'cursor-iron',
+  succubus: 'cursor-ember',
+  troll: 'cursor-chisel',
+  unicorn: 'cursor-needle',
+  vampire: 'cursor-thermopile',
+  'will-o-the-wisp': 'cursor-reed',
+  wraith: 'cursor-playhead',
+};
+
+function bindRoomCursor() {
+  const room = document.body.dataset.room;
+  if (!room) {
+    document.body.classList.add('hall-cursor');
+    return;
+  }
+  const cls = ROOM_CURSORS[room];
+  if (cls) document.body.classList.add(cls);
+}
+
+function unsealRoom() {
+  const room = document.body.dataset.room;
+  if (!room) return;
+  const key = `mr-bestiary-unsealed:${room}`;
+  let seen = false;
+  try {
+    seen = sessionStorage.getItem(key) === '1';
+    if (!seen) sessionStorage.setItem(key, '1');
+  } catch {
+    seen = false;
+  }
+  if (seen || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.body.classList.add('room-unsealing');
+  window.setTimeout(() => document.body.classList.remove('room-unsealing'), 1600);
+}
+
 export function boot() {
   bindCipher();
   bindSound();
   bindNight();
+  bindRoomCursor();
+  unsealRoom();
   document.querySelectorAll<HTMLElement>('[data-window]').forEach((el) => {
     if (el.dataset.mode === 'hall') mountWindow(el);
   });
