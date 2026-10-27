@@ -144,9 +144,14 @@ body[data-room='will-o-the-wisp']::after {
   pointer-events: none;
   z-index: 1;
   background: bottom center / 100% auto no-repeat var(--wall-foreground);
+  /* soften pale fringe at the alpha edge */
+  -webkit-mask-image: linear-gradient(to top, #000 72%, transparent);
+  mask-image: linear-gradient(to top, #000 72%, transparent);
 }
 html[data-night='on'] body[data-room='will-o-the-wisp']::after {
-  filter: brightness(0.45);
+  /* MAGIC note: tussock blades read too bright at night without CSS dim */
+  filter: brightness(0.42) saturate(0.75) contrast(0.95);
+  opacity: 0.88;
 }
 
 body[data-room='sidhe'] {
