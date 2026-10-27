@@ -1,0 +1,62 @@
+/*
+  MAGIC Builder painted grounds (public/walls/). CSS niches/cartouches sit on top —
+  grounds have no baked niches (see MANIFEST.md).
+*/
+
+body[data-room='vampire'] {
+  --wall-ground: url('/magic-registry/bestiary/walls/vampire/ground.webp');
+  --wall-ground-night: url('/magic-registry/bestiary/walls/vampire/ground-night.webp');
+  --wall-ornament: url('/magic-registry/bestiary/walls/vampire/ornament.svg');
+  --wall-niche-mask: url('/magic-registry/bestiary/walls/vampire/niche.svg');
+  background-image:
+    linear-gradient(180deg, rgb(0 0 0 / 0.35), rgb(0 0 0 / 0.55)),
+    var(--wall-ground);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+}
+html[data-night='on'] body[data-room='vampire'],
+html:not([data-night]) body[data-room='vampire'] {
+  /* night via html[data-night=on]; prefers-color-scheme handled by --night elsewhere */
+}
+html[data-night='on'] body[data-room='vampire'] {
+  background-image:
+    linear-gradient(180deg, rgb(8 12 22 / 0.45), rgb(0 0 0 / 0.6)),
+    var(--wall-ground-night);
+}
+
+/* Keystone / niche ornament from MAGIC Builder (currentColor) */
+body[data-room='vampire'] .keystone {
+  background:
+    center / contain no-repeat var(--wall-ornament),
+    linear-gradient(to bottom, color-mix(in srgb, var(--stone), #fff 10%), var(--stone));
+  color: color-mix(in srgb, var(--stone), #e8d4a8 40%);
+}
+
+body[data-room='djinn'] {
+  --wall-ground: url('/magic-registry/bestiary/walls/djinn/ground.webp');
+  --wall-band: url('/magic-registry/bestiary/walls/djinn/band.webp');
+  --wall-seal: url('/magic-registry/bestiary/walls/djinn/seal.svg');
+  background-image:
+    linear-gradient(180deg, rgb(10 8 20 / 0.4), rgb(0 0 0 / 0.55)),
+    var(--wall-ground);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+}
+
+body[data-room='djinn'] .band {
+  background:
+    center top / 100% auto repeat-y var(--wall-band) !important;
+  box-shadow:
+    inset -1px 0 0 rgb(255 230 170 / 0.35),
+    2px 0 6px rgb(0 0 0 / 0.5);
+}
+
+/* Eight-point seal on headings (replaces CSS clip-path star when seal asset loads) */
+body[data-room='djinn'] h1::before,
+body[data-room='djinn'] .text h2::before {
+  background: center / contain no-repeat var(--wall-seal) !important;
+  clip-path: none !important;
+  background-color: transparent !important;
+}
