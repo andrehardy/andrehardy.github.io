@@ -3,6 +3,51 @@
   blown up and centered on a webpage. Per-room sheets (rooms/*.css) draw niches, bands,
   plates, cells. This sheet only clears the document card and seats the opening in stone.
 */
+
+/*
+  Audit fix (nave vs B11): global.css hides initials, roots, tracery, and [data-ornament]
+  for the old almanac card skin. On a room leaf those ARE the carved wall — show them.
+*/
+body[data-room] .initial > svg,
+body[data-room] .roots,
+body[data-room] .tracery,
+body[data-room] .web,
+body[data-room] .gloss,
+body[data-room] [data-ornament] {
+  display: revert;
+}
+body[data-room] .keystone,
+body[data-room] .band,
+body[data-room] .leaf-light,
+body[data-room] .thread {
+  display: block;
+}
+
+/*
+  Specimen mode had stripped the stone surround (frame + mask) so the plate read as a
+  cropped poster card. In the leaf the frame is the aperture cut; glass sits inside it.
+*/
+body[data-room] .window[data-mode='specimen'][data-art] .window-frame {
+  display: block;
+}
+body[data-room] .window[data-mode='specimen'][data-art] .window-world {
+  -webkit-mask-image: var(--mask);
+  mask-image: var(--mask);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+/* Soften museum-case glow; masonry case-bay carries the surround now. */
+body[data-room] .specimen::before {
+  opacity: calc(0.18 + var(--night) * 0.2);
+  filter: blur(14px);
+}
+body[data-room] .sill {
+  margin-inline: 12%;
+  opacity: 0.85;
+}
+
 body[data-room] {
   --wall-deep: color-mix(in srgb, var(--stone) 88%, var(--glow, var(--gold)));
   background:
