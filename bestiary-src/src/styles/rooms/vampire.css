@@ -1,0 +1,389 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Vampire's own look (R-B-GLASS-06): its figures set as a galvanometer's scale is engraved,
+ * spaced and of one width; an entrance in which the heat comes up out of black; and the room's
+ * own warmth, which the specimen draws off while it is near (--drain, set by the scene). The
+ * ground only darkens, so the text against it only gains.
+ */
+body[data-room='vampire'] h1 {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 400;
+}
+body[data-room='vampire'] main .label {
+  font-variant-numeric: tabular-nums slashed-zero;
+  letter-spacing: 0.18em;
+}
+body.containment[data-room='vampire'] {
+  background-color: color-mix(in srgb, var(--c-ground), #050304 calc(var(--drain, 0) * 70%));
+}
+body[data-room='vampire'] .specimen .window-stage {
+  animation: vampire-bloom var(--t-reveal) var(--glass-ease-phosphor) var(--glass-clear-out) both;
+}
+
+@keyframes vampire-bloom {
+  from {
+    filter: brightness(0);
+  }
+  to {
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='vampire'] .specimen .window-stage {
+    animation: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): a crypt. One column down the wall, the crypt itself under its vault and
+ * the niches cut below it, each arched, recessed into shadow and keyed at its crown. Its
+ * entrance is the niches lit one after another out of the black, as a lamp is carried down.
+ */
+body[data-room='vampire'] .leaf {
+  --stone: color-mix(in srgb, #6d5a58 calc(100% - var(--cold, 0%)), #5d6b7a var(--cold, 0%));
+  --stone-edge: color-mix(in srgb, var(--stone), transparent 45%);
+  display: grid;
+  justify-items: center;
+  gap: var(--s-4);
+}
+body[data-room='vampire'] .leaf > * {
+  width: min(100%, 44rem);
+  animation: vampire-lit var(--life-ink) var(--glass-ease-phosphor) both;
+}
+body[data-room='vampire'] .leaf .room-stack > :nth-child(3) {
+  animation-delay: var(--life-beat);
+}
+body[data-room='vampire'] .leaf .room-stack > :nth-child(4) {
+  animation-delay: calc(var(--life-beat) * 2);
+}
+body[data-room='vampire'] .leaf .room-stack > :nth-child(n + 5) {
+  animation-delay: calc(var(--life-beat) * 3);
+}
+body[data-room='vampire'] .leaf > .leaf-light {
+  animation: none;
+  width: auto;
+}
+body[data-room='vampire'] .leaf > .thermopile {
+  animation: none;
+  width: 4.75rem;
+}
+body[data-room='vampire'] .leaf > .case-bay {
+  width: 100%;
+}
+@keyframes vampire-lit {
+  from {
+    opacity: 0;
+    filter: brightness(0.2);
+  }
+}
+
+/* The lintel: the name cut in a stone over the door, centred. */
+body[data-room='vampire'] .crumb {
+  justify-self: start;
+}
+body[data-room='vampire'] .creature-head {
+  text-align: center;
+  padding: var(--s-3) var(--s-4);
+  border-block: 1px solid var(--stone-edge);
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0.25), transparent);
+}
+
+/* The crypt: the case under a shallow vault, the ribs of it drawn over the top. */
+body[data-room='vampire'] .room {
+  --rise: 3.5rem;
+  position: relative;
+  padding: var(--rise) var(--s-4) var(--s-4);
+  background: radial-gradient(ellipse 50% var(--rise) at 50% 0, rgb(0 0 0 / 0.8), transparent);
+}
+body[data-room='vampire'] .room::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--stone-edge);
+  mask:
+    var(--arch-rule) top / 100% var(--rise) no-repeat,
+    linear-gradient(#000 0 0) 0 var(--rise) / 1px calc(100% - var(--rise)) no-repeat,
+    linear-gradient(#000 0 0) 100% var(--rise) / 1px calc(100% - var(--rise)) no-repeat,
+    linear-gradient(#000 0 0) bottom / 100% var(--sill, 1px) no-repeat;
+}
+
+/*
+ * The niches: arched, set back into the wall, the light falling off into them from the front;
+ * each keyed at its crown. The text stands on the niche's own dark ground.
+ */
+body[data-room='vampire'] .text,
+body[data-room='vampire'] .exemplars {
+  position: relative;
+  isolation: isolate;
+  max-width: none;
+  margin: 0;
+  padding: var(--s-6) clamp(1rem, 4vw, 3rem) var(--s-4);
+  --rise: 5.5rem;
+  --sill: 3px;
+  mask:
+    var(--arch-head) top / 100% var(--rise) no-repeat,
+    linear-gradient(#000 0 0) bottom / 100% calc(100% - var(--rise) + 1px) no-repeat;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgb(0 0 0 / 0.55), transparent 80%), rgb(8 2 3 / 0.5);
+  box-shadow:
+    inset 0 0 0 4px color-mix(in srgb, var(--c-ground), #000 30%),
+    inset 0 0 0 5px var(--stone-edge),
+    inset 0 2.5rem 3rem -2rem rgb(0 0 0 / 0.9);
+}
+body[data-room='vampire'] .text::before,
+body[data-room='vampire'] .exemplars::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: var(--stone-edge);
+  mask:
+    var(--arch-rule) top / 100% var(--rise) no-repeat,
+    linear-gradient(#000 0 0) 0 var(--rise) / 1px calc(100% - var(--rise)) no-repeat,
+    linear-gradient(#000 0 0) 100% var(--rise) / 1px calc(100% - var(--rise)) no-repeat,
+    linear-gradient(#000 0 0) bottom / 100% var(--sill, 1px) no-repeat;
+}
+body[data-room='vampire'] .keystone {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1.6rem;
+  height: 1.5rem;
+  translate: -50% 0;
+  clip-path: polygon(0 0, 100% 0, 78% 100%, 22% 100%);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--stone), #fff 10%), var(--stone));
+  animation: vampire-key var(--life-press) var(--glass-ease-shutter) both;
+}
+@keyframes vampire-key {
+  from {
+    clip-path: polygon(50% 0, 50% 0, 50% 100%, 50% 100%);
+  }
+}
+
+/* The ossuary: the parts set out in small loculi, two and three to a row. */
+body[data-room='vampire'] .anatomy {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--s-3);
+  margin: 0;
+}
+body[data-room='vampire'] .anatomy dt {
+  grid-column: 1 / -1;
+  margin-top: var(--s-2);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.78rem;
+  color: var(--c-ink-soft);
+}
+body[data-room='vampire'] .anatomy dd {
+  grid-column: 1 / -1;
+  padding: var(--s-3);
+  border: 1px solid var(--stone-edge);
+  box-shadow: inset 0 0.8rem 1.2rem -0.8rem rgb(0 0 0 / 0.9);
+}
+body[data-room='vampire'] .exemplars .reports li {
+  --rise: 1.6rem;
+  border-top: 0;
+  mask:
+    var(--arch-head) top / 100% var(--rise) no-repeat,
+    linear-gradient(#000 0 0) bottom / 100% calc(100% - var(--rise) + 1px) no-repeat;
+  padding-top: var(--s-4);
+}
+
+/* The epitaph: its neighbour named on a low slab, centred and spaced. */
+body[data-room='vampire'] [data-part='neighbour'] {
+  padding-top: var(--s-4);
+  text-align: center;
+}
+
+/*
+ * The heading hand: spaced capitals of an incised inscription, centred between two rules, in
+ * the arterial red.
+ */
+body[data-room='vampire'] .text h2,
+body[data-room='vampire'] .exemplars h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.26em;
+  color: var(--r-accent);
+  text-shadow: 0 -1px 0 rgb(0 0 0 / 0.8);
+}
+body[data-room='vampire'] .text h2::before,
+body[data-room='vampire'] .text h2::after,
+body[data-room='vampire'] .exemplars h2::before,
+body[data-room='vampire'] .exemplars h2::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--stone-edge));
+}
+body[data-room='vampire'] .text h2::after,
+body[data-room='vampire'] .exemplars h2::after {
+  background: linear-gradient(-90deg, transparent, var(--stone-edge));
+}
+
+/* The initial: its letter in a niche of its own, a candle guttering beside it. */
+body[data-room='vampire'] .initial .i-arch {
+  fill: rgb(0 0 0 / 0.4);
+  stroke: #6d5a58;
+  stroke-width: 1.2;
+}
+body[data-room='vampire'] .initial .i-inner {
+  fill: none;
+  stroke-width: 0.6;
+}
+body[data-room='vampire'] .initial .i-candle {
+  fill: #e9dcc4;
+}
+body[data-room='vampire'] .initial .i-flame {
+  fill: #ff9a4a;
+  transform-origin: 82px 66px;
+  animation: vampire-gutter var(--life-dawn) var(--glass-ease-tide) infinite alternate;
+}
+body[data-room='vampire'] .initial .i-drip {
+  fill: none;
+  stroke: #e9dcc4;
+  stroke-width: 1.4;
+  stroke-dasharray: 1;
+  animation: vampire-drip var(--life-dawn) var(--glass-ease-clear) calc(var(--life-beat) * 5) both;
+}
+body[data-room='vampire'] .initial-letter {
+  margin-top: 0.4rem;
+  margin-right: 0.6rem;
+  color: var(--r-accent);
+}
+@keyframes vampire-gutter {
+  to {
+    transform: scale(0.9, 0.82);
+  }
+}
+@keyframes vampire-drip {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/*
+ * The reader's warmth in false colour (R-B-LIVE-08): a bloom over the stone and the niches under
+ * the hand, white at its heart and falling through ember to arterial red, as the thermopile
+ * would paint it. It is carried by the hand, its colours laid once (--hx, --hy, --warmth).
+ */
+body[data-room='vampire'] .leaf > .warmth {
+  inset: auto;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 30rem;
+  height: 30rem;
+  translate: calc(var(--hx, -999) * 1px - 15rem) calc(var(--hy, -999) * 1px - 15rem);
+  background: radial-gradient(
+    closest-side,
+    rgb(255 214 150 / 0.36),
+    rgb(255 122 26 / 0.26) 28%,
+    rgb(193 18 31 / 0.2) 58%,
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: var(--warmth, 0);
+  will-change: translate, opacity;
+}
+
+/* Frost (R-B-LIVE-08): drawn by a hand left resting, creeping in from the niches' edges. */
+body[data-room='vampire'] .text::after,
+body[data-room='vampire'] .exemplars::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120' fill='none' stroke='%23d8e6f0' stroke-width='.6' stroke-linecap='round'%3E%3Cpath d='M0 20l14 6 6 14M14 26l10-2M6 23l2 8M0 70l10-4 8 6M10 66l2-9M120 40l-12 5-4 12M108 45l-9-3M120 95l-10 2-5 10M110 97l-6-6M40 0l4 10 10 3M44 10l-6 5M85 120l3-10 9-4M88 110l-7-4'/%3E%3C/svg%3E")
+    0 0 / 7.5rem 7.5rem;
+  mask-image: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    transparent calc(95% - var(--frost, 0) * 50%),
+    #000 100%
+  );
+  opacity: calc(var(--frost, 0) * 0.55);
+}
+
+/* The thermopile: its needle reads the warmth the hand brings over the page. */
+body[data-room='vampire'] .thermopile {
+  position: fixed;
+  left: max(0.5rem, calc((100vw - var(--house-max)) / 2 - 7rem));
+  top: 40vh;
+  overflow: visible;
+}
+/* With no margin to stand in, it stands at the foot of the page, behind the words. */
+@media (max-width: 70rem) {
+  body[data-room='vampire'] .thermopile {
+    z-index: -1;
+    top: auto;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    scale: 0.8;
+    transform-origin: 0 100%;
+  }
+}
+.thermopile .t-scale,
+.thermopile .t-base {
+  fill: none;
+  stroke: #c9a45c;
+  stroke-width: 1.2;
+}
+.thermopile .t-ticks {
+  stroke: #c9a45c;
+  stroke-width: 1;
+}
+.thermopile .t-hot {
+  fill: none;
+  stroke: #c1121f;
+  stroke-width: 3;
+}
+.thermopile .t-needle {
+  stroke: #fff4e0;
+  fill: #c9a45c;
+  stroke-width: 1.2;
+  rotate: calc(-62deg + var(--warmth, 0) * 110deg - var(--frost, 0) * 20deg);
+  transition: rotate var(--life-flick) linear;
+}
+
+/* The small hours (R-B-LIVE-09): the stone goes cold and blue, and frost stands in the niches. */
+body[data-room='vampire'][data-sky='on'] {
+  --cold: 70%;
+}
+body[data-room='vampire'][data-sky='on'] .text,
+body[data-room='vampire'][data-sky='on'] .exemplars {
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgb(0 0 10 / 0.6), transparent 80%),
+    rgb(40 58 88 / 0.55);
+}
+
+/* The thermopile's horn: a little brass cone, its junction a red bead at the tip. */
+body.cursor-thermopile[data-room='vampire'],
+body.cursor-thermopile[data-room='vampire'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 3l18 7-11 11z' fill='%23c9a45c' stroke='%23170709' stroke-width='1.2' stroke-linejoin='round'/%3E%3Cpath d='M9 6l9 3.5-8.5 8.5z' fill='%238a7140'/%3E%3Ccircle cx='3' cy='3' r='2.4' fill='%23ff5850' stroke='%23170709' stroke-width='1'/%3E%3C/svg%3E")
+      2 2,
+    auto;
+}
+body.cursor-thermopile[data-room='vampire'] :is(a, button, summary, label, [role='button']),
+body.cursor-thermopile[data-room='vampire'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='vampire'] .initial .i-flame {
+    animation: none;
+  }
+}

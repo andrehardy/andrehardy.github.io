@@ -1,0 +1,369 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Troll's own look (R-B-GLASS-06): its name cut into stone, the capitals wide and heavy and
+ * lit from above, as a runestone is cut; and an entrance in which the boulder field comes into
+ * focus out of the dark, as the eye finds the one stone that is not quite like the others.
+ */
+body[data-room='troll'] h1,
+body[data-room='troll'] .text h2 {
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 700;
+  font-variant-ligatures: none;
+}
+body[data-room='troll'] h1 {
+  text-shadow:
+    0 -1px 0 color-mix(in srgb, var(--c-ground), #000 45%),
+    0 1px 0 color-mix(in srgb, var(--r-accent), #fff 30%);
+}
+body[data-room='troll'] main .label {
+  letter-spacing: 0.14em;
+}
+body[data-room='troll'] .specimen .window-stage {
+  animation: troll-boulders var(--t-reveal) var(--glass-ease-clear) var(--glass-clear-out) both;
+}
+
+@keyframes troll-boulders {
+  from {
+    filter: blur(14px) brightness(0.35);
+  }
+  to {
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='troll'] .specimen .window-stage {
+    animation: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): stones raised down a hillside. Each stone's face is granite, rough and
+ * speckled, with a serpent band carved round it and its head at the band's start; they stand
+ * staggered down the slope. Their entrance is the eye finding them, one by one, out of the dusk.
+ */
+body[data-room='troll'] .leaf {
+  --granite: #3a3f47;
+  --band: rgb(150 58 40 / 0.24);
+  --cut: rgb(238 234 224 / 0.5);
+  display: grid;
+  gap: var(--s-5);
+}
+body[data-room='troll'] .leaf :is(section, .room) {
+  animation: troll-found var(--life-ink) var(--glass-ease-clear) both;
+}
+body[data-room='troll'] .leaf .room-stack > :nth-child(5) {
+  animation-delay: var(--life-beat);
+}
+body[data-room='troll'] .leaf .room-stack > :nth-child(6) {
+  animation-delay: calc(var(--life-beat) * 2);
+}
+body[data-room='troll'] .leaf .room-stack > :nth-child(n + 7) {
+  animation-delay: calc(var(--life-beat) * 3);
+}
+@keyframes troll-found {
+  from {
+    opacity: 0;
+    filter: blur(3px) brightness(0.5);
+  }
+}
+
+/* The stones: staggered down the slope, each its own rough shape. */
+body[data-room='troll'] .text {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 42rem);
+  max-width: none;
+  margin: 0;
+  padding: 4.25rem clamp(1.75rem, 5vw, 3.25rem) var(--s-5);
+  clip-path: polygon(
+    0 2.2rem,
+    3% 0.9rem,
+    14% 0.2rem,
+    38% 0,
+    61% 0.5rem,
+    83% 0.1rem,
+    97% 1.1rem,
+    100% 2.6rem,
+    99.4% 55%,
+    100% calc(100% - 1.4rem),
+    97% 100%,
+    52% calc(100% - 0.3rem),
+    4% 100%,
+    0 calc(100% - 1.8rem),
+    0.7% 48%
+  );
+  background:
+    var(--daylight, linear-gradient(transparent, transparent)),
+    radial-gradient(ellipse 70% 45% at 22% 8%, rgb(220 228 240 / 0.12), transparent 70%),
+    radial-gradient(ellipse 90% 60% at 100% 100%, rgb(0 0 0 / 0.4), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .92 0 0 0 0 .91 0 0 0 0 .88 0 0 0 1.1 -.62'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2' seed='9'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.4 -.78'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23d)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='520'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3' seed='2'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .11 0 0 0 0 .13 0 0 0 .9 -.3'/%3E%3C/filter%3E%3Crect width='520' height='520' filter='url(%23m)'/%3E%3C/svg%3E"),
+    var(--granite);
+  box-shadow:
+    inset 0 2px 1px rgb(255 255 255 / 0.1),
+    inset 0 -0.4rem 0.8rem rgb(0 0 0 / 0.45),
+    inset 0 0 0 0.7rem rgb(255 255 255 / 0.05),
+    inset 0 0 0 calc(0.7rem + 1px) rgb(0 0 0 / 0.5),
+    inset 0 0 0 1.35rem var(--band);
+  outline: 1px solid rgb(0 0 0 / 0.5);
+  outline-offset: calc(-1.35rem - 1px);
+}
+/* Its shade at the foot, which at night deepens and eases as the stone breathes. */
+body[data-room='troll'] .text::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  box-shadow: inset 0 -1.6rem 2.2rem -0.6rem rgb(0 0 0 / 0.85);
+  opacity: 0.75;
+}
+body[data-room='troll'][data-sky='off'] .text::before {
+  animation: troll-breath var(--life-breath) var(--glass-ease-tide) infinite alternate;
+}
+@keyframes troll-breath {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+body[data-room='troll'] .leaf > section.text:nth-of-type(even) {
+  justify-self: end;
+  clip-path: polygon(
+    0 1.6rem,
+    4% 0.4rem,
+    22% 0,
+    47% 0.6rem,
+    71% 0.1rem,
+    92% 0.7rem,
+    100% 2.4rem,
+    100% calc(100% - 2rem),
+    96% 100%,
+    40% calc(100% - 0.4rem),
+    2% 100%,
+    0.5% 60%
+  );
+}
+body[data-room='troll'] .leaf > section.text:nth-of-type(3) {
+  justify-self: center;
+}
+body[data-room='troll'] .serpent {
+  position: absolute;
+  top: 0.3rem;
+  left: calc(50% - 1.3rem);
+  width: 2.6rem;
+  height: 1.6rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='26' viewBox='0 0 42 26' fill='none' stroke='%23eeeae0' stroke-width='1' stroke-linejoin='round'%3E%3Cpath d='M2 22C6 10 14 4 26 4c8 0 14 4 14 10s-6 8-11 6' stroke-opacity='.6'/%3E%3Cpath d='M26 4c3-3 9-3 12 1 2 3 0 6-4 6-3 0-6-2-8-7z' fill='%23a3b06a' fill-opacity='.5'/%3E%3Ccircle cx='33' cy='6' r='1' fill='%23eeeae0'/%3E%3Cpath d='M37 8l4 2' stroke-opacity='.7'/%3E%3C/svg%3E")
+    0 0 / contain no-repeat;
+  animation: troll-carve var(--life-ink) var(--glass-ease-clear) calc(var(--life-beat) * 3) both;
+}
+@keyframes troll-carve {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+
+/* The standing stone at the head, and the cairn the case stands in. */
+body[data-room='troll'] .creature-head {
+  padding: var(--s-4) var(--s-4) var(--s-3);
+  border-left: 0.4rem solid var(--granite);
+}
+body[data-room='troll'] .room {
+  padding: var(--s-4);
+  background: linear-gradient(to bottom, rgb(58 63 71 / 0.5), transparent);
+}
+/* The scree at the foot: small stones, loose. */
+body[data-room='troll'] .exemplars {
+  padding-top: var(--s-4);
+  background:
+    radial-gradient(ellipse 0.9rem 0.5rem at 10% 6%, var(--granite) 98%, transparent) 0 0 / 7rem
+      3rem,
+    radial-gradient(ellipse 0.6rem 0.4rem at 60% 10%, #4a5058 98%, transparent) 0 0 / 5rem 2.5rem;
+  background-repeat: repeat-x;
+}
+body[data-room='troll'] .exemplars .reports li {
+  clip-path: polygon(0.4rem 0, 100% 0.25rem, calc(100% - 0.3rem) 100%, 0 calc(100% - 0.35rem));
+  background: var(--granite);
+}
+
+/* The heading hand: cut capitals in lichen green, a rune scored before them. */
+body[data-room='troll'] .text h2,
+body[data-room='troll'] .exemplars h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  font-size: 1.3rem;
+  color: var(--r-accent);
+  text-shadow:
+    0 -1px 0 rgb(0 0 0 / 0.7),
+    0 1px 0 rgb(255 255 255 / 0.12);
+  transition:
+    color var(--life-dawn) var(--glass-ease-clear),
+    text-shadow var(--life-dawn) var(--glass-ease-clear);
+}
+body[data-room='troll'] .text h2::before,
+body[data-room='troll'] .exemplars h2::before {
+  content: '';
+  flex: none;
+  width: 0.55em;
+  height: 0.95em;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 18' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M2 1v16M2 5l6 4-6 4'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+/*
+ * Lichen (R-B-LIVE-08, night): rosettes of crust, yellow-green and orange, creeping in from both
+ * edges of each stone all the way down it the longer the reader stays (--lichen, written on the
+ * stone); then its stain spreads along the edges, and at last out across the face, behind the words.
+ */
+body[data-room='troll'] .text::after {
+  --edges: clamp(0, (var(--lichen, 0) - 0.05) * 2.2, 1);
+  --face: clamp(0, (var(--lichen, 0) - 0.3) * 1.6, 1);
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='320'%3E%3Cfilter id='a' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.05' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .64 0 0 0 0 .69 0 0 0 0 .42 7 0 0 0 -3.95'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='.85'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Cfilter id='b' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.08' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .84 0 0 0 0 .59 0 0 0 0 .29 8 0 0 0 -5'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='.85'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3ClinearGradient id='g'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.5' stop-color='%23fff' stop-opacity='0'/%3E%3C/linearGradient%3E%3Cmask id='m'%3E%3Crect width='160' height='320' fill='url(%23g)'/%3E%3C/mask%3E%3Cg mask='url(%23m)'%3E%3Crect width='160' height='320' filter='url(%23a)'/%3E%3Crect width='160' height='320' filter='url(%23b)'/%3E%3C/g%3E%3C/svg%3E")
+      left top / 9rem 20rem repeat-y,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='320'%3E%3Cfilter id='a' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.05' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .64 0 0 0 0 .69 0 0 0 0 .42 7 0 0 0 -3.95'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='.85'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Cfilter id='b' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.08' numOctaves='2' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .84 0 0 0 0 .59 0 0 0 0 .29 8 0 0 0 -5'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='.85'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3ClinearGradient id='g' x1='1' x2='0'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.5' stop-color='%23fff' stop-opacity='0'/%3E%3C/linearGradient%3E%3Cmask id='m'%3E%3Crect width='160' height='320' fill='url(%23g)'/%3E%3C/mask%3E%3Cg mask='url(%23m)'%3E%3Crect width='160' height='320' filter='url(%23a)'/%3E%3Crect width='160' height='320' filter='url(%23b)'/%3E%3C/g%3E%3C/svg%3E")
+      right 0 top 0 / 9rem 20rem repeat-y,
+    radial-gradient(
+        ellipse 4.5rem 7rem at 0 50%,
+        rgb(163 176 106 / calc(var(--edges) * 0.4)),
+        transparent
+      )
+      0 0 / 100% 24rem repeat-y,
+    radial-gradient(
+        ellipse 4rem 6rem at 100% 50%,
+        rgb(214 150 70 / calc(var(--edges) * 0.34)),
+        transparent
+      )
+      0 10rem / 100% 24rem repeat-y,
+    radial-gradient(
+        ellipse 9rem 6rem at 70% 50%,
+        rgb(163 176 106 / calc(var(--face) * 0.3)),
+        transparent
+      )
+      0 4rem / 100% 30rem repeat-y;
+  opacity: min(1, var(--lichen, 0) * 3.6);
+}
+
+/*
+ * The sun (R-B-LIVE-09, day): its light rakes once across the leaf, and where it has passed
+ * every heading and ornament has gone to grey stone.
+ */
+body[data-room='troll'] .sunstrike {
+  overflow: hidden;
+}
+body[data-room='troll'] .sunstrike::before {
+  content: '';
+  position: absolute;
+  inset: -20% auto -20% -60%;
+  width: 45%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgb(255 236 200 / 0.08) 40%,
+    rgb(255 240 210 / 0.14) 50%,
+    rgb(255 236 200 / 0.08) 60%,
+    transparent
+  );
+  transform: translateX(0) skewX(-12deg);
+  opacity: 0;
+}
+body[data-room='troll'][data-sweep] .sunstrike::before {
+  animation: troll-sun var(--life-dawn) var(--glass-ease-tide) both;
+}
+@keyframes troll-sun {
+  0% {
+    opacity: 0;
+    transform: translateX(0) skewX(-12deg);
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(380%) skewX(-12deg);
+  }
+}
+/* By day the sun lies raking across every stone's face from the upper left. */
+body[data-room='troll'][data-sky='on'] .text {
+  --daylight: linear-gradient(
+    118deg,
+    rgb(255 238 206 / 0.2),
+    rgb(255 238 206 / 0.1) 38%,
+    transparent 62%
+  );
+}
+body[data-room='troll'][data-struck] :is(.text h2, .exemplars h2, h1) {
+  color: #a0a4a8;
+  text-shadow:
+    0 -1px 0 rgb(0 0 0 / 0.8),
+    0 1px 0 rgb(255 255 255 / 0.2);
+}
+body[data-room='troll'][data-struck] :is(.serpent, .initial) {
+  filter: grayscale(1) brightness(0.85);
+  transition: filter var(--life-dawn) var(--glass-ease-clear);
+}
+
+/* The initial: its letter on a little stone ringed by the serpent, its head at the foot. */
+body[data-room='troll'] .initial .i-stone {
+  fill: #4a5058;
+  stroke: #2a2f37;
+  stroke-width: 1.5;
+}
+body[data-room='troll'] .initial .i-band {
+  fill: none;
+  stroke: #a3b06a;
+  stroke-width: 3;
+  stroke-dasharray: 1;
+  animation: troll-ring var(--life-draw) var(--glass-ease-clear) both;
+}
+body[data-room='troll'] .initial .i-head {
+  fill: #a3b06a;
+}
+body[data-room='troll'] .initial-letter {
+  font-weight: 700;
+  color: #eeeae0;
+  text-shadow: 0 -1px 0 #000;
+}
+@keyframes troll-ring {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The chisel: a mason's, its edge the pointer's. */
+body.cursor-chisel[data-room='troll'],
+body.cursor-chisel[data-room='troll'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1 4l3-3 9 9-3 3z' fill='%23c9d0d6' stroke='%23101b33' stroke-width='1' stroke-linejoin='round'/%3E%3Cpath d='M11 11l10 10' stroke='%23101b33' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M11 11l10 10' stroke='%238a6a44' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E")
+      1 3,
+    auto;
+}
+body.cursor-chisel[data-room='troll'] :is(a, button, summary, label, [role='button']),
+body.cursor-chisel[data-room='troll'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='troll'][data-sky='on'] :is(.text h2, .exemplars h2, h1) {
+    color: #a0a4a8;
+  }
+  body[data-room='troll'][data-sky='off'] .text::before {
+    animation: none;
+  }
+}

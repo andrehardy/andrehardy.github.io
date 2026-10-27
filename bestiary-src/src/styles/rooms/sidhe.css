@@ -1,0 +1,377 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Sidhe's own look (R-B-GLASS-06): initials set large in moss gold, as an insular hand
+ * begins a page; and an entrance in which a seam of light opens down the middle of the case,
+ * as a door opens in the hill.
+ */
+body[data-room='sidhe'] h1::first-letter,
+body[data-room='sidhe'] .text h2::first-letter {
+  font-size: 1.45em;
+  line-height: 0.8;
+  color: var(--r-accent);
+  font-style: italic;
+  font-weight: 400;
+}
+body[data-room='sidhe'] main .label {
+  letter-spacing: 0.08em;
+}
+body[data-room='sidhe'] .specimen .window {
+  animation: sidhe-seam var(--glass-clear-in) var(--glass-ease-clear) var(--glass-clear-out) both;
+}
+
+@keyframes sidhe-seam {
+  from {
+    clip-path: inset(0 49.5% 0 49.5%);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='sidhe'] .specimen .window {
+    animation: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): the hill. Its season dresses it (--bloom: hawthorn, gold or rowan; the
+ * winter leaves it bare and the door shut). Its entrance is the door opening: a seam of light
+ * down the middle of the leaf, widening until the whole hill stands open.
+ */
+body[data-room='sidhe'] {
+  --bloom: #f3efe6;
+  --bloom-2: #e8d6c8;
+  --door-light: 1;
+  --glamour: 1;
+}
+body[data-room='sidhe'][data-sky-note='summer'] {
+  --bloom: #c4ad55;
+  --bloom-2: #e2c873;
+}
+body[data-room='sidhe'][data-sky-note='autumn'] {
+  --bloom: #c0392b;
+  --bloom-2: #d9783a;
+}
+body[data-room='sidhe'][data-sky-note='winter'] {
+  --bloom: transparent;
+  --bloom-2: transparent;
+  --door-light: 0;
+  --glamour: 0.35;
+}
+body[data-room='sidhe'] .leaf {
+  animation: sidhe-door var(--life-ink) var(--glass-ease-clear) backwards;
+}
+/*
+ * The season over the whole hill, behind the words: its light laid on the ground and its petals
+ * (or leaves) scattered down it. In winter there is neither.
+ */
+body[data-room='sidhe'] .leaf::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 30% 40%, var(--bloom) 0 2.4px, transparent 3.2px) 0 0 / 9rem 7rem,
+    radial-gradient(circle at 70% 60%, var(--bloom-2) 0 2px, transparent 2.8px) 3rem 2rem / 11rem
+      8rem,
+    radial-gradient(ellipse 4px 2px at 50% 50%, var(--bloom) 0 70%, transparent) 5rem 4rem / 13rem
+      10rem,
+    linear-gradient(color-mix(in srgb, var(--bloom) 11%, transparent), transparent 70vh);
+  background-color: color-mix(in srgb, var(--bloom) 9%, transparent);
+}
+@keyframes sidhe-door {
+  from {
+    clip-path: inset(0 48% 0 48% round 50% 50% 0 0);
+    opacity: 0.3;
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 0);
+    opacity: 1;
+  }
+}
+
+/* The mound and its door, standing over the name; the door lit from within, unless it is winter. */
+body[data-room='sidhe'] .creature-head {
+  position: relative;
+  padding-top: clamp(4rem, 10vw, 7rem);
+  text-align: center;
+}
+body[data-room='sidhe'] .mound {
+  position: absolute;
+  inset: 0 0 auto;
+  margin-inline: auto;
+  width: min(100%, 34rem);
+  height: clamp(4.5rem, 11vw, 7.5rem);
+  overflow: visible;
+}
+.mound .m-hill {
+  fill: color-mix(in srgb, #2f4a3a 60%, transparent);
+  stroke: #4f7a5f;
+  stroke-width: 1;
+}
+.mound .m-hatch {
+  fill: none;
+  stroke: #6f9a7a;
+  stroke-width: 0.6;
+  opacity: 0.6;
+}
+.mound .m-door {
+  fill: #0d0a14;
+  stroke: #8a8f9a;
+  stroke-width: 1.2;
+}
+.mound .m-lintel {
+  fill: none;
+  stroke: #a6abb5;
+  stroke-width: 2;
+}
+.mound .m-light {
+  fill: #f0b878;
+  opacity: calc(var(--door-light) * 0.85);
+  --glow: #f0b878;
+  filter: drop-shadow(0 0 6px var(--glow));
+}
+
+/* The turf line: the grass on the hill's skin, and the season's flowers in it. */
+body[data-room='sidhe'] .turf {
+  position: relative;
+  height: 2.2rem;
+  margin: var(--s-3) calc(var(--gutter) * -1) var(--s-5);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='36' viewBox='0 0 160 36' fill='none' stroke='%237fa88a' stroke-width='.8' stroke-linecap='round'%3E%3Cpath d='M2 30c1-8 3-14 6-20M6 30c0-6-2-12-5-16M12 30c2-9 6-15 10-19M18 30c-1-7-4-12-8-15M26 30c1-10 2-16 6-22M31 30c0-7-3-11-6-14M40 30c2-8 5-13 9-17M46 30c0-9-2-14-6-18M55 30c1-6 4-12 8-15M62 30c-1-8-3-13-6-17M70 30c2-10 6-16 10-20M77 30c0-6-2-10-5-13M86 30c1-8 4-13 7-17M92 30c-1-9-4-14-7-18M101 30c2-7 4-12 8-15M108 30c0-8-2-13-5-17M116 30c1-9 5-15 9-19M123 30c-1-6-3-11-6-14M132 30c2-8 5-14 8-18M139 30c0-9-3-14-7-18M147 30c1-7 4-12 7-15M154 30c-1-8-3-12-6-16'/%3E%3C/svg%3E")
+      0 0 / 10rem 2.2rem repeat-x,
+    linear-gradient(to bottom, transparent 80%, #2f4a3a 82%, #1d2a22);
+  animation: sidhe-turf var(--life-draw) var(--glass-ease-clear) both;
+}
+body[data-room='sidhe'] .turf .bloom {
+  position: absolute;
+  inset: 0 0 0.6rem;
+  background:
+    radial-gradient(circle at 20% 30%, var(--bloom) 0 1.6px, transparent 2.2px) 0 0 / 3.7rem 1.4rem,
+    radial-gradient(circle at 60% 55%, var(--bloom-2) 0 1.3px, transparent 1.9px) 0.8rem 0.2rem /
+      5.3rem 1.6rem,
+    radial-gradient(circle at 40% 20%, var(--bloom) 0 1.2px, transparent 1.8px) 2rem 0 / 6.1rem
+      1.5rem;
+}
+@keyframes sidhe-turf {
+  from {
+    clip-path: inset(0 50%);
+  }
+}
+
+/*
+ * The chambers, under the turf: each corbelled in dry stone, its courses drawn about it, and a
+ * passage running down from one to the next.
+ */
+body[data-room='sidhe'] .leaf {
+  --passage: 1.4rem;
+}
+body[data-room='sidhe'] .text,
+body[data-room='sidhe'] .exemplars {
+  position: relative;
+  margin-left: calc(var(--passage) * 2);
+  padding: var(--s-4) clamp(1rem, 3vw, 2.25rem);
+  border: 1px solid rgb(166 171 181 / 0.45);
+  background: color-mix(in srgb, rgb(26 20 40 / 0.55), var(--bloom) 8%);
+  box-shadow:
+    inset 0 0 0 5px rgb(26 20 40 / 0.6),
+    inset 0 0 0 6px rgb(166 171 181 / 0.2),
+    inset 0 1.5rem 2rem -1.5rem rgb(0 0 0 / 0.7);
+}
+body[data-room='sidhe'] .text {
+  max-width: calc(var(--measure) + 4.5rem);
+}
+body[data-room='sidhe'] .text::before,
+body[data-room='sidhe'] .exemplars::before {
+  content: '';
+  position: absolute;
+  top: -2.6rem;
+  bottom: 50%;
+  left: calc(var(--passage) * -1.25);
+  width: var(--passage);
+  border-left: 1px dashed rgb(166 171 181 / 0.4);
+  border-bottom: 1px dashed rgb(166 171 181 / 0.4);
+  pointer-events: none;
+}
+body[data-room='sidhe'] [data-part='screen'] .anatomy {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--s-2) var(--s-4);
+}
+body[data-room='sidhe'] [data-part='screen'] .anatomy :is(dt, dd) {
+  margin: 0;
+}
+body[data-room='sidhe'] [data-part='screen'] .anatomy dt {
+  padding-right: var(--s-3);
+  border-right: 1px solid rgb(166 171 181 / 0.3);
+  font-style: italic;
+  font-family: var(--f-text);
+  letter-spacing: 0;
+}
+@media (max-width: 40rem) {
+  body[data-room='sidhe'] [data-part='screen'] .anatomy {
+    grid-template-columns: 1fr;
+  }
+  body[data-room='sidhe'] [data-part='screen'] .anatomy dt {
+    border-right: 0;
+  }
+}
+body[data-room='sidhe'] [data-part='neighbour'] {
+  border-style: dashed;
+}
+
+/* The heading hand: an insular book hand, sloped, the first letter swelling in moss gold. */
+body[data-room='sidhe'] .text h2,
+body[data-room='sidhe'] .exemplars h2 {
+  font-style: italic;
+  font-size: 1.7rem;
+  letter-spacing: 0.01em;
+  color: var(--r-accent);
+}
+body[data-room='sidhe'] .exemplars h2::first-letter {
+  font-size: 1.45em;
+  line-height: 0.8;
+  color: var(--r-accent-2);
+}
+body[data-room='sidhe'] .text h2::first-letter {
+  color: var(--r-accent-2);
+}
+
+/* The initial: its letter in a square of interlace, drawn as an insular hand begins a page. */
+body[data-room='sidhe'] .initial .i-field {
+  fill: rgb(47 74 58 / 0.55);
+}
+body[data-room='sidhe'] .initial .i-knot {
+  fill: none;
+  stroke: #c4ad55;
+  stroke-width: 2.2;
+  stroke-dasharray: 1;
+  animation: sidhe-knot var(--life-dawn) var(--glass-ease-clear) both;
+}
+body[data-room='sidhe'] .initial .i-rim {
+  fill: none;
+  stroke: #c4ad55;
+  stroke-width: 1.4;
+}
+body[data-room='sidhe'] .initial-letter {
+  font-style: italic;
+  color: #f3efe6;
+  text-shadow: 0 1px 4px #1a1428;
+}
+@keyframes sidhe-knot {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/*
+ * The glamour (R-B-LIVE-08): a shifting sheen over the hill's ground, under the words. Where the
+ * iron comes it is stripped away, and the bare grey stone shows through: a disc of the stone
+ * carried over the sheen by the iron, its grain held still as it moves, so nothing the size of
+ * the page is redrawn as the hand goes.
+ */
+body[data-room='sidhe'] .glamour {
+  --stone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .56 0 0 0 0 .6 0 0 0 .35 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  overflow: hidden;
+  background: var(--stone);
+  background-color: rgb(40 40 46 / 0.5);
+}
+body[data-room='sidhe'] .glamour .veil {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: var(--glamour);
+}
+body[data-room='sidhe'] .glamour .bare {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 26rem;
+  height: 26rem;
+  overflow: hidden;
+  opacity: var(--iron, 0);
+  translate: calc(var(--ix, -999) * 1px - 13rem) calc(var(--iy, -999) * 1px - 13rem);
+  mask-image: radial-gradient(circle closest-side, #000 60%, transparent);
+  will-change: translate, opacity;
+}
+/* The bare stone: cold, pale, grey granite, nothing of the glamour's colour left in it. */
+body[data-room='sidhe'] .glamour .stone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  translate: calc(13rem - var(--ix, -999) * 1px) calc(13rem - var(--iy, -999) * 1px);
+  background:
+    var(--stone),
+    var(--stone) 70px 110px,
+    #6c6e78;
+}
+/*
+ * The sheen shifts as a glamour does, by one light giving way to another, never by moving. It
+ * turns in slow steps, each a fresh light laid on the ground, not a layer kept moving.
+ */
+@property --shift {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+body[data-room='sidhe'] .glamour .sheen {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      105deg,
+      transparent 20%,
+      rgb(185 163 227 / 0.22) 32%,
+      rgb(240 184 120 / 0.16) 40%,
+      rgb(127 209 193 / 0.18) 48%,
+      transparent 60%
+    ),
+    radial-gradient(ellipse at 30% 40%, rgb(75 58 107 / 0.9), transparent 60%),
+    radial-gradient(ellipse at 70% 60%, rgb(47 74 58 / 0.7), transparent 60%), #1a1428;
+}
+body[data-room='sidhe'] .glamour .sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    75deg,
+    transparent 35%,
+    rgb(127 209 193 / 0.2) 48%,
+    rgb(240 184 120 / 0.16) 56%,
+    rgb(185 163 227 / 0.22) 64%,
+    transparent 78%
+  );
+  opacity: var(--shift);
+  animation: sidhe-shimmer var(--life-weather) steps(12) infinite alternate;
+}
+@keyframes sidhe-shimmer {
+  to {
+    --shift: 1;
+  }
+}
+
+/* The iron nail: black, cold, its point the pointer's. */
+body.cursor-iron[data-room='sidhe'],
+body.cursor-iron[data-room='sidhe'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M2 22L16 8' stroke='%230d0a14' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M2 22L16 8' stroke='%235b5f66' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M3.5 20.5L15 9' stroke='%23a6abb5' stroke-width='.7'/%3E%3Cpath d='M13 5l6 6' stroke='%230d0a14' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M13 5l6 6' stroke='%236b7078' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E")
+      2 22,
+    auto;
+}
+body.cursor-iron[data-room='sidhe'] :is(a, button, summary, label, [role='button']),
+body.cursor-iron[data-room='sidhe'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='sidhe'] .glamour .sheen::after {
+    animation: none;
+  }
+}

@@ -1,0 +1,295 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Djinn's own look (R-B-GLASS-06): an eight-pointed star in brass set before its name and
+ * its headings, as the seal is cut in the lead; an entrance in which the smoke curls back into
+ * the stopper; and the heat of the open seal on the room's print (heat.ts).
+ */
+@property --djinn-smoke {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 120%;
+}
+
+body[data-room='djinn'] h1::before,
+body[data-room='djinn'] .text h2::before {
+  content: '';
+  display: inline-block;
+  width: 0.62em;
+  height: 0.62em;
+  margin-right: 0.35em;
+  vertical-align: 0.06em;
+  background: linear-gradient(
+    160deg,
+    var(--r-accent),
+    color-mix(in srgb, var(--r-accent), #000 45%)
+  );
+  clip-path: polygon(
+    50% 0,
+    64.64% 14.64%,
+    85.36% 14.64%,
+    85.36% 35.36%,
+    100% 50%,
+    85.36% 64.64%,
+    85.36% 85.36%,
+    64.64% 85.36%,
+    50% 100%,
+    35.36% 85.36%,
+    14.64% 85.36%,
+    14.64% 64.64%,
+    0 50%,
+    14.64% 35.36%,
+    14.64% 14.64%,
+    35.36% 14.64%
+  );
+}
+body[data-room='djinn'] .text h2::before {
+  width: 0.5em;
+  height: 0.5em;
+}
+body[data-room='djinn'] .specimen .window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 24%,
+    rgb(72 58 104 / 0.95) var(--djinn-smoke),
+    transparent calc(var(--djinn-smoke) + 30%)
+  );
+  pointer-events: none;
+  animation: djinn-smoke var(--t-reveal) var(--glass-ease-clear) var(--glass-clear-out) both;
+}
+/* The room's own print, never the house's bar: the head, the case's caption and plaque, and the
+   card beside it are what the reader sees while the seal is held; the passages below bend too. */
+body[data-room='djinn'][data-heat]
+  :is(
+    .creature-head,
+    .specimen > figcaption,
+    .vitrine .plinth,
+    .accession,
+    .exemplars,
+    [data-room-text]
+  ) {
+  filter: url(#djinn-heat);
+}
+
+@keyframes djinn-smoke {
+  from {
+    opacity: 1;
+    --djinn-smoke: 120%;
+  }
+  to {
+    opacity: 0;
+    --djinn-smoke: 0%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='djinn'] .specimen .window::after {
+    display: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): the vessel's inventory engraved on brass. A band of beaten brass, worked
+ * with the seal, runs down the left; every heading is cut in a cartouche. A hand held down lets
+ * smoke rise over the page, behind the words (--smoke); after sunset it comes heavier. Its
+ * entrance is the leaf gathering itself out of smoke.
+ */
+body[data-room='djinn'] .leaf {
+  padding-left: clamp(2.75rem, 6vw, 4.5rem);
+}
+body[data-room='djinn'] .leaf :is(section, .room, .creature-head) {
+  animation: djinn-gather var(--life-ink) var(--glass-ease-clear) backwards;
+}
+body[data-room='djinn'] .leaf .room-stack > :nth-child(n + 6) {
+  animation-delay: var(--life-beat);
+}
+@keyframes djinn-gather {
+  from {
+    opacity: 0;
+    scale: 1.03 0.96;
+    translate: 0 -0.6rem;
+  }
+}
+body[data-room='djinn'] .band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: clamp(1.4rem, 3vw, 2.2rem);
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='48' viewBox='0 0 32 48'%3E%3Cpath d='M16 10l4 4h6v6l4 4-4 4v6h-6l-4 4-4-4H6v-6l-4-4 4-4v-6h6z' fill='none' stroke='%233b2a10' stroke-width='1.2'/%3E%3Ccircle cx='16' cy='24' r='3' fill='none' stroke='%233b2a10' stroke-width='1'/%3E%3Cpath d='M0 2h32M0 46h32' stroke='%233b2a10' stroke-width='.8' stroke-dasharray='1 2'/%3E%3C/svg%3E")
+      center top / 100% auto repeat-y,
+    linear-gradient(
+      90deg,
+      #6e5020 0,
+      #c99a48 22%,
+      #f0d08a 38%,
+      #b5893a 55%,
+      #7a5a22 80%,
+      #4a3512 100%
+    );
+  box-shadow:
+    inset -1px 0 0 rgb(255 230 170 / 0.35),
+    2px 0 6px rgb(0 0 0 / 0.5);
+}
+body[data-room='djinn'][data-sky='on'] .band {
+  filter: brightness(0.8) sepia(0.2);
+}
+
+/* The cartouches: each heading cut in a panel of brass, ringed twice. */
+body[data-room='djinn'] .text h2,
+body[data-room='djinn'] .exemplars h2 {
+  display: table;
+  padding: 0.35em 1.3em 0.4em;
+  font-size: 1.35rem;
+  color: #f0d08a;
+  background: linear-gradient(rgb(181 137 58 / 0.14), rgb(181 137 58 / 0.04));
+  border: 1px solid rgb(208 161 76 / 0.75);
+  outline: 1px solid rgb(208 161 76 / 0.3);
+  outline-offset: 3px;
+}
+body[data-room='djinn'] .leaf [data-frame='cartouche'] {
+  max-width: calc(var(--measure) + 2rem);
+  margin-bottom: var(--s-5);
+}
+
+/* The vessel: the case set in a niche whose head is cut to the lamp's arch. */
+body[data-room='djinn'] .leaf > .case-bay {
+  --rise: 3rem;
+  position: relative;
+  padding: var(--s-4);
+  padding-top: var(--rise);
+  margin-bottom: var(--s-5);
+}
+body[data-room='djinn'] .leaf > .case-bay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgb(208 161 76 / 0.35);
+  mask:
+    var(--arch-rule) top / 100% var(--rise) no-repeat,
+    linear-gradient(#000 0 0) 0 var(--rise) / 1px calc(100% - var(--rise)) no-repeat,
+    linear-gradient(#000 0 0) 100% var(--rise) / 1px calc(100% - var(--rise)) no-repeat,
+    linear-gradient(#000 0 0) bottom / 100% 1px no-repeat;
+}
+
+/*
+ * The smoke: violet, standing up the page behind the words while the hand is held down (--smoke,
+ * written on the smoke alone), each column of it swaying and swelling where it stands; heavier
+ * after dark.
+ */
+body[data-room='djinn'] .smoke {
+  overflow: hidden;
+  opacity: var(--smoke, 0);
+  will-change: opacity;
+}
+/* Each plume kept under half the view even at the top of its sway (R-B-LIVE-11); three of them fill it. */
+body[data-room='djinn'] .plume {
+  position: absolute;
+  bottom: -10vh;
+  width: 48vw;
+  height: 80vh;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 40% 30% at 50% 30%, rgb(140 118 175 / 0.5), transparent 70%),
+    radial-gradient(
+      ellipse at 50% 55%,
+      rgb(118 98 150 / 0.62),
+      rgb(91 74 110 / 0.3) 45%,
+      transparent 70%
+    );
+  animation: djinn-plume var(--life-weather) var(--glass-ease-tide) infinite alternate paused;
+}
+body[data-room='djinn'][data-sky='on'] .plume {
+  background:
+    radial-gradient(ellipse 40% 30% at 50% 30%, rgb(160 132 196 / 0.6), transparent 70%),
+    radial-gradient(
+      ellipse at 50% 55%,
+      rgb(128 106 162 / 0.75),
+      rgb(91 74 110 / 0.4) 45%,
+      transparent 70%
+    );
+}
+body[data-room='djinn'][data-smoking] .plume {
+  animation-play-state: running;
+}
+body[data-room='djinn'] .plume:nth-child(1) {
+  left: -10vw;
+}
+body[data-room='djinn'] .plume:nth-child(2) {
+  left: 26vw;
+  bottom: 4vh;
+  animation-delay: calc(var(--life-weather) * -0.33);
+  animation-duration: calc(var(--life-weather) * 1.13);
+}
+body[data-room='djinn'] .plume:nth-child(3) {
+  left: 62vw;
+  animation-delay: calc(var(--life-weather) * -0.67);
+  animation-duration: calc(var(--life-weather) * 0.93);
+}
+@keyframes djinn-plume {
+  from {
+    transform: translateY(6vh) scale(0.94) rotate(-2deg);
+  }
+  to {
+    transform: translateY(-8vh) scale(1.03) rotate(3deg);
+  }
+}
+
+/* After sunset the lamp is lit: its glow lies down the whole brass, behind the words. */
+body[data-room='djinn'] .leaf::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 42% at 55% 40%, rgb(208 161 76 / 0.17), transparent 72%) 0
+    0 / 100% 100vh repeat-y;
+  opacity: 0;
+  transition: opacity var(--life-dawn) var(--glass-ease-clear);
+}
+body[data-room='djinn'][data-sky='on'] .leaf::after {
+  opacity: 1;
+}
+
+/* The initial: its letter in the eight-pointed seal, cut in brass. */
+body[data-room='djinn'] .initial .i-star {
+  fill: #2a2015;
+  stroke: #d0a14c;
+  stroke-width: 2;
+}
+body[data-room='djinn'] .initial .i-inner {
+  fill: none;
+  stroke: #d0a14c;
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  animation: djinn-cut var(--life-draw) var(--glass-ease-clear) both;
+}
+body[data-room='djinn'] .initial-letter {
+  font-size: 2.9rem;
+  color: #f0d08a;
+}
+@keyframes djinn-cut {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The seal ring: a band of brass, the eight-pointed star cut in its bezel. */
+body.cursor-seal-ring[data-room='djinn'],
+body.cursor-seal-ring[data-room='djinn'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='14' cy='15' r='7' stroke='%23100d1a' stroke-width='4'/%3E%3Ccircle cx='14' cy='15' r='7' stroke='%23d0a14c' stroke-width='2'/%3E%3Cpath d='M1 1l5 2-2 3z' fill='%23d0a14c' stroke='%23100d1a' stroke-width='.8'/%3E%3Cpath d='M9 4l2 2h3v3l2 2-2 2v3h-3l-2 2-2-2H4v-3l-2-2 2-2V6h3z' transform='translate(-1 -1) scale(.7)' fill='%236fb7ff' stroke='%23100d1a' stroke-width='.8'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+}
+body.cursor-seal-ring[data-room='djinn'] :is(a, button, summary, label, [role='button']),
+body.cursor-seal-ring[data-room='djinn'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}

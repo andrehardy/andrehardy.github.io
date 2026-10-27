@@ -1,0 +1,247 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Unicorn's own look (R-B-GLASS-06): Lombardic capitals in pomegranate red, set in a
+ * ruled box with the hairline flourish of a scribe's pen, as a tapestry's legend begins; and an
+ * entrance in which the dawn mist parts from the middle of the clearing outward.
+ */
+@property --unicorn-clear {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+body[data-room='unicorn'] h1::first-letter,
+body[data-room='unicorn'] .text h2::first-letter {
+  color: var(--r-accent);
+  font-size: 1.35em;
+  line-height: 1;
+  padding: 0 0.12em;
+  margin-right: 0.08em;
+  border: 1px solid color-mix(in srgb, var(--r-accent), transparent 40%);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, var(--c-ground), transparent 20%),
+    inset 0 0 0 3px color-mix(in srgb, var(--r-accent), transparent 70%);
+}
+body[data-room='unicorn'] main .label {
+  letter-spacing: 0.12em;
+  font-variant: small-caps;
+}
+body[data-room='unicorn'] .specimen .window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 60%,
+    transparent var(--unicorn-clear),
+    rgb(235 236 228 / 0.92) calc(var(--unicorn-clear) + 40%)
+  );
+  pointer-events: none;
+  animation: unicorn-mist var(--t-reveal) var(--glass-ease-clear) var(--glass-clear-out) both;
+}
+
+@keyframes unicorn-mist {
+  from {
+    opacity: 1;
+    --unicorn-clear: 0%;
+  }
+  to {
+    opacity: 0;
+    --unicorn-clear: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='unicorn'] .specimen .window::after {
+    display: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): a millefleurs hanging. A woven border of flowering ground right round it;
+ * the field inside woven too, warp and weft; legends lettered on banderoles. Its entrance is the
+ * hanging woven: row by row from the top, as the weft is beaten up on the loom.
+ */
+body[data-room='unicorn'] .leaf {
+  --weft: rgb(29 42 32 / 0.035);
+  isolation: isolate;
+  padding: clamp(2.25rem, 5vw, 4rem) clamp(1.25rem, 5vw, 4.5rem);
+  text-align: center;
+  background:
+    repeating-linear-gradient(to right, var(--weft) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(to bottom, var(--weft) 0 1px, transparent 1px 3px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='260' viewBox='0 0 220 260' fill='none' stroke='%232f5d3a' stroke-width='.9' stroke-dasharray='2 1.6' stroke-linecap='round' opacity='.32'%3E%3Cpath d='M30 60c2-14 8-20 14-24M36 52c-5-3-9-2-12 1M40 46c3-5 8-6 12-4'/%3E%3Ccircle cx='46' cy='34' r='3.5' stroke='%23b3263e'/%3E%3Cpath d='M170 190c-2-12-8-18-14-22M164 182c5-3 9-2 12 1M160 176c-3-5-8-6-12-4'/%3E%3Ccircle cx='154' cy='166' r='3' stroke='%23b3263e'/%3E%3Cpath d='M180 40c-6 6-8 14-6 22M176 50c5 0 8-3 9-7M120 230c4-8 10-12 18-12M128 224c-2-4-6-5-9-4'/%3E%3Ccircle cx='60' cy='200' r='2.6'/%3E%3Cpath d='M60 203v18M54 214c3 0 5-2 6-5M66 216c-3 0-5-2-6-5'/%3E%3C/svg%3E")
+      0 0 / 13.75rem 16.25rem,
+    var(--c-ground);
+  animation: unicorn-weave var(--life-draw) steps(26, jump-end) backwards;
+}
+@keyframes unicorn-weave {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+body[data-room='unicorn'] .leaf :is(section, .room, .creature-head) {
+  margin-inline: auto;
+}
+body[data-room='unicorn'] .text {
+  max-width: var(--measure);
+  text-align: left;
+}
+body[data-room='unicorn'] .crumb {
+  justify-content: center;
+}
+
+/*
+ * The woven border: a band of dark millefleurs ground with its sprigs, edged in red; as tight as
+ * the reader's calm has let it close (--weave), and unravelling where it is not.
+ */
+body[data-room='unicorn'] .border {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: clamp(0.9rem, 2vw, 1.5rem) solid transparent;
+  border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Crect width='72' height='72' fill='%232f5d3a'/%3E%3Cg fill='none' stroke='%23f6f1e3' stroke-width='.9' stroke-dasharray='1.6 1.2' stroke-linecap='round'%3E%3Cpath d='M6 18c4-3 8-3 12 0M12 18v8M30 10c2 4 2 8 0 12M54 16c4 2 6 6 6 10M8 54c4-2 8-2 10 2M36 52c3 3 3 7 0 10M58 50c-4 2-6 6-6 10'/%3E%3C/g%3E%3Cg fill='%23b3263e'%3E%3Ccircle cx='12' cy='15' r='2.2'/%3E%3Ccircle cx='60' cy='28' r='2'/%3E%3Ccircle cx='36' cy='64' r='2.2'/%3E%3C/g%3E%3Cg fill='%23f6f1e3'%3E%3Ccircle cx='30' cy='8' r='1.6'/%3E%3Ccircle cx='8' cy='52' r='1.6'/%3E%3Ccircle cx='58' cy='48' r='1.4'/%3E%3C/g%3E%3Cpath d='M0 1h72M0 71h72M1 0v72M71 0v72' stroke='%23b3263e' stroke-width='2'/%3E%3C/svg%3E")
+    24 round;
+  opacity: calc(0.55 + var(--weave, 1) * 0.45);
+  filter: saturate(calc(0.5 + var(--weave, 1) * 0.5));
+}
+/* The threads worked loose from the foot of the border as it unravels. */
+body[data-room='unicorn'] .loose {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: calc(-3.5rem + 2px);
+  width: 84%;
+  height: 3.5rem;
+  overflow: visible;
+}
+body[data-room='unicorn'] .loose path {
+  fill: none;
+  stroke: #2f5d3a;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(var(--weave, 1));
+  vector-effect: non-scaling-stroke;
+  transition: stroke-dashoffset var(--life-press);
+}
+body[data-room='unicorn'] .loose .red {
+  stroke: #b3263e;
+}
+/*
+ * The glare: slow to come and slow to go, a hard light over the field that bleaches the
+ * lettering and the colours with it, as a hanging fades left in the sun.
+ */
+body[data-room='unicorn'] .glare {
+  z-index: 2;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    ellipse 75% 65% at 50% 45%,
+    rgb(255 250 236 / 0.9),
+    rgb(255 250 236 / 0.5) 55%,
+    transparent 90%
+  );
+  opacity: calc(var(--glare, 0) * 0.6);
+  will-change: opacity;
+}
+
+/* The enclosure: the specimen kept within a low paling, as in the hanging's last scene. */
+body[data-room='unicorn'] .room {
+  text-align: left;
+  padding: var(--s-4) var(--s-4) var(--s-5);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='40' viewBox='0 0 24 40' fill='none' stroke='%236f531b' stroke-width='1.4'%3E%3Cpath d='M4 40V6l2-4 2 4v34M16 40V6l2-4 2 4v34M0 16h24M0 30h24'/%3E%3C/svg%3E")
+    0 100% / 1.5rem 2.5rem repeat-x;
+}
+
+/* The banderole: each legend lettered on a ribbon with its ends cut in a swallowtail. */
+body[data-room='unicorn'] .text h2,
+body[data-room='unicorn'] .exemplars h2 {
+  display: block;
+  width: fit-content;
+  margin: 0 auto var(--s-4);
+  padding: 0.3em 2em 0.35em;
+  font-size: 1.45rem;
+  letter-spacing: 0.03em;
+  text-align: center;
+  color: var(--r-accent-2);
+  background: #efe7cf;
+  clip-path: polygon(0 0, 100% 0, 96% 50%, 100% 100%, 0 100%, 4% 50%);
+  box-shadow:
+    inset 0 2px 0 rgb(179 38 62 / 0.5),
+    inset 0 -2px 0 rgb(179 38 62 / 0.5);
+}
+body[data-room='unicorn'] .creature-head h1 {
+  color: var(--r-accent);
+}
+
+/* The initial: its letter red on a square of millefleurs, the sprigs stitched in about it. */
+body[data-room='unicorn'] .initial .i-field {
+  fill: #2f5d3a;
+}
+body[data-room='unicorn'] .initial .i-sprig {
+  fill: none;
+  stroke: #f6f1e3;
+  stroke-width: 1;
+  stroke-dasharray: 2 1.4;
+  stroke-linecap: round;
+}
+body[data-room='unicorn'] .initial .i-bloom {
+  fill: #f6f1e3;
+}
+body[data-room='unicorn'] .initial .i-bloom.red {
+  fill: #e0566c;
+}
+body[data-room='unicorn'] .initial .i-rim {
+  fill: none;
+  stroke: #b3263e;
+  stroke-width: 3;
+  stroke-dasharray: 1;
+  animation: unicorn-stitch var(--life-draw) steps(20, jump-end) both;
+}
+body[data-room='unicorn'] .initial-letter {
+  color: #f6f1e3;
+  font-size: 3.6rem;
+}
+@keyframes unicorn-stitch {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Dawn (R-B-LIVE-09): the hanging lightens, warm from its head, the mist lifting off the field. */
+body[data-room='unicorn'][data-sky='on'] .leaf {
+  background-color: #fbf3e6;
+  box-shadow: inset 0 18rem 14rem -12rem rgb(255 196 160 / 0.28);
+}
+body[data-room='unicorn'] .leaf::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -8%, rgb(255 178 132 / 0.42), transparent 70%),
+    linear-gradient(rgb(255 168 124 / 0.34), rgb(255 186 146 / 0.24) 55%, rgb(255 200 160 / 0.16));
+  opacity: 0;
+}
+body[data-room='unicorn'][data-sky='on'] .leaf::after {
+  opacity: 1;
+}
+
+/* The needle: steel, with a red thread through its eye. */
+body.cursor-needle[data-room='unicorn'],
+body.cursor-needle[data-room='unicorn'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1.5 1.5L19 19' stroke='%231d2a20' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M1.5 1.5L19 19' stroke='%23c7d3d6' stroke-width='1.4' stroke-linecap='round'/%3E%3Cellipse cx='17.5' cy='17.5' rx='1' ry='2.2' transform='rotate(-45 17.5 17.5)' fill='%231d2a20'/%3E%3Cpath d='M18 18c3 1 4 3 3 5' stroke='%23b3263e' stroke-width='1.2' fill='none'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+}
+body.cursor-needle[data-room='unicorn'] :is(a, button, summary, label, [role='button']),
+body.cursor-needle[data-room='unicorn'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}

@@ -1,0 +1,324 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Golem's own look (R-B-GLASS-06): the three letters of the word for truth struck above its
+ * name, as they are cut into its brow, and kept from assistive technology, which reads the name;
+ * and an entrance in which the wet clay settles into its shape.
+ */
+body[data-room='golem'] h1::before {
+  content: '\05D0\05DE\05EA';
+  content: '\05D0\05DE\05EA' / '';
+  display: block;
+  direction: rtl;
+  width: max-content;
+  margin-bottom: var(--s-1);
+  font-size: 0.55em;
+  letter-spacing: 0.3em;
+  color: var(--r-accent);
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--c-ground), #000 40%);
+}
+body[data-room='golem'] main .label {
+  letter-spacing: 0.1em;
+}
+body[data-room='golem'] .specimen .window-stage {
+  transform-origin: 50% 100%;
+  animation: golem-settle var(--t-reveal) var(--glass-ease-clear) var(--glass-clear-out) both;
+}
+
+@keyframes golem-settle {
+  from {
+    transform: scale(1.03, 0.94);
+    filter: saturate(0.4) brightness(0.8);
+  }
+  to {
+    transform: none;
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='golem'] .specimen .window-stage {
+    animation: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): tablets of river clay, pillowed and edged with the stylus's marks, the
+ * long account across the leaf and the parts and habits side by side under it. Its entrance is
+ * each tablet pressed down into shape. On the Sabbath (data-sky) the clay is grey.
+ */
+body[data-room='golem'] {
+  --clay: #4a3826;
+  --clay-deep: #33271b;
+  --clay-hi: rgb(255 226 180 / 0.1);
+}
+body[data-room='golem'][data-sky='on'] {
+  --clay: #303234;
+  --clay-deep: #1f2022;
+  --clay-hi: rgb(220 230 240 / 0.07);
+}
+body[data-room='golem'] .leaf {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-4);
+  align-items: start;
+}
+body[data-room='golem']
+  .leaf
+  > :is(.crumb, .creature-head, .room, [data-part='account'], .exemplars, [data-part='neighbour']) {
+  grid-column: 1 / -1;
+}
+@media (max-width: 52rem) {
+  body[data-room='golem'] .leaf {
+    grid-template-columns: 1fr;
+  }
+}
+body[data-room='golem'] .leaf :is(section, .room) {
+  transform-origin: 50% 100%;
+  animation: golem-press var(--life-press) var(--glass-ease-clear) both;
+}
+body[data-room='golem'] .leaf .room-stack > :nth-child(5) {
+  animation-delay: var(--life-beat);
+}
+body[data-room='golem'] .leaf .room-stack > :nth-child(n + 6) {
+  animation-delay: calc(var(--life-beat) * 2);
+}
+@keyframes golem-press {
+  from {
+    opacity: 0;
+    transform: scale(1.015, 0.97);
+  }
+}
+
+/* A tablet: pillowed clay, its texture worn smooth and burnished as it is rubbed. */
+body[data-room='golem'] .text {
+  position: relative;
+  isolation: isolate;
+  max-width: none;
+  margin: 0;
+  padding: 2.4rem clamp(1.25rem, 4vw, 2.5rem) var(--s-5);
+  background: radial-gradient(ellipse 90% 80% at 40% 30%, var(--clay), var(--clay-deep));
+  box-shadow:
+    inset 0 2px 0 var(--clay-hi),
+    inset 0 -4px 10px rgb(0 0 0 / 0.45),
+    inset 0 0 0 1px rgb(0 0 0 / 0.4),
+    0 6px 14px -6px rgb(0 0 0 / 0.8);
+}
+body[data-room='golem'] [data-part='account'] > :not(.impress) {
+  max-width: var(--measure);
+}
+/*
+ * The raw clay: its grain, and the marks the tool left dragging it flat, gouged dark with a
+ * lighter ridge thrown up beside each. Rubbing wears them away.
+ */
+body[data-room='golem'] .text::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='210' viewBox='0 0 300 210' fill='none' stroke-linecap='round'%3E%3Cg stroke='%23000' stroke-opacity='.34' stroke-width='1.6'%3E%3Cpath d='M8 22c16-3 30-7 46-9M34 58c20-5 38-9 58-11M150 18c18-4 34-8 52-9M214 64c14-2 26-6 40-9M20 128c22-6 42-11 64-13M118 150c16-5 32-9 50-10M226 132c16-3 32-7 48-11M52 190c18-5 36-9 56-11M176 198c14-2 28-6 44-9'/%3E%3C/g%3E%3Cg stroke='%23ffe2b4' stroke-opacity='.13' stroke-width='1'%3E%3Cpath d='M9 25c16-3 30-7 46-9M35 61c20-5 38-9 58-11M151 21c18-4 34-8 52-9M215 67c14-2 26-6 40-9M21 131c22-6 42-11 64-13M119 153c16-5 32-9 50-10M227 135c16-3 32-7 48-11M53 193c18-5 36-9 56-11M177 201c14-2 28-6 44-9'/%3E%3C/g%3E%3C/svg%3E")
+      0 0 / 18.75rem 13.1rem,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .07 0 0 0 0 .04 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23c)'/%3E%3C/svg%3E");
+  opacity: calc(1 - var(--smooth, 0) * 0.85);
+  /* The smoothness is set in tenths; the clay passes between them on its own. */
+  transition: opacity var(--life-ink) linear;
+}
+/* The burnish: a broad glossy light across the rubbed clay, as on a pot polished with a stone. */
+body[data-room='golem'] .text::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      115deg,
+      transparent 14%,
+      rgb(255 236 200 / 0.14) 34%,
+      rgb(255 240 210 / 0.24) 46%,
+      rgb(255 236 200 / 0.14) 58%,
+      transparent 82%
+    ),
+    radial-gradient(ellipse 60% 70% at 40% 35%, rgb(255 226 180 / 0.1), transparent 70%);
+  opacity: var(--smooth, 0);
+  transition: opacity var(--life-ink) linear;
+}
+/* The stylus's marks along a tablet's head and foot: wedges pressed in a row. */
+body[data-room='golem'] .impress {
+  position: absolute;
+  inset: 0.7rem 1.2rem;
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10' viewBox='0 0 24 10'%3E%3Cpath d='M4 1l4 8 4-8z' fill='%23000' fill-opacity='.45'/%3E%3Cpath d='M4 1l4 8' stroke='%23ffe2b4' stroke-opacity='.18' stroke-width='.8'/%3E%3C/svg%3E")
+      0 0 / 1.5rem 0.62rem repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10' viewBox='0 0 24 10'%3E%3Cpath d='M4 9l4-8 4 8z' fill='%23000' fill-opacity='.45'/%3E%3Cpath d='M4 9l4-8' stroke='%23ffe2b4' stroke-opacity='.18' stroke-width='.8'/%3E%3C/svg%3E")
+      0 100% / 1.5rem 0.62rem repeat-x;
+  animation: golem-impress var(--life-draw) steps(16, jump-end) both;
+}
+@keyframes golem-impress {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+
+/* The kiln, and the shards the exemplars are kept on. */
+body[data-room='golem'] .room {
+  --rise: 2.6rem;
+  position: relative;
+  padding: var(--s-4);
+  padding-top: var(--rise);
+  background: radial-gradient(ellipse at 50% 100%, rgb(255 140 60 / 0.12), transparent 60%);
+}
+body[data-room='golem'] .room::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgb(176 122 60 / 0.35);
+  mask:
+    var(--arch-rule) top / 100% var(--rise) no-repeat,
+    linear-gradient(#000 0 0) 0 var(--rise) / 1px calc(100% - var(--rise)) no-repeat,
+    linear-gradient(#000 0 0) 100% var(--rise) / 1px calc(100% - var(--rise)) no-repeat,
+    linear-gradient(#000 0 0) bottom / 100% 1px no-repeat;
+}
+body[data-room='golem'] .exemplars .reports li {
+  background: radial-gradient(ellipse at 40% 30%, var(--clay), var(--clay-deep));
+  border: 0;
+  clip-path: polygon(
+    2% 4%,
+    40% 0,
+    70% 3%,
+    99% 0,
+    97% 48%,
+    100% 96%,
+    60% 100%,
+    22% 97%,
+    0 100%,
+    3% 52%
+  );
+  padding: var(--s-4);
+}
+
+/* The heading hand: small capitals pressed into the clay, ochre, their edges catching light. */
+body[data-room='golem'] .text h2,
+body[data-room='golem'] .exemplars h2 {
+  font-weight: 700;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.04em;
+  color: var(--r-accent-2);
+  text-shadow:
+    0 1px 0 rgb(255 226 180 / 0.12),
+    0 -1px 0 rgb(0 0 0 / 0.6);
+}
+body[data-room='golem'][data-sky='on'] :is(.text h2, .exemplars h2) {
+  color: #b8b0a2;
+}
+
+/* The word on its brow: on the Sabbath its first letter is wiped away, and it reads death. */
+body[data-room='golem'][data-sky='on'] h1::before {
+  content: '\05DE\05EA';
+  content: '\05DE\05EA' / '';
+  color: #8a857c;
+}
+/* The two candles of the Sabbath, lit on the shelf by the name. */
+body[data-room='golem'] .creature-head {
+  position: relative;
+}
+body[data-room='golem'] .candles {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: none;
+  gap: 0.8rem;
+}
+body[data-room='golem'][data-sky='on'] .candles {
+  display: flex;
+}
+body[data-room='golem'] .candles span {
+  width: 0.5rem;
+  height: 2.2rem;
+  background: #ece8dc;
+  position: relative;
+}
+body[data-room='golem'] .candles span::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 0.5rem;
+  height: 0.8rem;
+  translate: -50% -2px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 70%, #fff4d0, #ffb347 60%, transparent 70%);
+}
+
+/* The initial: its letter pressed into a roundel of clay, rolled from a seal. */
+body[data-room='golem'] .initial .i-clay {
+  fill: #4a3826;
+}
+body[data-room='golem'] .initial .i-ring {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: 0.4;
+  stroke-width: 2;
+  stroke-dasharray: 1;
+  animation: golem-roll var(--life-draw) var(--glass-ease-clear) both;
+}
+body[data-room='golem'] .initial .i-wedges {
+  fill: #000;
+  fill-opacity: 0.45;
+}
+body[data-room='golem'] .initial-letter {
+  font-weight: 700;
+  color: #c88d48;
+  text-shadow:
+    0 1px 0 rgb(255 226 180 / 0.2),
+    0 -1px 0 #000;
+}
+@keyframes golem-roll {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Sparks struck by the rubbing: small, blue-white, gone in half a second. */
+body[data-room='golem'] .sparks {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+body[data-room='golem'] .spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: #fff4dc;
+  --glow: #ffc870;
+  box-shadow: 0 0 5px 1px var(--glow);
+  animation: golem-spark var(--life-press) var(--glass-ease-clear) both;
+}
+@keyframes golem-spark {
+  to {
+    opacity: 0;
+    transform: rotate(var(--a)) translateX(var(--d));
+  }
+}
+
+/* The stylus: a cut reed, its wedge-shaped end the pointer's. */
+body.cursor-stylus[data-room='golem'],
+body.cursor-stylus[data-room='golem'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1 1l5 2 16 16-3 3L3 6z' fill='%23d9c08a' stroke='%231d1a16' stroke-width='1.1' stroke-linejoin='round'/%3E%3Cpath d='M1 1l5 2-3 3z' fill='%238c6a2f'/%3E%3Cpath d='M9 9l2-2M14 14l2-2' stroke='%238c6a2f' stroke-width='.8'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+}
+body.cursor-stylus[data-room='golem'] :is(a, button, summary, label, [role='button']),
+body.cursor-stylus[data-room='golem'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}

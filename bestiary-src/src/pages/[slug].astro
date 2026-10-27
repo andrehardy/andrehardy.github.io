@@ -1,5 +1,6 @@
 ---
 import Window from '../components/Window.astro';
+import { architectureOf } from '../data/architectures';
 import { findCreature, openingCaption, orderedSections, roster } from '../data/house';
 import House from '../layouts/House.astro';
 
@@ -19,6 +20,7 @@ const creature = findCreature(slug);
 if (!creature) throw new Error(`unknown creature ${slug}`);
 
 const { entity, frame, spec } = creature;
+const arch = architectureOf(slug);
 const state = creature.states[0] ?? '';
 const caption = openingCaption(creature);
 const sections = orderedSections(entity.sections);
@@ -28,8 +30,37 @@ const ring = `${import.meta.env.BASE_URL}instruments/iron-ring.svg`;
 ---
 
 <House title={entity.title} description={entity.description} og={entity.og} room={slug}>
-  <article class="creature" style={`--glow:${frame.glow}`}>
-    <header class="creature-head">
+  <article
+    class="creature leaf"
+    data-architecture={arch.id}
+    style={`--glow:${frame.glow}`}
+  >
+    {/* Room ornaments — B11 leaf layers. Painted grounds from MAGIC Builder hook via --wall-ground. */}
+    {slug === 'djinn' && <span class="band" data-ornament aria-hidden="true"></span>}
+    {slug === 'vampire' && <div class="leaf-light warmth" aria-hidden="true"></div>}
+    {
+      slug === 'djinn' && (
+        <div class="leaf-light smoke" aria-hidden="true">
+          <span class="plume"></span>
+          <span class="plume"></span>
+          <span class="plume"></span>
+        </div>
+      )
+    }
+    {
+      slug === 'minotaur' && (
+        <svg class="thread" data-ornament aria-hidden="true" focusable="false">
+          <path class="clew-line"></path>
+        </svg>
+      )
+    }
+    {
+      slug === 'will-o-the-wisp' && (
+        <div class="leaf-light bog-glow" aria-hidden="true"></div>
+      )
+    }
+
+    <header class="creature-head" data-frame={arch.head}>
       <p class="label mark">{entity.mark}</p>
       <h1>{entity.name}</h1>
       <p class="epithet">
@@ -37,55 +68,62 @@ const ring = `${import.meta.env.BASE_URL}instruments/iron-ring.svg`;
         <span data-layer="cipher">{entity.epithet.cipher}</span>
       </p>
     </header>
-    <div class="room">
-      <div class="window-col">
-        <figure
-          class="specimen"
-          data-specimen={slug}
-          data-input={entity.input}
-          data-link={entity.link}
-          data-voice={entity.voice}
-          data-setting={entity.setting}
-          data-state={state}
-          data-dead-script={slug === 'lich' ? true : undefined}
-          tabindex="0"
-          aria-label={`${entity.name}. ${spec.hint}`}
-        >
-          <Window slug={slug} mode="specimen" frame={frame} state={state} name={entity.name}>
-            {entity.input === 'iron-lens' && <img slot="world" class="iron-ring" src={ring} alt="" />}
-            {slug === 'will-o-the-wisp' && <span slot="world" class="wisp-light" aria-hidden="true"></span>}
-            {
-              creature.readout && (
-                <p slot="face" class="readout" data-readout aria-hidden="true">
-                  0.00
-                </p>
-              )
-            }
-            {vessel && <div slot="face" class="vessel-mount" set:html={vessel} />}
-          </Window>
-          <div class="sill" aria-hidden="true"></div>
-          <figcaption>
-            <div class="caption-swap" data-caption-almanac data-layer="almanac">
-              <p class="plate is-on">{caption.almanac}</p>
-              <p class="plate" aria-hidden="true"></p>
-            </div>
-            <div class="caption-swap" data-caption-cipher data-layer="cipher">
-              <p class="plate is-on">{caption.cipher}</p>
-              <p class="plate" aria-hidden="true"></p>
-            </div>
-            <p class="hint">{spec.hint}</p>
-            <p class="frame-note label">{frame.sill} · {frame.shape} · {frame.material}</p>
-          </figcaption>
-          {lichScript && <div class="script-mount" set:html={lichScript} />}
-        </figure>
+
+    <div class="room-stack">
+      {/* The opening cut into the wall — crypt / vessel / plate / cell centre */}
+      <div class="case-bay room" data-frame={arch.case}>
+        <div class="window-col">
+          <figure
+            class="specimen"
+            data-specimen={slug}
+            data-input={entity.input}
+            data-link={entity.link}
+            data-voice={entity.voice}
+            data-setting={entity.setting}
+            data-state={state}
+            data-dead-script={slug === 'lich' ? true : undefined}
+            tabindex="0"
+            aria-label={`${entity.name}. ${spec.hint}`}
+          >
+            <Window slug={slug} mode="specimen" frame={frame} state={state} name={entity.name}>
+              {entity.input === 'iron-lens' && <img slot="world" class="iron-ring" src={ring} alt="" />}
+              {slug === 'will-o-the-wisp' && <span slot="world" class="wisp-light" aria-hidden="true"></span>}
+              {
+                creature.readout && (
+                  <p slot="face" class="readout" data-readout aria-hidden="true">
+                    0.00
+                  </p>
+                )
+              }
+              {vessel && <div slot="face" class="vessel-mount" set:html={vessel} />}
+            </Window>
+            <div class="sill" aria-hidden="true"></div>
+            <figcaption>
+              <div class="caption-swap" data-caption-almanac data-layer="almanac">
+                <p class="plate is-on">{caption.almanac}</p>
+                <p class="plate" aria-hidden="true"></p>
+              </div>
+              <div class="caption-swap" data-caption-cipher data-layer="cipher">
+                <p class="plate is-on">{caption.cipher}</p>
+                <p class="plate" aria-hidden="true"></p>
+              </div>
+              <p class="hint">{spec.hint}</p>
+              <p class="frame-note label">{frame.sill} · {frame.shape} · {frame.material}</p>
+            </figcaption>
+            {lichScript && <div class="script-mount" set:html={lichScript} />}
+          </figure>
+        </div>
       </div>
+
+      {/* Inscriptions recessed in the wall — sections already carry data-frame from B11 */}
       <div class="prose" id="text">
-        <div set:html={entity.accession} />
+        <div class="accession" set:html={entity.accession} />
         {sections.map((section) => <div class="passage" set:html={section} />)}
       </div>
     </div>
+
     <footer class="colophon">
-      <p class="label">The Bestiary of the Magic Registry</p>
+      <p class="label">The Bestiary of the Magic Registry · {arch.label}</p>
     </footer>
   </article>
 </House>

@@ -1,0 +1,295 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Minotaur's own look (R-B-GLASS-06): a meander border, the Cretan key, run under its name
+ * and its headings as on a painted frieze; and an entrance in which the plan is inked from the
+ * outside in, as its walls are.
+ */
+@property --minotaur-inked {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+body[data-room='minotaur'] h1::after,
+body[data-room='minotaur'] .text h2::after {
+  content: '';
+  display: block;
+  height: 0.5rem;
+  max-width: 18rem;
+  margin-top: var(--s-1);
+  background-color: var(--r-accent);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8' viewBox='0 0 16 8'%3E%3Cpath d='M0 7.5h4.5v-7h7v4.5h-3.5v-2' fill='none' stroke='black' stroke-width='1'/%3E%3Cpath d='M11.5 7.5h4.5' fill='none' stroke='black' stroke-width='1'/%3E%3C/svg%3E")
+    repeat-x left center / 1rem 0.5rem;
+  opacity: 0.8;
+}
+body[data-room='minotaur'] main .label {
+  letter-spacing: 0.12em;
+}
+body[data-room='minotaur'] .specimen .window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--c-ground), #d9c08a 25%);
+  mask: radial-gradient(
+    circle farthest-corner,
+    #000 calc(100% - var(--minotaur-inked)),
+    transparent calc(100% - var(--minotaur-inked) + 3%)
+  );
+  pointer-events: none;
+  animation: minotaur-ink var(--t-reveal) var(--glass-ease-clear) var(--glass-clear-out) both;
+}
+
+@keyframes minotaur-ink {
+  from {
+    --minotaur-inked: 0%;
+  }
+  to {
+    --minotaur-inked: 103%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='minotaur'] .specimen .window::after {
+    display: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): the plan of the labyrinth on papyrus. Its cells wind from the way in,
+ * left and right, down to the centre where the specimen is kept, and out again to the way out.
+ * Unread, a cell is only pricked out on the plan; read, its walls are ruled in, a doorway left
+ * in each, and the red thread is laid through it. Its entrance is the reader pacing the plan.
+ */
+@property --minotaur-wall {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+body[data-room='minotaur'] .leaf {
+  --wall-ink: var(--r-accent);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    'crumb crumb'
+    'head head'
+    'account screen'
+    'case case'
+    'habits neighbour'
+    'exemplars exemplars';
+  column-gap: 0.75rem;
+  row-gap: 0.75rem;
+  isolation: isolate;
+}
+body[data-room='minotaur'] .leaf > .crumb {
+  grid-area: crumb;
+}
+body[data-room='minotaur'] .leaf > [data-part='head'] {
+  grid-area: head;
+}
+body[data-room='minotaur'] .leaf > [data-part='account'] {
+  grid-area: account;
+}
+body[data-room='minotaur'] .leaf > [data-part='screen'] {
+  grid-area: screen;
+}
+body[data-room='minotaur'] .leaf > [data-part='case'] {
+  grid-area: case;
+}
+body[data-room='minotaur'] .leaf > [data-part='habits'] {
+  grid-area: habits;
+}
+body[data-room='minotaur'] .leaf > [data-part='neighbour'] {
+  grid-area: neighbour;
+}
+body[data-room='minotaur'] .leaf > [data-part='exemplars'] {
+  grid-area: exemplars;
+}
+@media (max-width: 52rem) {
+  body[data-room='minotaur'] .leaf {
+    grid-template-columns: 1fr;
+    grid-template-areas: 'crumb' 'head' 'account' 'screen' 'case' 'habits' 'neighbour' 'exemplars';
+  }
+}
+
+/* A cell: pricked out on the plan, its walls ruled in once read, a doorway left at head and foot. */
+body[data-room='minotaur'] .leaf :is(section, .room) {
+  --minotaur-wall: 0;
+  position: relative;
+  max-width: none;
+  margin: 0;
+  padding: clamp(1.5rem, 3.5vw, 2.5rem);
+  outline: 1px dashed rgb(31 95 139 / 0.35);
+  outline-offset: -1px;
+  background:
+    linear-gradient(var(--wall-ink) 0 0) 0 0 / calc(var(--minotaur-wall) * 40%) 4px no-repeat,
+    linear-gradient(var(--wall-ink) 0 0) 100% 0 / calc(var(--minotaur-wall) * 40%) 4px no-repeat,
+    linear-gradient(var(--wall-ink) 0 0) 0 100% / calc(var(--minotaur-wall) * 40%) 4px no-repeat,
+    linear-gradient(var(--wall-ink) 0 0) 100% 100% / calc(var(--minotaur-wall) * 40%) 4px no-repeat,
+    linear-gradient(var(--wall-ink) 0 0) 0 0 / 4px calc(var(--minotaur-wall) * 100%) no-repeat,
+    linear-gradient(var(--wall-ink) 0 0) 100% 100% / 4px calc(var(--minotaur-wall) * 100%) no-repeat,
+    linear-gradient(rgb(168 68 42 / calc(var(--minotaur-wall) * 0.13)) 0 0);
+  animation: minotaur-pace var(--life-press) var(--glass-ease-clear) backwards;
+}
+/* Once read, the cell walled and its floor trodden, ruled in over a moment; as the plan is unread, gone at once. */
+body[data-room='minotaur'] .leaf > [data-read] {
+  --minotaur-wall: 1;
+  outline-color: transparent;
+  transition: --minotaur-wall var(--life-draw) var(--glass-ease-clear);
+}
+body[data-room='minotaur'] .leaf > [data-part='screen'] {
+  animation-delay: var(--life-beat);
+}
+body[data-room='minotaur'] .leaf > [data-part='case'] {
+  animation-delay: calc(var(--life-beat) * 2);
+}
+body[data-room='minotaur'] .leaf > [data-part='habits'] {
+  animation-delay: calc(var(--life-beat) * 3);
+}
+body[data-room='minotaur'] .leaf > [data-part='neighbour'] {
+  animation-delay: calc(var(--life-beat) * 4);
+}
+body[data-room='minotaur'] .leaf > [data-part='exemplars'] {
+  animation-delay: calc(var(--life-beat) * 5);
+}
+@keyframes minotaur-pace {
+  from {
+    opacity: 0;
+    translate: 0 0.4rem;
+  }
+}
+/* The centre: walled twice in red ochre, and the specimen kept within. */
+body[data-room='minotaur'] .leaf > .case-bay {
+  --wall-ink: var(--r-accent-2);
+  box-shadow: inset 0 0 0 10px rgb(168 68 42 / calc(var(--minotaur-wall) * 0.18));
+}
+/* With nothing to watch the reading, and on paper, the plan stands finished. */
+@media (prefers-reduced-motion: reduce), print {
+  body[data-room='minotaur'] .leaf :is(section, .room) {
+    --minotaur-wall: 1;
+    outline-color: transparent;
+  }
+}
+body[data-room='minotaur'] .text > p,
+body[data-room='minotaur'] .text > .account,
+body[data-room='minotaur'] .text > .calm {
+  max-width: var(--measure);
+}
+
+/* The red thread, laid along the corridors through every cell passed: under the words. */
+body[data-room='minotaur'] .thread {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: visible;
+}
+body[data-room='minotaur'] .clew-line {
+  fill: none;
+  stroke: var(--r-accent-2);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+/* The heading hand: capitals spaced as on a painted frieze, Aegean blue, the key run under them. */
+body[data-room='minotaur'] .text h2,
+body[data-room='minotaur'] .exemplars h2 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--r-accent);
+}
+
+/* The Bull's sign over the frieze: bronze, and burning gold when the sun stands in it. */
+body[data-room='minotaur'] .creature-head {
+  position: relative;
+}
+body[data-room='minotaur'] .taurus {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: clamp(3rem, 7vw, 4.5rem);
+  height: auto;
+  overflow: visible;
+}
+body[data-room='minotaur'] .taurus .t-sun {
+  fill: none;
+  stroke: #8c6a2f;
+  stroke-width: 1.5;
+}
+body[data-room='minotaur'] .taurus :is(.t-rays, .t-horns) {
+  fill: none;
+  stroke: #8c6a2f;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+body[data-room='minotaur'][data-sky='on'] .taurus .t-sun {
+  fill: #e9b949;
+  stroke: #a8442a;
+  --glow: rgb(233 185 73 / 0.8);
+  filter: drop-shadow(0 0 6px var(--glow));
+}
+body[data-room='minotaur'][data-sky='on'] .taurus :is(.t-rays, .t-horns) {
+  stroke: #a8442a;
+}
+body[data-room='minotaur'][data-sky='on'] .leaf {
+  background: radial-gradient(ellipse 80% 50% at 85% 0, rgb(233 185 73 / 0.22), transparent 70%);
+}
+/* The bull's festival: the sun in the plan, warming every passage of it, not only its head. */
+body[data-room='minotaur'][data-sky='on'] .leaf::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    160deg,
+    rgb(233 185 73 / 0.24),
+    rgb(233 185 73 / 0.12) 60%,
+    rgb(233 185 73 / 0.08)
+  );
+}
+
+/* The initial: its letter in a square of red ochre, the key wound inward behind it. */
+body[data-room='minotaur'] .initial .i-ground {
+  fill: var(--r-accent-2);
+}
+body[data-room='minotaur'] .initial .i-key {
+  fill: none;
+  stroke: #e8dcb5;
+  stroke-width: 3;
+  stroke-opacity: 0.45;
+  stroke-dasharray: 1;
+  animation: minotaur-wind var(--life-draw) var(--glass-ease-clear) both;
+}
+body[data-room='minotaur'] .initial-letter {
+  font-weight: 700;
+  color: #f6eed4;
+  --glow: var(--r-accent-2);
+  text-shadow: 0 0 6px var(--glow);
+}
+@keyframes minotaur-wind {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The clew: a ball of red thread, its end the pointer's. */
+body.cursor-clew[data-room='minotaur'],
+body.cursor-clew[data-room='minotaur'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M1 1c3 2 5 6 6 9' stroke='%23a8442a' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='14' cy='14' r='7' fill='%23a8442a' stroke='%232a1d12' stroke-width='1'/%3E%3Cpath d='M8.5 11c3 1 8 1 11-1M7.5 15c4 1 9 1 13-1M10 19c3 0 6-1 8-2' stroke='%23e8dcb5' stroke-width='.8' stroke-linecap='round'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+}
+body.cursor-clew[data-room='minotaur'] :is(a, button, summary, label, [role='button']),
+body.cursor-clew[data-room='minotaur'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}

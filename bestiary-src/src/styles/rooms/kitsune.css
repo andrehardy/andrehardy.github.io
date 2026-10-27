@@ -1,0 +1,431 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Kitsune's own look (R-B-GLASS-06): its name set vertically, as on a shrine's board, beside
+ * its mark and epithet; and an entrance in which the falling snow settles from the glass before
+ * the fox's eyes open.
+ */
+body[data-room='kitsune'] .creature-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
+  column-gap: var(--s-3);
+  align-items: start;
+}
+body[data-room='kitsune'] .creature-head h1 {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  margin: 0;
+  padding-block-end: var(--s-2);
+  border-inline-start: 3px solid var(--r-accent);
+  padding-inline-start: var(--s-1);
+}
+body[data-room='kitsune'] .creature-head > :not(h1) {
+  grid-column: 2;
+}
+body[data-room='kitsune'] .specimen .window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, var(--c-ground) 70%);
+  pointer-events: none;
+  animation: kitsune-snow var(--t-reveal) var(--glass-ease-clear) var(--glass-clear-out) both;
+}
+
+@keyframes kitsune-snow {
+  from {
+    opacity: 0.92;
+    transform: translateY(-30%);
+  }
+  to {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='kitsune'] .specimen .window::after {
+    display: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): the path of gates in the snow. Every section is a gate the reader passes
+ * through: two vermilion posts, the tie-beam, and the black top-beam with its ends turned up.
+ * Its entrance is the gates appearing one behind another up the path, out of the falling snow.
+ */
+body[data-room='kitsune'] .leaf {
+  --vermilion: #c8362a;
+  --beam: #1c2923;
+  display: grid;
+  gap: var(--s-5);
+  justify-items: center;
+  background: linear-gradient(
+      to right,
+      transparent calc(50% - 1.8rem),
+      rgb(28 41 35 / 0.05) calc(50% - 1.8rem),
+      rgb(28 41 35 / 0.05) calc(50% + 1.8rem),
+      transparent calc(50% + 1.8rem)
+    )
+    0 0 / 100% 100% no-repeat;
+}
+body[data-room='kitsune'] .leaf :is(section, .room, .creature-head, .crumb) {
+  width: min(100%, 46rem);
+  animation: kitsune-gate var(--life-ink) var(--glass-ease-clear) both;
+}
+body[data-room='kitsune'] .leaf > .case-bay {
+  width: 100%;
+}
+body[data-room='kitsune'] .leaf .room-stack > :nth-child(5) {
+  animation-delay: var(--life-beat);
+}
+body[data-room='kitsune'] .leaf .room-stack > :nth-child(6) {
+  animation-delay: calc(var(--life-beat) * 2);
+}
+body[data-room='kitsune'] .leaf .room-stack > :nth-child(n + 7) {
+  animation-delay: calc(var(--life-beat) * 3);
+}
+@keyframes kitsune-gate {
+  from {
+    opacity: 0;
+    filter: blur(3px) brightness(1.15);
+  }
+}
+
+/* A gate: its posts down either side of the passage, and its beams over the heading. */
+body[data-room='kitsune'] .text {
+  position: relative;
+  max-width: none;
+  margin: 0;
+  padding: 3.4rem clamp(1.25rem, 4vw, 3rem) var(--s-4);
+  border-inline: 0.5rem solid transparent;
+  border-image: linear-gradient(to bottom, var(--vermilion) 0 70%, transparent) 1;
+}
+body[data-room='kitsune'] .torii {
+  position: absolute;
+  top: 0;
+  left: -1.6rem;
+  right: -1.6rem;
+  height: 2.6rem;
+  background:
+    linear-gradient(var(--vermilion), var(--vermilion)) 50% 1.95rem / calc(100% - 3rem) 0.42rem
+      no-repeat,
+    linear-gradient(var(--vermilion), var(--vermilion)) 50% 0.62rem / 100% 0.5rem no-repeat;
+  animation: kitsune-beam var(--life-ink) var(--glass-ease-shutter) var(--life-beat) both;
+}
+body[data-room='kitsune'] .torii::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.7rem;
+  background: var(--beam);
+  clip-path: polygon(0 0, 100% 0, 98.5% 100%, 1.5% 100%);
+}
+body[data-room='kitsune'] .torii::after {
+  content: '';
+  position: absolute;
+  top: 0.62rem;
+  bottom: 0;
+  left: 50%;
+  width: 0.9rem;
+  translate: -50% 0;
+  background: var(--beam);
+}
+/* Opened by its mask, not clipped: a piece clipped to nothing is never seen, and never opens. */
+@keyframes kitsune-beam {
+  from {
+    mask: linear-gradient(#000, #000) 50% 0 / 0% 100% no-repeat;
+  }
+  to {
+    mask: linear-gradient(#000, #000) 50% 0 / 100% 100% no-repeat;
+  }
+}
+/* On a narrow page the beams overhang only as far as the page goes. */
+@media (max-width: 52rem) {
+  body[data-room='kitsune'] .torii {
+    left: -1.4rem;
+    right: -1.4rem;
+  }
+}
+/* The snow on the top-beam, deeper the longer the reader has kept still. */
+body[data-room='kitsune'] .snowcap {
+  position: absolute;
+  inset: -0.55rem 0.3rem auto;
+  height: 0.65rem;
+  background:
+    radial-gradient(ellipse 50% 100% at 50% 100%, #fff 97%, transparent),
+    radial-gradient(
+      ellipse calc(50% + 1px) calc(100% + 1px) at 50% 100%,
+      rgb(61 111 196 / 0.35) 97%,
+      transparent
+    );
+  transform-origin: bottom;
+  transform: scaleY(var(--snow, 0.6));
+}
+
+/* The shrine's board, its name set down it; under it the path begins. */
+body[data-room='kitsune'] .creature-head {
+  padding: var(--s-3);
+  border: 1px solid rgb(28 41 35 / 0.25);
+  background: linear-gradient(to bottom, #e9e2d3, #f2f4f6);
+}
+body[data-room='kitsune'] .room {
+  padding: var(--s-4);
+  border-top: 0.7rem solid var(--beam);
+  box-shadow: inset 0 0.5rem 0 var(--vermilion);
+}
+
+/* The votive plaques: each exemplar on a little wooden board with a pointed roof. */
+body[data-room='kitsune'] .exemplars {
+  width: 100%;
+}
+body[data-room='kitsune'] .exemplars .reports li {
+  padding-top: var(--s-5);
+  background: linear-gradient(to bottom, #e8dcc4, #efe6d3);
+  border: 1px solid rgb(28 41 35 / 0.35);
+  border-top: 0;
+  clip-path: polygon(0 1.4rem, 50% 0, 100% 1.4rem, 100% 100%, 0 100%);
+}
+body[data-room='kitsune'] .exemplars .reports li::before {
+  content: '';
+  position: absolute;
+  top: 0.9rem;
+  left: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: var(--vermilion);
+}
+
+/* The heading hand: heavy and upright in vermilion, a little seal stamped before it. */
+body[data-room='kitsune'] .text h2,
+body[data-room='kitsune'] .exemplars h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--vermilion);
+}
+body[data-room='kitsune'] .text h2::before,
+body[data-room='kitsune'] .exemplars h2::before {
+  content: '';
+  flex: none;
+  width: 0.62em;
+  height: 0.62em;
+  background: var(--vermilion);
+  box-shadow: inset 0 0 0 2px #f2f4f6;
+  outline: 1px solid var(--vermilion);
+}
+
+/* The initial: its letter in a vermilion seal, cut white, pressed a little unevenly. */
+body[data-room='kitsune'] .initial .i-seal {
+  fill: #c8362a;
+}
+body[data-room='kitsune'] .initial .i-rim {
+  fill: none;
+  stroke: #f2f4f6;
+  stroke-width: 1.6;
+}
+body[data-room='kitsune'] .initial-letter {
+  font-weight: 700;
+  color: #fff;
+  animation: kitsune-press var(--life-press) var(--glass-ease-shutter) both;
+}
+body[data-room='kitsune'] .initial svg {
+  animation: kitsune-press var(--life-press) var(--glass-ease-shutter) both;
+}
+@keyframes kitsune-press {
+  from {
+    opacity: 0;
+    scale: 1.06;
+  }
+}
+
+/*
+ * Snow (R-B-LIVE-08): falling across the leaf while the reader keeps still, behind the words.
+ * Two depths of flakes, slow, never a flicker.
+ */
+body[data-room='kitsune'] .snowfall {
+  --flakes-near: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='%23fff' stroke='%2393a7bf' stroke-width='1.1'%3E%3Ccircle cx='20' cy='30' r='2.6'/%3E%3Ccircle cx='90' cy='12' r='2'/%3E%3Ccircle cx='150' cy='60' r='2.8'/%3E%3Ccircle cx='60' cy='100' r='2.2'/%3E%3Ccircle cx='130' cy='140' r='2.4'/%3E%3Ccircle cx='30' cy='160' r='1.9'/%3E%3Ccircle cx='105' cy='78' r='1.7'/%3E%3C/svg%3E");
+  --flakes-far: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' fill='%23cfd8e1'%3E%3Ccircle cx='10' cy='20' r='1.1'/%3E%3Ccircle cx='70' cy='40' r='.9'/%3E%3Ccircle cx='100' cy='90' r='1.2'/%3E%3Ccircle cx='40' cy='80' r='.8'/%3E%3C/svg%3E");
+  background:
+    var(--flakes-near) 0 0 / 11rem 11rem,
+    var(--flakes-far) 0 0 / 7.5rem 7.5rem,
+    linear-gradient(rgb(118 140 170 / 0.3), rgb(118 140 170 / 0.24));
+  /* In tenths, each too small a step to see: a transition between them would cost every frame. */
+  opacity: var(--still, 0);
+  /* A small step a few times a second, not a fresh ground every frame: it falls slow enough. */
+  animation: kitsune-fall var(--life-drift) steps(92) infinite paused;
+}
+/* It falls only while there is snow to see; a stir stops it where it hangs. */
+body[data-room='kitsune'][data-snowing] .snowfall {
+  animation-play-state: running;
+}
+@keyframes kitsune-fall {
+  to {
+    background-position:
+      0 22rem,
+      0 15rem,
+      0 0;
+  }
+}
+
+/*
+ * The foxfires: blue flames, one lit for each of the room's tails. Scattered, they wait out
+ * beyond the gates, low embers; while the reader keeps still they gather in to the gate posts
+ * either side of the path, burning up bright, each with its blue light thrown round it on the
+ * snow; a stir sends them back out.
+ */
+body[data-room='kitsune'] .foxfires {
+  position: fixed;
+  z-index: -1;
+  inset: 16vh 0 14vh;
+  overflow: hidden;
+  pointer-events: none;
+}
+body[data-room='kitsune'] .foxfire {
+  --side: 0;
+  --reach: min(24.6rem, 50% - 1.2rem);
+  position: absolute;
+  top: calc(var(--i) * 7.5%);
+  left: calc(50% + (var(--side) * 2 - 1) * var(--reach) - 0.9rem);
+  width: 1.8rem;
+  height: 2.6rem;
+  display: none;
+  background: radial-gradient(
+    ellipse 40% 55% at 50% 62%,
+    #eaf2ff 0 18%,
+    #6f9be6 38%,
+    rgb(61 111 196 / 0.35) 62%,
+    transparent 72%
+  );
+  opacity: calc(0.2 + var(--still, 0) * 0.8);
+  translate: calc((1 - var(--still, 0)) * (var(--side) * 2 - 1) * 7rem) 0;
+  transition:
+    opacity var(--life-press),
+    translate var(--life-ink) var(--glass-ease-clear);
+  /* A flame's jitter, in steps: a smooth sway would have the whole view redrawn each frame. */
+  animation: kitsune-flicker calc(var(--life-dawn) + var(--i) * var(--life-flick)) steps(6) infinite
+    alternate;
+}
+/* Their light on the snow, there only while it snows or the tails are grown. */
+body[data-room='kitsune'][data-snowing] .foxfire::before,
+body[data-room='kitsune'][data-sky='on'] .foxfire::before {
+  content: '';
+  position: absolute;
+  inset: -3.4rem -3.6rem;
+  background: radial-gradient(
+    closest-side,
+    rgb(111 155 230 / 0.42),
+    rgb(111 155 230 / 0.16) 55%,
+    transparent
+  );
+  opacity: var(--still, 0);
+  transition: opacity var(--life-press);
+}
+body[data-room='kitsune'] .foxfire:nth-child(even) {
+  --side: 1;
+}
+body[data-room='kitsune'] .foxfire[data-lit] {
+  display: block;
+}
+/* Scattered, they lie low as embers; they burn up and flicker only as they gather, or under the grown tails. */
+body[data-room='kitsune']:not([data-snowing], [data-sky='on']) .foxfire {
+  animation-play-state: paused;
+}
+@keyframes kitsune-flicker {
+  to {
+    transform: translateY(-0.4rem) scale(0.94, 1.03);
+  }
+}
+/*
+ * With tails grown, the path itself is lit blue by the fires that walk it, down the whole way
+ * between the gates.
+ */
+body[data-room='kitsune'][data-sky='on'] .leaf {
+  background:
+    linear-gradient(
+      to right,
+      transparent 14%,
+      rgb(111 155 230 / 0.17) 30%,
+      rgb(111 155 230 / 0.22) 50%,
+      rgb(111 155 230 / 0.17) 70%,
+      transparent 86%
+    ),
+    linear-gradient(
+        to right,
+        transparent calc(50% - 1.8rem),
+        rgb(28 41 35 / 0.05) calc(50% - 1.8rem),
+        rgb(28 41 35 / 0.05) calc(50% + 1.8rem),
+        transparent calc(50% + 1.8rem)
+      )
+      0 0 / 100% 100% no-repeat;
+}
+/* At nine tails the fires burn with a little gold at their hearts, and throw their light even unwatched. */
+body[data-room='kitsune'][data-sky='on'] .foxfire::before {
+  opacity: max(0.6, var(--still, 0));
+}
+body[data-room='kitsune'][data-sky='on'] .foxfire {
+  background: radial-gradient(
+    ellipse 40% 55% at 50% 62%,
+    #fff6d8 0 18%,
+    #6f9be6 40%,
+    rgb(61 111 196 / 0.35) 62%,
+    transparent 72%
+  );
+}
+
+/* With no margin to keep them in, the nine-tailed fires settle on the gates' seals instead. */
+@media (max-width: 70rem) {
+  body[data-room='kitsune'][data-sky='on'] :is(.text, .exemplars) h2::before {
+    background: radial-gradient(
+      ellipse 45% 55% at 50% 60%,
+      #fff6d8 0 22%,
+      #6f9be6 48%,
+      rgb(61 111 196 / 0.4) 70%,
+      transparent 74%
+    );
+    --glow: rgb(111 155 230 / 0.6);
+    box-shadow: 0 0 6px 1px var(--glow);
+    outline-color: #3d6fc4;
+  }
+}
+
+/* The foxfire pointer: a blue flame, and the sparks it sheds. */
+body.cursor-foxfire[data-room='kitsune'],
+body.cursor-foxfire[data-room='kitsune'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='26' viewBox='0 0 20 26'%3E%3Cpath d='M3 2c5 3 13 8 13 15a6.5 6.5 0 0 1-13 0c0-4 3-5 3-9 0-2-1-4-3-6z' fill='%233d6fc4' stroke='%231c2923' stroke-width='1.1'/%3E%3Cpath d='M8 12c3 2 5 4 5 7a3 3 0 0 1-6 0c0-2 1-3 1-7z' fill='%23eaf2ff'/%3E%3C/svg%3E")
+      3 2,
+    auto;
+}
+body.cursor-foxfire[data-room='kitsune'] :is(a, button, summary, label, [role='button']),
+body.cursor-foxfire[data-room='kitsune'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}
+body[data-room='kitsune'] .foxfire-spark {
+  width: 5px;
+  height: 5px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: #3d6fc4;
+  --glow: #6f9be6;
+  box-shadow: 0 0 4px var(--glow);
+  /* It sputters out in a few steps: a smooth fade would have the whole view redrawn each frame. */
+  animation: kitsune-spark var(--life-ink) steps(4) both;
+}
+@keyframes kitsune-spark {
+  to {
+    opacity: 0;
+    transform: translate(calc(var(--drift) * 10px), -16px) scale(0.3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='kitsune'] :is(.snowfall, .foxfire) {
+    animation: none;
+  }
+}

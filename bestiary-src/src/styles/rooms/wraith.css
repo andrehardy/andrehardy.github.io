@@ -1,0 +1,310 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Wraith's own look (R-B-GLASS-06): its name and headings typed, as a transcript of what the
+ * wire played back would be, on the machine's own face (the system's, so nothing is fetched for
+ * it); and an entrance in which the wire is threaded across the case, from one spool to the
+ * other, before the playback begins.
+ */
+@property --wraith-thread {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+body[data-room='wraith'] h1,
+body[data-room='wraith'] .text h2 {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+}
+body[data-room='wraith'] h1::first-letter {
+  color: color-mix(in srgb, var(--c-ink) 80%, var(--r-accent));
+}
+body[data-room='wraith'] .specimen .window::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 75.5%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--r-light) var(--wraith-thread),
+    transparent var(--wraith-thread)
+  );
+  pointer-events: none;
+  animation: wraith-thread var(--t-reveal) var(--glass-ease-clear) var(--glass-clear-out) both;
+}
+
+@keyframes wraith-thread {
+  0% {
+    opacity: 1;
+    --wraith-thread: 0%;
+  }
+  70% {
+    opacity: 1;
+    --wraith-thread: 100%;
+  }
+  100% {
+    opacity: 0;
+    --wraith-thread: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='wraith'] .specimen .window::after {
+    display: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): the transcript of a wire recording, reel by reel. The trace of the
+ * playback runs down the left; going on down the page frays it (--fray), and the headings passed
+ * are left doubled (data-ghost). Under the moon a still grain lies over the transcript. Its
+ * entrance is the transcript typed out as the wire plays, a few lines at a time.
+ */
+body[data-room='wraith'] .leaf {
+  counter-reset: reel;
+  padding-left: clamp(2.5rem, 6vw, 4.25rem);
+}
+body[data-room='wraith'] .leaf :is(section, .room, .creature-head) {
+  animation: wraith-play var(--life-ink) steps(9, jump-end) backwards;
+}
+body[data-room='wraith'] .leaf .room-stack > :nth-child(n + 5) {
+  animation-delay: calc(var(--life-beat) * 2);
+}
+@keyframes wraith-play {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 -1rem 0);
+  }
+}
+
+/* The trace down the left: clean as first recorded, fraying the further the reader goes. */
+body[data-room='wraith'] .wire {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1.5rem;
+  pointer-events: none;
+}
+body[data-room='wraith'] .wire > span {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat-y;
+  background-size: 100% 7.5rem;
+}
+body[data-room='wraith'] .wire .clean {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='120' viewBox='0 0 24 120'%3E%3Cpath d='M12 0C20 10 4 20 12 30S22 50 12 60 2 80 12 90s6 20 0 30' fill='none' stroke='%23ffb347' stroke-width='1.1' stroke-opacity='.7'/%3E%3C/svg%3E");
+  opacity: calc(1 - var(--fray, 0) * 0.75);
+}
+body[data-room='wraith'] .wire .frayed {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='120' viewBox='0 0 24 120' fill='none' stroke='%237d8a96' stroke-width='1'%3E%3Cpath d='M12 0l3 6-6 5 9 4-7 6 2 5M12 34l-5 7 8 3-6 8 4 4M12 70l6 5-9 6 7 4-5 6 3 5M12 106l-4 6 5 8'/%3E%3Cpath d='M4 20h2M19 48h2M3 84h3M18 112h2' stroke='%23ffb347' stroke-opacity='.5'/%3E%3C/svg%3E");
+  opacity: var(--life, 0);
+}
+
+/*
+ * The playback head, riding the trace at the middle of the view: its two shoes across the
+ * wire and the running time of the reading beside them.
+ */
+body[data-room='wraith'] .wire > .head {
+  position: sticky;
+  inset: auto;
+  top: 50vh;
+  display: block;
+  height: 0;
+}
+body[data-room='wraith'] .wire > .head::before {
+  content: '';
+  position: absolute;
+  left: 0.15rem;
+  top: -0.5rem;
+  width: 1.2rem;
+  height: 1rem;
+  border-block: 2px solid #c8d6e3;
+  background: linear-gradient(90deg, transparent 45%, #ffb347 45% 55%, transparent 55%);
+  --glow: rgb(255 179 71 / 0.45);
+  box-shadow: 0 0 8px var(--glow);
+}
+body[data-room='wraith'] .wire .count {
+  position: absolute;
+  left: 1.6rem;
+  top: -0.45rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: #ffb347;
+  white-space: nowrap;
+}
+@media (max-width: 40rem) {
+  body[data-room='wraith'] .wire .count {
+    display: none;
+  }
+}
+
+/*
+ * The wire's static: hiss across the transcript and the white streaks where the wire drops out,
+ * over the ground and under the words, coming up as the wire frays.
+ */
+body[data-room='wraith'] .static {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='420' fill='%23c8d6e3'%3E%3Crect x='0' y='38' width='310' height='2' opacity='.5'/%3E%3Crect x='120' y='41' width='420' height='1' opacity='.35'/%3E%3Crect x='60' y='131' width='580' height='3' opacity='.4'/%3E%3Crect x='300' y='204' width='260' height='1' opacity='.55'/%3E%3Crect x='0' y='262' width='470' height='2' opacity='.3'/%3E%3Crect x='190' y='266' width='160' height='1' opacity='.5'/%3E%3Crect x='20' y='355' width='620' height='2' opacity='.45'/%3E%3Crect x='420' y='398' width='220' height='1' opacity='.5'/%3E%3C/svg%3E")
+      0 0 / 640px 420px,
+    repeating-linear-gradient(rgb(200 214 227 / 0.11) 0 1px, transparent 1px 4px);
+  opacity: calc(var(--fray, 0) * 0.9);
+  will-change: opacity;
+}
+
+/*
+ * A reel: its mark kept in its own column beside the transcript as the reel is read, its
+ * heading typed. The transcript stands to the right of the marks, as a log's entries do.
+ */
+body[data-room='wraith'] .leaf > section[data-room-text] {
+  counter-increment: reel;
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, var(--measure));
+  column-gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+body[data-room='wraith'] .leaf > section[data-room-text] > * {
+  grid-column: 2;
+}
+body[data-room='wraith'] .leaf > section[data-room-text]::before {
+  content: 'Reel ' counter(reel, decimal-leading-zero);
+  content: 'Reel ' counter(reel, decimal-leading-zero) / '';
+  grid-column: 1;
+  grid-row: 1 / span 40;
+  align-self: start;
+  position: sticky;
+  top: 5rem;
+  padding: 0.2rem 0 0.3rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--r-accent-2);
+  border-bottom: 1px dashed rgb(255 179 71 / 0.35);
+}
+@media (max-width: 48rem) {
+  body[data-room='wraith'] .leaf > section[data-room-text] {
+    display: block;
+    max-width: calc(var(--measure) + 2rem);
+  }
+  body[data-room='wraith'] .leaf > section[data-room-text]::before {
+    display: block;
+    position: static;
+    margin-bottom: 0.3rem;
+  }
+}
+body[data-room='wraith'] .leaf > section[data-frame='splice'] {
+  counter-increment: none;
+}
+body[data-room='wraith'] .leaf > section[data-frame='splice']::before {
+  content: 'Splice';
+  content: 'Splice' / '';
+}
+body[data-room='wraith'] .text h2,
+body[data-room='wraith'] .exemplars h2 {
+  position: relative;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 400;
+  font-size: 1.4rem;
+  letter-spacing: 0.03em;
+  color: var(--r-accent);
+}
+/*
+ * A heading doubled by its echo, a little off it, as on a worn wire: as the page moves the echo
+ * trails behind the words (--lag), and comes back to them when it stops.
+ */
+body[data-room='wraith'] h2[data-ghost]::after {
+  content: attr(data-ghost);
+  content: attr(data-ghost) / '';
+  position: absolute;
+  inset: 0;
+  translate: 0.45rem calc(0.28rem + var(--lag, 0) * 1px);
+  white-space: nowrap;
+  color: var(--r-accent);
+  opacity: 0.4;
+  filter: blur(0.6px);
+  pointer-events: none;
+}
+
+/* The spool: the case between its flanges. */
+body[data-room='wraith'] .leaf > .case-bay {
+  padding: var(--s-4);
+  border-inline: 3px double rgb(200 214 227 / 0.35);
+  margin-bottom: var(--s-5);
+}
+
+/*
+ * Moonlight: a still grain, cold, over the transcript's ground and behind its words, as much of
+ * it as the moon is lit (--sky, its lit fraction).
+ */
+body[data-room='wraith'] .leaf::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .78 0 0 0 0 .84 0 0 0 0 .89 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E"),
+    linear-gradient(rgb(200 214 227 / 0.05), rgb(200 214 227 / 0.05));
+  opacity: calc(0.06 + var(--sky, 0) * 0.42);
+}
+
+/* The initial: its letter on a spool of wire, the wire wound on. */
+body[data-room='wraith'] .initial .i-flange {
+  fill: #272016;
+  stroke: #7d8a96;
+  stroke-width: 2;
+}
+body[data-room='wraith'] .initial .i-wound {
+  fill: #3a2f20;
+  stroke: #704214;
+  stroke-width: 1;
+}
+body[data-room='wraith'] .initial .i-spokes {
+  stroke: #7d8a96;
+  stroke-width: 2;
+}
+body[data-room='wraith'] .initial .i-hub {
+  fill: #7d8a96;
+}
+body[data-room='wraith'] .initial .i-turn {
+  fill: none;
+  stroke: #ffb347;
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  opacity: 0.6;
+  animation: wraith-wind var(--life-draw) linear both;
+}
+body[data-room='wraith'] .initial-letter {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 2.6rem;
+  color: var(--c-ink);
+  text-shadow: 0 1px 6px #1a140c;
+}
+@keyframes wraith-wind {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The playback head: a narrow gap between two shoes, the wire's line through it. */
+body.cursor-playhead[data-room='wraith'],
+body.cursor-playhead[data-room='wraith'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 1v22' stroke='%231a140c' stroke-width='3'/%3E%3Cpath d='M12 1v22' stroke='%23ffb347' stroke-width='1.2'/%3E%3Cpath d='M6 1h12l-6 6z' fill='%23c8d6e3' stroke='%231a140c' stroke-width='.8'/%3E%3C/svg%3E")
+      12 1,
+    auto;
+}
+body.cursor-playhead[data-room='wraith'] :is(a, button, summary, label, [role='button']),
+body.cursor-playhead[data-room='wraith'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}

@@ -1,0 +1,335 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Will-o'-the-wisp's own look (R-B-GLASS-06): a faint italic, and an entrance in which
+ * the case stands dark a moment before its one light comes up.
+ */
+body[data-room='will-o-the-wisp'] h1 {
+  font-style: italic;
+  font-weight: 400;
+  color: color-mix(in srgb, var(--r-accent) 82%, var(--c-ground));
+}
+body[data-room='will-o-the-wisp'] main .label {
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+body[data-room='will-o-the-wisp'] .specimen .window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--c-ground);
+  pointer-events: none;
+  animation: wisp-dark var(--t-reveal) var(--glass-ease-clear) var(--glass-clear-in) both;
+}
+
+@keyframes wisp-dark {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='will-o-the-wisp'] .specimen .window::after {
+    display: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): a way across the bog. Tussocks of moss stand zigzag over black water from
+ * the near bank to the far one; a light keeps a little ahead of the hand, never on it, and under
+ * a dark sky other lights stand off over the water. Its entrance is the tussocks coming up out
+ * of the dark, one after another, as a light finds each.
+ */
+body[data-room='will-o-the-wisp'] .leaf::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    repeating-radial-gradient(
+      ellipse 140% 18% at 30% 40%,
+      transparent 0 22px,
+      rgb(127 209 193 / 0.035) 22px 23px
+    ),
+    repeating-radial-gradient(
+      ellipse 120% 14% at 75% 80%,
+      transparent 0 30px,
+      rgb(241 239 230 / 0.025) 30px 31px
+    );
+}
+body[data-room='will-o-the-wisp'] .leaf :is(section, .room) {
+  animation: will-o-the-wisp-rise var(--life-ink) var(--glass-ease-clear) backwards;
+}
+body[data-room='will-o-the-wisp'] .leaf > [data-part='habits'] {
+  animation-delay: var(--life-beat);
+}
+body[data-room='will-o-the-wisp'] .leaf > [data-part='account'] {
+  animation-delay: calc(var(--life-beat) * 3);
+}
+body[data-room='will-o-the-wisp'] .leaf > [data-part='screen'] {
+  animation-delay: calc(var(--life-beat) * 4);
+}
+body[data-room='will-o-the-wisp'] .leaf > :is([data-part='neighbour'], [data-part='exemplars']) {
+  animation-delay: calc(var(--life-beat) * 5);
+}
+@keyframes will-o-the-wisp-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.8rem;
+    filter: brightness(0.3);
+  }
+}
+
+/* A tussock: a hummock of moss over the water, its blades along the top, its likeness under it. */
+body[data-room='will-o-the-wisp'] .leaf [data-frame='tussock'] {
+  position: relative;
+  max-width: calc(var(--measure) + 4.5rem);
+  margin-block: 0 var(--s-5);
+  padding: 2.2rem clamp(1.25rem, 4vw, 2.25rem) 2.4rem;
+  background: radial-gradient(
+    ellipse 66% 78% at 50% 44%,
+    rgb(58 66 36 / 0.62),
+    rgb(26 29 17 / 0.82) 48%,
+    rgb(26 29 17 / 0.58) 72%,
+    transparent 97%
+  );
+}
+body[data-room='will-o-the-wisp'] .leaf [data-frame='tussock']::before {
+  content: '';
+  position: absolute;
+  left: 1.5rem;
+  right: 1.5rem;
+  top: -0.85rem;
+  height: 1.1rem;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='18' viewBox='0 0 60 18' fill='none' stroke='%237f8f4a' stroke-width='1.1' stroke-linecap='round'%3E%3Cpath d='M3 18c0-6 1-10 4-14M8 18c1-5 3-9 7-12M14 18c0-7-1-11-3-16M22 18c1-6 4-10 8-13M30 18c-1-5-3-9-6-12M36 18c0-7 2-12 5-16M44 18c1-5 3-8 7-10M50 18c-1-6-2-10-5-13M56 18c0-4 1-7 3-9'/%3E%3C/svg%3E")
+    0 100% / 3.75rem 1.1rem repeat-x;
+  opacity: 0.8;
+}
+/* Cotton-grass on each tussock, its heads coming up white as the reader reaches it. */
+body[data-room='will-o-the-wisp'] .cotton {
+  position: absolute;
+  top: -2.6rem;
+  right: 2.2rem;
+  width: 2.6rem;
+  height: 2.8rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 28' fill='none'%3E%3Cg stroke='%237f8f4a' stroke-width='.8' stroke-linecap='round'%3E%3Cpath d='M6 28c0-7 1-13 2-19M13 28c0-9 0-15 1-22M20 28c0-6-1-11-3-16M10 28c-1-4-3-7-6-9'/%3E%3C/g%3E%3Cg fill='%23ece9df'%3E%3Cellipse cx='8' cy='7' rx='2.6' ry='3.2'/%3E%3Cellipse cx='14' cy='4' rx='3' ry='3.6'/%3E%3Cellipse cx='17' cy='10.5' rx='2.4' ry='2.9'/%3E%3C/g%3E%3Cg fill='%23ffffff' fill-opacity='.55'%3E%3Ccircle cx='7.2' cy='6' r='1'/%3E%3Ccircle cx='13.2' cy='3' r='1.2'/%3E%3Ccircle cx='16.3' cy='9.6' r='.9'/%3E%3C/g%3E%3C/svg%3E")
+    center bottom / contain no-repeat;
+  --glow: rgb(236 233 223 / 0.25);
+  filter: drop-shadow(0 0 4px var(--glow));
+  transform-origin: 50% 100%;
+  animation: will-o-the-wisp-cotton var(--life-draw) var(--glass-ease-clear)
+    calc(var(--life-beat) * 3) backwards;
+}
+body[data-room='will-o-the-wisp'] [data-part='account'] .cotton {
+  right: auto;
+  left: 2.4rem;
+}
+@keyframes will-o-the-wisp-cotton {
+  from {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+}
+
+body[data-room='will-o-the-wisp'] .leaf > [data-part='habits'],
+body[data-room='will-o-the-wisp'] .leaf > [data-part='screen'] {
+  margin-right: auto;
+}
+body[data-room='will-o-the-wisp'] .leaf > [data-part='account'] {
+  margin-left: auto;
+}
+body[data-room='will-o-the-wisp'] .leaf [data-frame='tussock'] > :not(h2) {
+  max-width: var(--measure);
+}
+
+/* The banks, near and far: firm ground, its edge cut into the peat. */
+body[data-room='will-o-the-wisp'] .leaf [data-frame='far-bank'] {
+  max-width: none;
+  margin-top: var(--s-5);
+  padding-top: var(--s-4);
+  border-top: 3px solid #4b3a26;
+  box-shadow: inset 0 6px 0 -3px rgb(127 143 74 / 0.4);
+}
+body[data-room='will-o-the-wisp'] .exemplars .reports li {
+  background: linear-gradient(#2a2116, #1e1810);
+  border: 0;
+  border-top: 2px solid #4b3a26;
+  box-shadow:
+    inset 0 -3px 0 rgb(0 0 0 / 0.35),
+    inset 0 1px 0 rgb(168 141 100 / 0.2);
+}
+
+/* The heading hand: a faint italic, the light's own colour, giving a little light off. */
+body[data-room='will-o-the-wisp'] .text h2,
+body[data-room='will-o-the-wisp'] .exemplars h2 {
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.5rem;
+  color: var(--r-accent);
+  --glow: rgb(127 209 193 / 0.45);
+  text-shadow: 0 0 14px var(--glow);
+}
+
+/*
+ * The light ahead of the hand: cold, laid over the moss and the water alike as a light falls on
+ * them, never so bright as to wash out the words. It is written on alone (--lx, --ly, --burn).
+ */
+body[data-room='will-o-the-wisp'] .lure {
+  inset: auto;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 30rem;
+  height: 30rem;
+  display: none;
+  translate: calc(var(--lx, 0) * 1px - 15rem) calc(var(--ly, 0) * 1px - 15rem);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgb(200 240 230 / 0.36) 0,
+    rgb(127 209 193 / 0.28) 20%,
+    rgb(127 209 193 / 0.13) 45%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  /* Low while it waits, burning up only as it is followed. */
+  opacity: var(--burn, 0.3);
+  will-change: translate, opacity;
+}
+
+/* By day a pale mist lies over the water between the tussocks; after dark the water is black. */
+body[data-room='will-o-the-wisp'] .leaf::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(rgb(206 214 196 / 0.09), rgb(206 214 196 / 0.13) 60vh) 0 0 / 100%
+    100vh;
+  transition: opacity var(--life-dawn) var(--glass-ease-clear);
+}
+body[data-room='will-o-the-wisp'][data-sky='on'] .leaf::after {
+  opacity: 0;
+}
+body[data-room='will-o-the-wisp'][data-lure] .lure {
+  display: block;
+}
+
+/* Under a dark sky: other lights, far off over the water, drifting and never coming nearer. */
+body[data-room='will-o-the-wisp'] .far-lights {
+  display: none;
+}
+body[data-room='will-o-the-wisp'][data-sky='on'] .far-lights {
+  display: block;
+}
+body[data-room='will-o-the-wisp'] .far-lights span {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c8f0e6;
+  --glow: rgb(127 209 193);
+  box-shadow:
+    0 0 10px 4px color-mix(in srgb, var(--glow) 45%, transparent),
+    0 0 36px 14px color-mix(in srgb, var(--glow) 12%, transparent);
+  opacity: 0.55;
+  animation: will-o-the-wisp-drift var(--life-drift) var(--glass-ease-tide) infinite alternate;
+}
+body[data-room='will-o-the-wisp'] .far-lights span:nth-child(1) {
+  left: 6%;
+  top: 30%;
+}
+body[data-room='will-o-the-wisp'] .far-lights span:nth-child(2) {
+  right: 7%;
+  top: 55%;
+  animation-duration: calc(var(--life-drift) * 1.26);
+  animation-delay: calc(var(--life-drift) * -0.39);
+}
+body[data-room='will-o-the-wisp'] .far-lights span:nth-child(3) {
+  left: 9%;
+  top: 78%;
+  animation-duration: calc(var(--life-drift) * 1.35);
+  animation-delay: calc(var(--life-drift) * -0.74);
+}
+body[data-room='will-o-the-wisp'] .far-lights span:nth-child(4) {
+  right: 4%;
+  top: 18%;
+  animation-duration: calc(var(--life-drift) * 1.13);
+  animation-delay: calc(var(--life-drift) * -0.17);
+}
+@keyframes will-o-the-wisp-drift {
+  0% {
+    translate: 0 0;
+    opacity: 0.35;
+  }
+  50% {
+    translate: 1.5rem -0.8rem;
+    opacity: 0.7;
+  }
+  100% {
+    translate: -1rem 0.6rem;
+    opacity: 0.45;
+  }
+}
+/* With no margin to keep them in, the far lights hold to the page's edges, smaller, behind the words. */
+@media (max-width: 70rem) {
+  body[data-room='will-o-the-wisp'] .far-lights span {
+    width: 4px;
+    height: 4px;
+    box-shadow: 0 0 8px 3px color-mix(in srgb, var(--glow) 40%, transparent);
+  }
+  body[data-room='will-o-the-wisp'] .far-lights span:nth-child(odd) {
+    left: 0.3rem;
+  }
+  body[data-room='will-o-the-wisp'] .far-lights span:nth-child(even) {
+    right: 0.3rem;
+  }
+}
+
+/* The initial: a tussock over black water, and a light standing off it. */
+body[data-room='will-o-the-wisp'] .initial .i-water {
+  fill: #0a0906;
+  stroke: #4b3a26;
+}
+body[data-room='will-o-the-wisp'] .initial .i-ripple {
+  fill: none;
+  stroke: rgb(127 209 193 / 0.3);
+  stroke-width: 1;
+}
+body[data-room='will-o-the-wisp'] .initial .i-tussock {
+  fill: #2c3219;
+}
+body[data-room='will-o-the-wisp'] .initial .i-blades {
+  fill: none;
+  stroke: #7f8f4a;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+body[data-room='will-o-the-wisp'] .initial .i-light {
+  fill: #c8f0e6;
+  --glow: #7fd1c1;
+  filter: drop-shadow(0 0 5px var(--glow));
+}
+body[data-room='will-o-the-wisp'] .initial-letter {
+  font-style: italic;
+  color: var(--r-accent);
+  --glow: rgb(127 209 193 / 0.5);
+  text-shadow: 0 0 10px var(--glow);
+}
+
+/* The reed: a cut stem, to sound the ground before the foot goes down. */
+body.cursor-reed[data-room='will-o-the-wisp'],
+body.cursor-reed[data-room='will-o-the-wisp'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M1 1l21 21' stroke='%230f0d09' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M1 1l21 21' stroke='%23a88d64' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M7 7l2-1M13 13l2-1M19 19l2-1' stroke='%234b3a26' stroke-width='1'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+}
+body.cursor-reed[data-room='will-o-the-wisp'] :is(a, button, summary, label, [role='button']),
+body.cursor-reed[data-room='will-o-the-wisp'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}

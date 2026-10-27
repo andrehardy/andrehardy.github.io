@@ -1,0 +1,427 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Fae's own look (R-B-GLASS-06): their name and headings in a light, sloped hand with a gilt
+ * hairline drawn under, as copperplate is ruled; an entrance in which the lattice weaves itself
+ * up from the threshold across the glass and then sinks under it; and the court's copy of any
+ * words the reader takes up, written in the margin beside them (terms.ts), with the threads that
+ * tie the two together.
+ */
+@property --fae-weave {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+body[data-room='fae'] h1,
+body[data-room='fae'] .text h2 {
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+body[data-room='fae'] h1::after {
+  content: '';
+  display: block;
+  width: min(9em, 100%);
+  height: 1px;
+  margin-top: 0.12em;
+  background: linear-gradient(
+    90deg,
+    var(--r-accent),
+    color-mix(in srgb, var(--r-accent), transparent 85%) 70%,
+    transparent
+  );
+}
+body[data-room='fae'] .specimen .window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      60deg,
+      transparent 0 22px,
+      color-mix(in srgb, var(--r-accent), transparent 30%) 22px 23px
+    ),
+    repeating-linear-gradient(
+      -60deg,
+      transparent 0 22px,
+      color-mix(in srgb, var(--r-accent), transparent 30%) 22px 23px
+    ),
+    rgb(6 6 10 / 0.9);
+  mask-image: linear-gradient(
+    to top,
+    #000 var(--fae-weave),
+    transparent calc(var(--fae-weave) + 12%)
+  );
+  pointer-events: none;
+  animation: fae-weave var(--t-reveal) var(--glass-ease-clear) var(--glass-clear-out) both;
+}
+
+.fae-terms {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  opacity: 0;
+  transition: opacity var(--glass-clear-in) var(--glass-ease-clear);
+}
+.fae-terms[data-shown] {
+  opacity: 1;
+}
+.fae-space {
+  display: block;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.fae-terms svg {
+  position: absolute;
+  inset: 0;
+  width: 1px;
+  height: 1px;
+  overflow: visible;
+}
+.fae-terms path {
+  fill: none;
+  stroke: var(--r-accent);
+  stroke-width: 1;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+.fae-echo {
+  position: relative;
+  margin: 0;
+  font-family: var(--f-text);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  letter-spacing: 0.04em;
+  color: var(--r-accent);
+  overflow-wrap: anywhere;
+}
+.fae-terms[data-below] .fae-echo {
+  padding: 0.5em 0.8em;
+  background: rgb(6 6 10 / 0.88);
+  border-top: 1px solid color-mix(in srgb, var(--r-accent), transparent 50%);
+}
+
+@keyframes fae-weave {
+  0% {
+    opacity: 1;
+    --fae-weave: 0%;
+  }
+  60% {
+    opacity: 1;
+    --fae-weave: 100%;
+  }
+  100% {
+    opacity: 0;
+    --fae-weave: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='fae'] .specimen .window::after {
+    display: none;
+  }
+  .fae-terms {
+    transition: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): a covenant engrossed on black glass. Its articles are numbered and ruled
+ * off down the right for the court's copy, the margins of the leaf are laid with a gilt lattice,
+ * and the case is set as the seal. Taking up words strikes the binding (--life): the lattice
+ * draws tight and burns brighter. Its entrance is the covenant engrossed, a line at a time.
+ */
+body[data-room='fae'] .leaf {
+  counter-reset: article;
+}
+body[data-room='fae'] .leaf :is(section, .room, .creature-head) {
+  animation: fae-engross var(--life-ink) var(--glass-ease-clear) backwards;
+}
+body[data-room='fae'] .leaf .room-stack > :nth-child(n + 5) {
+  animation-delay: var(--life-beat);
+}
+body[data-room='fae'] .leaf .room-stack > :nth-child(n + 7) {
+  animation-delay: calc(var(--life-beat) * 2);
+}
+@keyframes fae-engross {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 -2rem 0 0);
+  }
+}
+
+/* The articles: numbered, and ruled off down the right, where the court keeps its copy. */
+body[data-room='fae'] .leaf > [data-room-text] {
+  max-width: calc(var(--measure) + 2.5rem);
+  margin-bottom: var(--s-5);
+  padding-right: 2rem;
+  border-right: 1px solid rgb(192 57 43 / 0.5);
+  box-shadow: 4px 0 0 -3px rgb(207 167 0 / 0.45);
+}
+body[data-room='fae'] .leaf [data-frame='article'] {
+  counter-increment: article;
+}
+/* On a narrow page the rule is set in from the edge, so the seals pressed on it stay on the page. */
+@media (max-width: 30rem) {
+  body[data-room='fae'] .leaf > [data-room-text] {
+    margin-right: 1.4rem;
+  }
+}
+
+/* Each term sealed where its rule ends: red wax pressed over a gilt ribbon, as it is reached. */
+body[data-room='fae'] .leaf > [data-room-text] {
+  position: relative;
+}
+body[data-room='fae'] .wax {
+  position: absolute;
+  right: -1.15rem;
+  bottom: -1rem;
+  width: 2.3rem;
+  height: 2.9rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 23 29'%3E%3Cpath d='M8 15l-4 13 4-2 2 3 2-13zM15 15l4 13-4-2-2 3-2-13z' fill='%23cfa700' fill-opacity='.85'/%3E%3Cpath d='M11.5 1.5c3 0 4 1.6 6.4 2.2 2 .5 3.6 2.2 3.4 4.4-.2 1.6.8 2.9.4 4.8-.5 2.2-2.4 3-3.4 4.6-1.2 1.9-3.8 2.6-6.8 2.6s-5.4-.6-6.7-2.5C3.8 16 1.9 15.2 1.4 13c-.4-1.9.6-3.2.4-4.8C1.6 6 3.2 4.3 5.2 3.8 7.6 3.1 8.5 1.5 11.5 1.5z' fill='%238e1b12'/%3E%3Ccircle cx='11.5' cy='10.4' r='5.4' fill='none' stroke='%23c0392b' stroke-width='1'/%3E%3Cpath d='M9 8.6c1.4.4 2.4 1.4 2.5 3.3.2-1.9 1.2-2.9 2.6-3.3M11.5 12v2.6' fill='none' stroke='%23e36b5d' stroke-width='.9' stroke-linecap='round'/%3E%3Cpath d='M5.5 6.5c1.8-2 4-2.6 6.6-2.4' fill='none' stroke='%23ffffff' stroke-opacity='.25' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.6));
+  animation: fae-wax var(--life-press) var(--glass-ease-clear) calc(var(--life-beat) * 3) backwards;
+}
+@keyframes fae-wax {
+  from {
+    opacity: 0;
+    transform: translateY(-0.75rem) scale(1.03) rotate(-12deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.94);
+  }
+}
+body[data-room='fae'] .leaf > [data-room-text] > h2::before,
+body[data-room='fae'] .exemplars h2::before {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-family: var(--f-label);
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-ink-soft);
+}
+body[data-room='fae'] .leaf [data-frame='article'] > h2::before {
+  content: 'Article ' counter(article, upper-roman);
+  content: 'Article ' counter(article, upper-roman) / '';
+}
+body[data-room='fae'] .leaf [data-frame='schedule'] > h2::before {
+  content: 'The Schedule';
+  content: 'The Schedule' / '';
+}
+body[data-room='fae'] .leaf [data-frame='witness'] > h2::before {
+  content: 'Witnessed';
+  content: 'Witnessed' / '';
+}
+body[data-room='fae'] .exemplars h2::before {
+  content: 'Precedents';
+  content: 'Precedents' / '';
+}
+
+/* The heading hand: the sloped copperplate, gilt, its hairline ruled under. */
+body[data-room='fae'] .text h2,
+body[data-room='fae'] .exemplars h2 {
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.55rem;
+  color: var(--r-accent);
+  border-bottom: 1px solid rgb(207 167 0 / 0.4);
+  padding-bottom: 0.2rem;
+}
+
+/* The seal: the specimen's case closed with red wax and a gilt cord. */
+body[data-room='fae'] .leaf > .case-bay {
+  position: relative;
+  padding: var(--s-4);
+  border: 1px solid rgb(207 167 0 / 0.35);
+  outline: 1px solid rgb(207 167 0 / 0.18);
+  outline-offset: 5px;
+}
+body[data-room='fae'] .leaf > .case-bay::after {
+  content: '';
+  position: absolute;
+  right: -1.1rem;
+  bottom: -1.1rem;
+  width: 3.4rem;
+  height: 3.4rem;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 38% 34%, rgb(255 255 255 / 0.25), transparent 30%),
+    radial-gradient(circle, #9d2a1f 0 52%, #7a1d14 60%, transparent 62%),
+    conic-gradient(from 15deg, #b8952c 0 8%, transparent 8% 50%, #b8952c 50% 58%, transparent 58%);
+  border-radius: 50%;
+  filter: drop-shadow(0 3px 4px rgb(0 0 0 / 0.6));
+}
+@media (max-width: 30rem) {
+  body[data-room='fae'] .leaf > .case-bay::after {
+    right: -0.5rem;
+  }
+}
+
+/*
+ * The binding laid over the whole glass under the words: a gilt lattice, fine and faint until a
+ * term is struck, then drawn tight and burning, thinnest where the words are read.
+ */
+body[data-room='fae'] .binding {
+  --mesh: calc(30px - var(--bind, 0) * 14px);
+  --rest: 0.12;
+  background:
+    repeating-linear-gradient(
+      60deg,
+      transparent 0 var(--mesh),
+      #cfa700 var(--mesh) calc(var(--mesh) + 1px)
+    ),
+    repeating-linear-gradient(
+      -60deg,
+      transparent 0 var(--mesh),
+      #cfa700 var(--mesh) calc(var(--mesh) + 1px)
+    );
+  mask-image: radial-gradient(ellipse 34% 70% at 50% 50%, rgb(0 0 0 / 0.45), #000 85%);
+  opacity: calc(var(--rest) + var(--bind, 0) * 0.38);
+  will-change: opacity;
+}
+body[data-room='fae'][data-sky='on'] .binding {
+  --rest: 0.3;
+}
+/* Near a fire festival the hill fires light the glass from below. */
+body[data-room='fae'][data-sky='on'] .leaf::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgb(255 122 40 / 0.22),
+    rgb(255 150 60 / 0.12) 55%,
+    rgb(255 170 80 / 0.05)
+  );
+}
+
+/* The lattice in the leaf's margins: gilt, drawn tighter and brighter as the binding is struck. */
+body[data-room='fae'] .lattice {
+  --mesh: calc(26px - var(--bind, 0) * 10px);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  z-index: -1;
+  width: clamp(3rem, 9vw, 10rem);
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      60deg,
+      transparent 0 var(--mesh),
+      #cfa700 var(--mesh) calc(var(--mesh) + 1px)
+    ),
+    repeating-linear-gradient(
+      -60deg,
+      transparent 0 var(--mesh),
+      #cfa700 var(--mesh) calc(var(--mesh) + 1px)
+    );
+  opacity: calc(0.26 + var(--bind, 0) * 0.4);
+  animation: fae-lattice var(--life-draw) var(--glass-ease-clear) backwards;
+}
+body[data-room='fae'] .lattice.left {
+  left: 0;
+  mask-image: linear-gradient(to right, #000, transparent);
+}
+body[data-room='fae'] .lattice.right {
+  right: 0;
+  mask-image: linear-gradient(to left, #000, transparent);
+}
+@keyframes fae-lattice {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+/* Near a fire festival: the gilt brighter, and rowan laid on the leaf against the Fair Folk. */
+body[data-room='fae'][data-sky='on'] .lattice {
+  opacity: calc(0.42 + var(--bind, 0) * 0.4);
+  --glow: rgb(255 215 80 / 0.6);
+  filter: drop-shadow(0 0 3px var(--glow));
+}
+body[data-room='fae'] .creature-head {
+  position: relative;
+}
+body[data-room='fae'] .rowan {
+  display: none;
+  position: absolute;
+  top: -0.5rem;
+  right: 0;
+  width: 7rem;
+  height: 4rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='112' height='64' viewBox='0 0 112 64'%3E%3Cpath d='M4 60C30 44 60 30 108 20' fill='none' stroke='%235a3b22' stroke-width='1.6'/%3E%3Cg fill='%233e6b3a'%3E%3Cpath d='M30 46c-2-7-8-10-14-10 3 6 8 9 14 10zM30 46c5-5 6-11 4-16-4 4-6 10-4 16zM56 34c-2-7-8-10-14-10 3 6 8 9 14 10zM56 34c5-5 6-11 4-16-4 4-6 10-4 16zM82 26c-2-7-8-10-14-10 3 6 8 9 14 10zM82 26c5-5 6-11 4-16-4 4-6 10-4 16z'/%3E%3C/g%3E%3Cg fill='%23c0392b' stroke='%237a1d14' stroke-width='.6'%3E%3Ccircle cx='96' cy='30' r='3.4'/%3E%3Ccircle cx='102' cy='34' r='3'/%3E%3Ccircle cx='92' cy='36' r='3'/%3E%3Ccircle cx='99' cy='40' r='2.8'/%3E%3C/g%3E%3C/svg%3E")
+    no-repeat center / contain;
+}
+body[data-room='fae'][data-sky='on'] .rowan {
+  display: block;
+}
+body[data-room='fae'][data-sky='on'] :is(.text h2, .exemplars h2) {
+  color: #f0c419;
+  --glow: rgb(240 196 25 / 0.35);
+  text-shadow: 0 0 10px var(--glow);
+}
+
+/* The initial: its letter gilt on black glass, the lattice behind it, three rowan berries. */
+body[data-room='fae'] .initial .i-glass {
+  fill: #0b0b10;
+  stroke: #cfa700;
+  stroke-width: 1;
+}
+body[data-room='fae'] .initial .i-lattice {
+  stroke: #cfa700;
+  stroke-width: 0.6;
+  opacity: 0.4;
+}
+body[data-room='fae'] .initial .i-rule {
+  fill: none;
+  stroke: #cfa700;
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  animation: fae-rule var(--life-draw) var(--glass-ease-clear) both;
+}
+body[data-room='fae'] .initial .i-berry {
+  fill: #c0392b;
+}
+body[data-room='fae'] .initial-letter {
+  font-style: italic;
+  color: #e9c94a;
+  text-shadow: 0 1px 8px #0b0b10;
+}
+@keyframes fae-rule {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The quill: its nib the pointer's, wet with gilt. */
+body.cursor-quill[data-room='fae'],
+body.cursor-quill[data-room='fae'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1 1l4 1c6 3 12 9 17 20-8-3-15-9-19-16z' fill='%23eae6df' stroke='%230b0b10' stroke-width='1'/%3E%3Cpath d='M1 1l6 6M9 9l9 9' stroke='%230b0b10' stroke-width='.7'/%3E%3Cpath d='M1 1l3 1-2 2z' fill='%23d4af37'/%3E%3C/svg%3E")
+      1 1,
+    auto;
+}
+body.cursor-quill[data-room='fae'] :is(a, button, summary, label, [role='button']),
+body.cursor-quill[data-room='fae'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}

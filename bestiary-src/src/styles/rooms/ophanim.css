@@ -1,0 +1,311 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Ophanim's own look (R-B-GLASS-06): their Hebrew name set after their own, between two
+ * rules of white gold, as the word is cut on a wheel's rim; an entrance in which the eyepiece's iris
+ * opens out from the reticle's centre on the wheels, already standing in it; and the wheels held at the
+ * centre of the view, faint, behind the room's text, so that the words pass through them as the
+ * reader goes down the page. They stay where they are: they go wherever and never turn.
+ */
+@property --ophanim-iris {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+body[data-room='ophanim'] h1::after {
+  content: '\05D0\05D5\05E4\05E0\05D9\05DD';
+  content: '\05D0\05D5\05E4\05E0\05D9\05DD' / '';
+  display: inline-block;
+  direction: rtl;
+  margin-inline-start: 0.6em;
+  padding: 0.12em 0.2em 0.18em;
+  vertical-align: 0.3em;
+  font-size: 0.42em;
+  letter-spacing: 0.08em;
+  color: var(--c-ink);
+  border-block: 1px solid color-mix(in srgb, var(--r-light), transparent 35%);
+}
+body[data-room='ophanim'] main .label {
+  letter-spacing: 0.18em;
+}
+body[data-room='ophanim'] .specimen .window {
+  clip-path: circle(var(--ophanim-iris) at 50% 50%);
+  animation: ophanim-iris var(--t-reveal) var(--glass-ease-clear) var(--glass-clear-out) both;
+}
+body[data-room='ophanim']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400' fill='none' stroke='%23f2e6c4' stroke-width='1.2'%3E%3Cpath d='M292.4 169.7L292.0 160.2L290.7 151.1L288.5 142.5L285.4 134.4L281.5 126.9L276.9 120.2L271.5 114.2L265.4 109.1L258.6 104.8L251.4 101.4L243.6 99.0L235.4 97.6L226.8 97.1L218.0 97.7L209.1 99.2L200.0 101.7L190.9 105.2L182.0 109.5L173.2 114.7L164.6 120.8L156.4 127.6L148.6 135.1L141.4 143.3L134.6 151.9L128.5 161.1L123.1 170.6L118.5 180.4L114.6 190.4L111.5 200.5L109.3 210.6L108.0 220.5L107.6 230.3L108.0 239.8L109.3 248.9L111.5 257.5L114.6 265.6L118.5 273.1L123.1 279.8L128.5 285.8L134.6 290.9L141.4 295.2L148.6 298.6L156.4 301.0L164.6 302.4L173.2 302.9L182.0 302.3L190.9 300.8L200.0 298.3L209.1 294.8L218.0 290.5L226.8 285.3L235.4 279.2L243.6 272.4L251.4 264.9L258.6 256.7L265.4 248.1L271.5 238.9L276.9 229.4L281.5 219.6L285.4 209.6L288.5 199.5L290.7 189.4L292.0 179.5L292.4 169.7'/%3E%3Cpath d='M200.0 101.7L206.2 106.5L212.3 112.2L218.4 118.8L224.2 126.2L229.8 134.2L235.1 142.9L240.1 152.1L244.7 161.8L248.9 171.9L252.6 182.2L255.8 192.8L258.4 203.3L260.5 213.9L262.0 224.3L262.9 234.5L263.2 244.3L262.9 253.7L262.0 262.6L260.5 270.9L258.4 278.6L255.8 285.4L252.6 291.5L248.9 296.6L244.7 300.8L240.1 304.1L235.1 306.3L229.8 307.6L224.2 307.8L218.4 306.9L212.3 305.0L206.2 302.2L200.0 298.3L193.8 293.5L187.7 287.8L181.6 281.2L175.8 273.8L170.2 265.8L164.9 257.1L159.9 247.9L155.3 238.2L151.1 228.1L147.4 217.8L144.2 207.2L141.6 196.7L139.5 186.1L138.0 175.7L137.1 165.5L136.8 155.7L137.1 146.3L138.0 137.4L139.5 129.1L141.6 121.4L144.2 114.6L147.4 108.5L151.1 103.4L155.3 99.2L159.9 95.9L164.9 93.7L170.2 92.4L175.8 92.2L181.6 93.1L187.7 95.0L193.8 97.8L200.0 101.7'/%3E%3Cpath d='M263.2 244.3L272.0 241.1L280.1 237.6L287.4 233.6L293.8 229.3L299.3 224.8L303.9 220.0L307.5 215.0L310.1 209.9L311.6 204.7L312.0 199.4L311.3 194.2L309.6 188.9L306.8 183.9L303.0 178.9L298.2 174.2L292.4 169.7L285.8 165.5L278.3 161.6L270.1 158.1L261.2 155.0L251.7 152.4L241.7 150.2L231.3 148.4L220.6 147.2L209.8 146.5L198.8 146.3L187.8 146.6L176.9 147.5L166.3 148.8L156.0 150.6L146.1 152.9L136.8 155.7L128.0 158.9L119.9 162.4L112.6 166.4L106.2 170.7L100.7 175.2L96.1 180.0L92.5 185.0L89.9 190.1L88.4 195.3L88.0 200.6L88.7 205.8L90.4 211.1L93.2 216.1L97.0 221.1L101.8 225.8L107.6 230.3L114.2 234.5L121.7 238.4L129.9 241.9L138.8 245.0L148.3 247.6L158.3 249.8L168.7 251.6L179.4 252.8L190.2 253.5L201.2 253.7L212.2 253.4L223.1 252.5L233.7 251.2L244.0 249.4L253.9 247.1L263.2 244.3'/%3E%3Cg transform='translate(235.4 97.6) rotate(-174)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(200.0 101.7) rotate(162)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(164.6 120.8) rotate(142)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(134.6 151.9) rotate(126)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(114.6 190.4) rotate(109)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(107.6 230.3) rotate(90)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(114.6 265.6) rotate(66)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(134.6 290.9) rotate(36)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(209.2 109.2) rotate(43)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(232.4 138.3) rotate(58)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(250.7 176.8) rotate(70)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(261.3 218.9) rotate(82)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(262.6 258.1) rotate(96)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(254.3 288.4) rotate(118)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(237.8 305.3) rotate(155)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(184.5 93.9) rotate(17)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(287.1 233.8) rotate(-31)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(307.4 215.2) rotate(-58)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(88.6 205.6) rotate(78)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(101.6 225.6) rotate(41)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(129.6 241.7) rotate(21)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(168.2 251.5) rotate(8)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(211.8 253.4) rotate(-3)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3Cg transform='translate(253.5 247.2) rotate(-15)'%3E%3Cpath d='M-10 0Q0-7 10 0Q0 7-10 0Z'/%3E%3Ccircle r='2.6'/%3E%3C/g%3E%3C/svg%3E")
+    center / min(80vmin, 40rem) no-repeat;
+  opacity: 0.07;
+}
+
+@keyframes ophanim-iris {
+  from {
+    --ophanim-iris: 0%;
+    filter: brightness(1.6);
+  }
+  to {
+    --ophanim-iris: 75%;
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='ophanim'] .specimen .window {
+    clip-path: none;
+    animation: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): an observer's log kept at the eyepiece. The leaf is ruled; each entry is
+ * numbered, its watch marked in the column of times down its left; the case is the eyepiece and
+ * the exemplars the catalogue. The wheels' eyes stand open in both margins and follow the hand.
+ * At noon the log is gilded. Its entrance is the iris opening over the whole leaf.
+ */
+body[data-room='ophanim'] {
+  --log-rule: rgb(242 230 196 / 0.07);
+  --log-mark: var(--r-accent);
+}
+body[data-room='ophanim'][data-sky='on'] {
+  --log-rule: rgb(255 214 120 / 0.22);
+  --log-mark: #ffd27a;
+}
+/* Noon: the light of the wheels laid over the whole log, gold from its head. */
+body[data-room='ophanim'][data-sky='on'] .leaf::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(rgb(255 205 120 / 0.15), rgb(255 205 120 / 0.09));
+}
+body[data-room='ophanim'] .leaf {
+  counter-reset: obs;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(1.75rem - 1px),
+    var(--log-rule) calc(1.75rem - 1px) 1.75rem
+  );
+  animation: ophanim-open var(--life-draw) var(--glass-ease-clear) backwards;
+}
+@keyframes ophanim-open {
+  from {
+    clip-path: circle(0% at 50% 14rem);
+  }
+  to {
+    clip-path: circle(160% at 50% 14rem);
+  }
+}
+
+/* An entry: numbered, its watch marked in the column of times, graduated down its left. */
+body[data-room='ophanim'] .leaf [data-frame='entry'] {
+  counter-increment: obs;
+  position: relative;
+  max-width: calc(var(--measure) + 5rem);
+  margin: 0 0 var(--s-5);
+  padding-left: 4.5rem;
+  background:
+    linear-gradient(var(--log-mark) 0 0) 3.25rem 0 / 1px 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--log-mark) 0 1px, transparent 1px 1.75rem) 2.9rem 0 /
+      0.35rem 100% no-repeat;
+}
+body[data-room='ophanim'] .leaf [data-frame='entry']::before {
+  content: counter(obs, upper-roman);
+  content: counter(obs, upper-roman) / '';
+  position: absolute;
+  left: 0;
+  top: 0.35rem;
+  width: 2.4rem;
+  text-align: right;
+  font-family: var(--f-label);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--log-mark);
+}
+body[data-room='ophanim'] .leaf [data-frame='entry'] > h2::before {
+  content: 'Obs. ' counter(obs, decimal-leading-zero) '\2002\2014\2002';
+  content: 'Obs. ' counter(obs, decimal-leading-zero) '\2002\2014\2002' / '';
+  color: var(--log-mark);
+}
+
+/* The heading hand: an observer's plain capitals, widely spaced. */
+body[data-room='ophanim'] .text h2,
+body[data-room='ophanim'] .exemplars h2 {
+  font-family: var(--f-label);
+  font-weight: 600;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--c-ink);
+}
+body[data-room='ophanim'][data-sky='on'] :is(.text h2, .exemplars h2) {
+  color: #ffe3a3;
+  --glow: rgb(255 190 80 / 0.35);
+  text-shadow: 0 0 12px var(--glow);
+}
+
+/* The eyepiece: the case ringed in brass, as the glass is in its tube. */
+body[data-room='ophanim'] .leaf > .case-bay {
+  padding: var(--s-4);
+  box-shadow:
+    0 0 0 1px rgb(242 230 196 / 0.3),
+    0 0 0 7px var(--c-ground),
+    0 0 0 8px rgb(255 159 28 / 0.45);
+  margin-bottom: var(--s-5);
+}
+
+/* The catalogue: each sighting given its number. */
+body[data-room='ophanim'] .exemplars .reports {
+  counter-reset: cat;
+}
+body[data-room='ophanim'] .exemplars .reports li {
+  counter-increment: cat;
+}
+body[data-room='ophanim'] .exemplars .reports li::before {
+  content: 'No. ' counter(cat);
+  content: 'No. ' counter(cat) / '';
+  position: absolute;
+  top: 0.4rem;
+  right: 0.6rem;
+  font-family: var(--f-label);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--log-mark);
+}
+
+/*
+ * The gaze on the leaf: where the hand is watched, a wheel within a wheel laid on the log, rimmed
+ * with eyes; it comes clear as the hand moves and fades when it rests, and never turns.
+ */
+body[data-room='ophanim'] .gaze {
+  inset: auto;
+  top: 0;
+  left: 0;
+  width: 30rem;
+  height: 30rem;
+  translate: calc(var(--gx, -999) * 1px - 15rem) calc(var(--gy, -999) * 1px - 15rem);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-100 -100 200 200'%3E%3Cdefs%3E%3Cg id='e'%3E%3Cpath d='M-6 0Q0-4.6 6 0Q0 4.6-6 0Z' fill='%23e8dcbc' fill-opacity='.8'/%3E%3Ccircle r='2.2' fill='%231d3270'/%3E%3Ccircle r='.9' fill='%2305081a'/%3E%3C/g%3E%3C/defs%3E%3Ccircle r='62' fill='none' stroke='%23ffd678' stroke-opacity='.6' stroke-width='1.4'/%3E%3Ccircle r='91' fill='none' stroke='%23a7c957' stroke-opacity='.55' stroke-width='1'/%3E%3Cg%3E%3Cuse href='%23e' transform='translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(22.5) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(45) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(67.5) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(90) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(112.5) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(135) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(157.5) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(180) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(202.5) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(225) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(247.5) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(270) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(292.5) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(315) translate(0 -77)'/%3E%3Cuse href='%23e' transform='rotate(337.5) translate(0 -77)'/%3E%3C/g%3E%3C/svg%3E")
+      center / contain no-repeat,
+    radial-gradient(
+      closest-side,
+      rgb(255 214 120 / 0.24),
+      rgb(255 214 120 / 0.14) 40%,
+      transparent 62%
+    );
+  opacity: var(--gaze, 0);
+  will-change: translate, opacity;
+}
+
+/* The eyes in the margins: open, and following the hand. The wheels behind never turn. */
+body[data-room='ophanim'] .eyes {
+  position: fixed;
+  top: 16vh;
+  bottom: 10vh;
+  z-index: -1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 3.4rem;
+  pointer-events: none;
+}
+body[data-room='ophanim'] .eyes.left {
+  left: 1.5rem;
+}
+body[data-room='ophanim'] .eyes.right {
+  right: 1.5rem;
+}
+body[data-room='ophanim'] .eyes.right .eye:nth-child(2),
+body[data-room='ophanim'] .eyes.left .eye:nth-child(3) {
+  translate: 0.6rem 0;
+}
+body[data-room='ophanim'] .eye {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+body[data-room='ophanim'] .eye .lid {
+  fill: #e8dcbc;
+}
+body[data-room='ophanim'] .eye .pupil {
+  translate: calc(var(--px, 0) * 7px) calc(var(--py, 0) * 2.6px);
+}
+body[data-room='ophanim'] .eye .iris {
+  fill: #1d3270;
+  stroke: #a7c957;
+  stroke-width: 1.4;
+}
+body[data-room='ophanim'] .eye .black {
+  fill: #05081a;
+}
+body[data-room='ophanim'] .eye .glint {
+  fill: #fff;
+  opacity: 0.8;
+}
+body[data-room='ophanim'] .eye .rim {
+  fill: var(--c-ground);
+}
+body[data-room='ophanim'] .eye .lash {
+  fill: none;
+  stroke: var(--log-mark);
+  stroke-width: 1.2;
+  opacity: calc(0.55 + var(--life, 0) * 0.45);
+}
+body[data-room='ophanim'][data-sky='on'] .eye .lash {
+  --glow: rgb(255 210 122 / 0.8);
+  filter: drop-shadow(0 0 3px var(--glow));
+}
+
+/* The initial: its letter in the eyepiece, the reticle's arms about it. */
+body[data-room='ophanim'] .initial .i-tube {
+  fill: #141c45;
+  stroke: var(--r-accent);
+  stroke-width: 2;
+}
+body[data-room='ophanim'] .initial .i-lens {
+  fill: #0a1030;
+}
+body[data-room='ophanim'] .initial .i-reticle {
+  stroke: #a7c957;
+  stroke-width: 1;
+  opacity: 0.7;
+}
+body[data-room='ophanim'] .initial .i-ring {
+  fill: none;
+  stroke: #f2e6c4;
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  animation: ophanim-ring var(--life-draw) var(--glass-ease-clear) both;
+}
+body[data-room='ophanim'] .initial-letter {
+  font-size: 2.8rem;
+  color: #f2e6c4;
+}
+@keyframes ophanim-ring {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The reticle: crossed hairs in a ring, its centre the pointer's. */
+body.cursor-reticle[data-room='ophanim'],
+body.cursor-reticle[data-room='ophanim'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='8' stroke='%230a1030' stroke-width='3'/%3E%3Ccircle cx='12' cy='12' r='8' stroke='%23f2e6c4' stroke-width='1.2'/%3E%3Cpath d='M12 1v7M12 16v7M1 12h7M16 12h7' stroke='%230a1030' stroke-width='3'/%3E%3Cpath d='M12 1v7M12 16v7M1 12h7M16 12h7' stroke='%23ff9f1c' stroke-width='1.2'/%3E%3C/svg%3E")
+      12 12,
+    crosshair;
+}
+body.cursor-reticle[data-room='ophanim'] :is(a, button, summary, label, [role='button']),
+body.cursor-reticle[data-room='ophanim'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}

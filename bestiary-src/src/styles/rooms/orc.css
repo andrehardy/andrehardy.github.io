@@ -1,0 +1,385 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Orc's own look (R-B-GLASS-06): letters stamped as a soil survey marks its horizons, wide
+ * and upright; an entrance in which the case fills from the foot up, stratum by stratum; and the
+ * mycelium (--mycelium, from growth.ts), which spreads into the margins of the page and the
+ * gaps between its paragraphs while the reader lingers. It grows only where there is no text.
+ */
+body[data-room='orc'] h1,
+body[data-room='orc'] .text h2 {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 400;
+}
+body[data-room='orc'] main .label {
+  letter-spacing: 0.24em;
+}
+body[data-room='orc'] .specimen .window {
+  animation: orc-strata var(--glass-clear-in) var(--glass-detent) var(--glass-clear-out) both;
+}
+
+@keyframes orc-strata {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+/* The margins: threads either side of each section of text, outside its measure, never in it. */
+body[data-room='orc'] [data-room-text] {
+  position: relative;
+}
+body[data-room='orc'] [data-room-text]::before,
+body[data-room='orc'] [data-room-text]::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='480' viewBox='0 0 240 480' fill='none' stroke='%23efe7cf' stroke-width='0.8' stroke-linecap='round'%3E%3Cpath d='M120 0C110 60 150 110 128 170S90 260 118 330 150 420 120 480'/%3E%3Cpath d='M128 170C160 180 190 150 240 160'/%3E%3Cpath d='M118 330C80 340 40 310 0 322'/%3E%3Cpath d='M140 60C170 70 175 40 210 30'/%3E%3Cpath d='M100 250C70 240 50 260 20 240'/%3E%3Cpath d='M135 410C160 430 190 420 230 440'/%3E%3Cpath stroke-opacity='.6' d='M60 0C50 80 70 120 40 200S10 330 30 480'/%3E%3Cpath stroke-opacity='.6' d='M200 0C215 90 190 160 205 240S230 400 210 480'/%3E%3C/svg%3E");
+  background-size: 15rem 30rem;
+  opacity: calc(var(--mycelium, 0) * 0.45);
+}
+body[data-room='orc'] [data-room-text]::before {
+  right: calc(100% + var(--s-3));
+  width: 15rem;
+  mask-image: linear-gradient(to left, #000, transparent);
+}
+body[data-room='orc'] [data-room-text]::after {
+  left: calc(100% + var(--s-4));
+  width: 22rem;
+  mask-image: linear-gradient(to right, #000 40%, transparent);
+}
+/* A narrow page has no margins to grow into; the threads keep to its gaps and its leading. */
+@media (max-width: 64rem) {
+  body[data-room='orc'] [data-room-text]::before,
+  body[data-room='orc'] [data-room-text]::after {
+    display: none;
+  }
+}
+/*
+ * The gaps between paragraphs: one thread laid along each. Only true gaps: a passage given in
+ * both voices is two paragraphs of which one is hidden, and between them there is no gap at all.
+ */
+body[data-room='orc'] [data-room-text] p {
+  position: relative;
+}
+body[data-room='orc']
+  [data-room-text]
+  p:not([data-layer], [data-lens-layer], .lensed *)
+  + p:not([data-layer], [data-lens-layer], .lensed *)::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 100%;
+  height: 1em;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='12' viewBox='0 0 400 12' fill='none' stroke='%23efe7cf' stroke-width='0.8' stroke-linecap='round'%3E%3Cpath d='M0 6C40 3 60 9 100 6S160 2 200 6 260 10 300 5 360 4 400 6'/%3E%3Cpath d='M150 5C155 1 162 0 170 1M290 5C296 9 304 10 312 9'/%3E%3C/svg%3E")
+    center / 25rem 0.75rem repeat-x;
+  clip-path: inset(0 calc((1 - var(--mycelium, 0)) * 100%) 0 0);
+  opacity: 0.4;
+}
+/* The line spacing: a hairline in the leading between each line and the next, behind the words. */
+body[data-room='orc'] [data-room-text] p::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 100' preserveAspectRatio='none' fill='none' stroke='%23efe7cf' stroke-width='0.7' stroke-linecap='round'%3E%3Cpath vector-effect='non-scaling-stroke' d='M0 1C50 0 90 2 140 1S230 0 280 1.5 360 2 400 1'/%3E%3C/svg%3E")
+    0 0 / 25rem 1lh repeat;
+  clip-path: inset(0 calc((1 - var(--mycelium, 0)) * 100%) 0 0);
+  opacity: 0.3;
+}
+body[data-room='orc'][data-torn]
+  [data-room-text]
+  p:not([data-layer], [data-lens-layer], .lensed *)
+  + p:not([data-layer], [data-lens-layer], .lensed *)::before,
+body[data-room='orc'][data-torn] [data-room-text] p::after {
+  opacity: 0.12;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='orc'] .specimen .window {
+    animation: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): a soil profile. A depth rule down the margin; under the surface and its
+ * litter, horizon under horizon, each a band of its own soil, lettered as a surveyor letters
+ * them, its upper boundary wavering. Its entrance is the profile cut: the horizons coming clear
+ * one under another from the surface down.
+ */
+@counter-style orc-horizons {
+  system: fixed;
+  symbols: 'O' 'A' 'B' 'C' 'R';
+  suffix: '';
+}
+body[data-room='orc'] .leaf {
+  counter-reset: horizon;
+  padding-left: clamp(2.5rem, 6vw, 4.5rem);
+}
+body[data-room='orc'] .depth-rule {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1.4rem;
+  border-right: 1px solid rgb(239 231 207 / 0.35);
+  background:
+    repeating-linear-gradient(to bottom, rgb(239 231 207 / 0.45) 0 1px, transparent 1px 3rem) right
+      0 / 0.9rem 100% no-repeat,
+    repeating-linear-gradient(to bottom, rgb(239 231 207 / 0.3) 0 1px, transparent 1px 0.6rem) right
+      0 / 0.45rem 100% no-repeat;
+  animation: orc-cut var(--life-draw) var(--glass-detent) both;
+}
+body[data-room='orc'] .leaf :is(section, .room) {
+  animation: orc-cut var(--life-ink) var(--glass-ease-clear) backwards;
+}
+body[data-room='orc'] .leaf .room-stack > :nth-child(5) {
+  animation-delay: var(--life-beat);
+}
+body[data-room='orc'] .leaf .room-stack > :nth-child(6) {
+  animation-delay: calc(var(--life-beat) * 2);
+}
+body[data-room='orc'] .leaf .room-stack > :nth-child(n + 7) {
+  animation-delay: calc(var(--life-beat) * 3);
+}
+@keyframes orc-cut {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+/* The surface: the name stands on the ground, its litter of leaves and crumb along the line. */
+body[data-room='orc'] .creature-head {
+  position: relative;
+  padding-bottom: var(--s-4);
+}
+body[data-room='orc'] .litter {
+  position: absolute;
+  left: calc(clamp(2.5rem, 6vw, 4.5rem) * -1);
+  right: 0;
+  bottom: 0;
+  height: 0.9rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='14' viewBox='0 0 200 14' fill='none' stroke='%23bcae94' stroke-width='.7'%3E%3Cpath d='M0 8c10-2 20 1 30-1s22 2 34 0 20-3 32 0 22 2 34-1 24 1 36 0 22-2 34 1'/%3E%3Cpath d='M12 6c3-3 7-3 9 0-3 2-6 2-9 0zM58 5c2-3 6-4 8-1-2 2-5 3-8 1zM104 7c3-2 6-2 8 1-3 1-6 1-8-1zM150 5c2-3 6-3 8 0-3 2-5 2-8 0z'/%3E%3Ccircle cx='40' cy='11' r='1'/%3E%3Ccircle cx='86' cy='12' r='.8'/%3E%3Ccircle cx='132' cy='11' r='1.1'/%3E%3Ccircle cx='178' cy='12' r='.9'/%3E%3C/svg%3E")
+    0 0 / 12.5rem 0.9rem repeat-x;
+}
+
+/* The horizons: a band of each soil across the leaf, its boundary wavering at the top. */
+body[data-room='orc'] .text,
+body[data-room='orc'] .exemplars {
+  --soil: #2a1d12;
+  counter-increment: horizon;
+  position: relative;
+  max-width: none;
+  margin: 0;
+  padding: 2.75rem clamp(1rem, 3vw, 2rem) var(--s-4);
+  background:
+    var(--fruits, none) 0 0 / 21.25rem 1.1rem repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='10' viewBox='0 0 300 10' fill='none' stroke='%23efe7cf' stroke-opacity='.4' stroke-width='.8'%3E%3Cpath d='M0 5c20-4 35 3 60 0s40-4 65 1 40 3 60-1 45-3 65 1 30 2 50-1'/%3E%3C/svg%3E")
+      0 0 / 18.75rem 0.65rem repeat-x,
+    radial-gradient(circle at 30% 40%, rgb(239 231 207 / 0.07) 0 1.2px, transparent 1.8px) 0 0 /
+      2.3rem 1.9rem,
+    radial-gradient(circle at 70% 70%, rgb(0 0 0 / 0.35) 0 2.5px, transparent 3px) 0.6rem 0.4rem /
+      3.1rem 2.7rem,
+    var(--soil);
+}
+body[data-room='orc'] .text:nth-of-type(1) {
+  --soil: #22170d;
+}
+body[data-room='orc'] [data-part='screen'] {
+  --soil: #2b1c11;
+}
+body[data-room='orc'] [data-part='habits'] {
+  --soil: #33190e;
+}
+body[data-room='orc'] [data-part='neighbour'] {
+  --soil: #352a1e;
+}
+body[data-room='orc'] .exemplars {
+  --soil: #262624;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='120' viewBox='0 0 160 120' fill='none' stroke='%23efe7cf' stroke-opacity='.12' stroke-width='.8'%3E%3Cpath d='M0 30l40 10 30-20 50 15 40-5M20 120l20-40 40-10 20-30M100 120l10-30 50-20'/%3E%3C/svg%3E")
+      0 0 / 10rem 7.5rem,
+    var(--soil);
+}
+/* Its words keep to their measure; the band runs on beyond them, where the mycelium spreads. */
+body[data-room='orc'] .text > :not(.roots, .web) {
+  max-width: var(--measure);
+}
+body[data-room='orc'] [data-room-text]::before {
+  display: none;
+}
+body[data-room='orc'] [data-room-text]::after {
+  left: calc(var(--measure) + clamp(1rem, 3vw, 2rem) + var(--s-5));
+  right: 0;
+  width: auto;
+}
+
+/*
+ * The roots: down from each horizon's top through the whole of it, behind the words, as far as
+ * the reader's lingering has let them grow; and the mycelium's white web spreading through the
+ * soil with them (--roots, written on the horizon). In the fruiting season the web is already
+ * there, standing in the soil.
+ */
+body[data-room='orc'] .text:has(> .roots) {
+  isolation: isolate;
+}
+body[data-room='orc'] .roots {
+  position: absolute;
+  z-index: -1;
+  top: 0.4rem;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 0.4rem);
+  overflow: visible;
+}
+body[data-room='orc'] .roots path {
+  fill: none;
+  stroke: #cdbd9c;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--roots, 1));
+  vector-effect: non-scaling-stroke;
+  opacity: 0.7;
+  transition: stroke-dashoffset var(--life-ink) var(--glass-ease-clear);
+}
+body[data-room='orc'] .web {
+  --web-floor: 0;
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='170' viewBox='0 0 240 170' fill='none' stroke='%23efe7cf' stroke-width='.8' stroke-linecap='round'%3E%3Cpath d='M0 40c30-8 46 10 72 4s40-22 70-14 50 18 98 6M18 0c6 30-4 52 8 80s2 54 14 90M72 44c-10 26 6 40-2 66s10 40 4 60M142 30c14 22 4 44 20 62s2 46 18 78M190 0c-8 24 10 40 2 64M240 36c-20 6-36 30-56 30M0 120c26 10 50-6 74 6s36 20 62 10 46-14 70-2 24 6 34 4M100 0c4 14-6 22 0 34M60 170c4-16 20-22 18-40M200 170c-6-20 8-30 0-50'/%3E%3Cpath d='M30 56l-8 8M30 56l10 6M112 112l-10-6M112 112l2 12M168 92l10-4M168 92l-2 12M50 140l-6 10M214 116l10 6' stroke-width='.6'/%3E%3Cg fill='%23efe7cf' stroke='none'%3E%3Ccircle cx='72' cy='44' r='1.6'/%3E%3Ccircle cx='142' cy='30' r='1.4'/%3E%3Ccircle cx='26' cy='80' r='1.3'/%3E%3Ccircle cx='162' cy='92' r='1.5'/%3E%3Ccircle cx='136' cy='136' r='1.4'/%3E%3Ccircle cx='74' cy='126' r='1.2'/%3E%3C/g%3E%3C/svg%3E")
+    0 0 / 15rem 10.6rem;
+  opacity: calc(max(var(--web-floor), var(--roots, 0)) * 0.55);
+  transition: opacity var(--life-ink) linear;
+  will-change: opacity;
+}
+body[data-room='orc'][data-sky='on'] .web {
+  --web-floor: 1;
+}
+
+/* Fruiting bodies (R-B-LIVE-09): in their season they push up along the surface. */
+body[data-room='orc'] .fruit {
+  position: absolute;
+  inset: auto 0 0.35rem;
+  height: 2.4rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='26' viewBox='0 0 260 26' fill='none' stroke='%23efe7cf' stroke-width='.9'%3E%3Cpath d='M30 26v-9M24 17c0-6 12-6 12 0z' fill='%238c6a4a'/%3E%3Cpath d='M38 26v-6M34 20c0-4 8-4 8 0z' fill='%23a07a52'/%3E%3Cpath d='M120 26v-12M112 14c0-8 16-8 16 0z' fill='%238c6a4a'/%3E%3Cpath d='M114 14c4 1 8 1 12 0' stroke-width='.5'/%3E%3Cpath d='M131 26v-5M128 21c0-3 6-3 6 0z' fill='%23a07a52'/%3E%3Cpath d='M210 26v-8M204 18c0-5 12-5 12 0z' fill='%238c6a4a'/%3E%3C/svg%3E")
+    0 100% / 24rem 2.4rem repeat-x;
+  transform-origin: bottom;
+  transform: scaleY(0);
+  transition: transform var(--life-dawn) var(--glass-ease-clear) calc(var(--life-beat) * 5);
+}
+body[data-room='orc'][data-sky='on'] .fruit {
+  transform: scaleY(1);
+}
+/* Their season is the damp of autumn: a low amber light lies over the whole profile. */
+body[data-room='orc'][data-sky='on'] .leaf::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(rgb(204 146 72 / 0.2), rgb(176 120 58 / 0.16));
+}
+body[data-room='orc'][data-sky='on'] {
+  --fruits: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='18' viewBox='0 0 340 18' fill='none' stroke='%23efe7cf' stroke-width='.8'%3E%3Cpath d='M60 18v-6M55 12c0-5 10-5 10 0z' fill='%238c6a4a'/%3E%3Cpath d='M250 18v-8M244 10c0-6 12-6 12 0z' fill='%238c6a4a'/%3E%3Cpath d='M258 18v-4M255 14c0-3 6-3 6 0z' fill='%23a07a52'/%3E%3C/svg%3E");
+}
+
+/* The heading hand: the surveyor's stamped capitals, the horizon's letter boxed before them. */
+body[data-room='orc'] .text h2,
+body[data-room='orc'] .exemplars h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  color: var(--r-accent);
+}
+body[data-room='orc'] .text h2::before,
+body[data-room='orc'] .exemplars h2::before {
+  content: counter(horizon, orc-horizons) / '';
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  border: 1px solid rgb(239 231 207 / 0.6);
+  font-family: var(--f-label);
+  font-weight: 600;
+  font-size: 0.62em;
+  letter-spacing: 0;
+  color: var(--c-ink);
+  background: rgb(0 0 0 / 0.25);
+}
+body[data-room='orc'] .exemplars h2 {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 400;
+}
+
+/* The initial: a core taken from the profile, its strata banded, its letter over them. */
+body[data-room='orc'] .initial .i-core {
+  fill: #4a3423;
+}
+body[data-room='orc'] .initial .b1 {
+  fill: #33190e;
+}
+body[data-room='orc'] .initial .b2 {
+  fill: #5a3d27;
+}
+body[data-room='orc'] .initial .b3 {
+  fill: #6b6e70;
+}
+body[data-room='orc'] .initial .i-wave {
+  fill: none;
+  stroke: #efe7cf;
+  stroke-width: 0.6;
+  opacity: 0.5;
+}
+body[data-room='orc'] .initial .i-rim {
+  fill: none;
+  stroke: #efe7cf;
+  stroke-width: 1;
+}
+body[data-room='orc'] .initial svg {
+  clip-path: inset(0 0 0 0);
+  animation: orc-cut var(--life-ink) var(--glass-ease-clear) both;
+}
+body[data-room='orc'] .initial-letter {
+  color: #efe7cf;
+  text-shadow: 0 1px 3px #000;
+}
+
+/* The trowel, and the spores that drift down from it. */
+body.cursor-trowel[data-room='orc'],
+body.cursor-trowel[data-room='orc'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M2 2l9 3 3 6-3 3-6-3z' fill='%23bfc3c6' stroke='%231e150d' stroke-width='1.1' stroke-linejoin='round'/%3E%3Cpath d='M12 12l9 9' stroke='%231e150d' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M12 12l9 9' stroke='%23a0682e' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E")
+      2 2,
+    auto;
+}
+body.cursor-trowel[data-room='orc'] :is(a, button, summary, label, [role='button']),
+body.cursor-trowel[data-room='orc'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}
+body[data-room='orc'] .orc-spore {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #efe7cf;
+  opacity: 0.7;
+  animation: orc-spore var(--life-draw) var(--glass-ease-clear) both;
+}
+@keyframes orc-spore {
+  to {
+    opacity: 0;
+    transform: translate(calc(var(--drift) * 14px), 26px);
+  }
+}

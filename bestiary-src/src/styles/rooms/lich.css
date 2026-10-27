@@ -1,0 +1,331 @@
+/* Auto-ported from magic-registry B11 room.css — do not hand-edit; re-run port-room-css.mjs */
+/*
+ * The Lich's own look (R-B-GLASS-06): its name set again after itself as a dead script, turned
+ * over, spaced and faint, as the inscription in its case is drawn until the stone is found
+ * (hidden from assistive technology); headings set wide and dry; and an entrance in which dust
+ * comes down over the glass of the case and settles there.
+ */
+@property --lich-dust {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+body[data-room='lich'] h1::after {
+  content: 'Lich';
+  content: 'Lich' / '';
+  display: inline-block;
+  margin-inline-start: 0.5em;
+  transform: scaleY(-1);
+  font-size: 0.5em;
+  letter-spacing: 0.4em;
+  color: color-mix(in srgb, var(--r-accent), transparent 45%);
+  filter: blur(0.4px);
+}
+body[data-room='lich'] .text h2 {
+  letter-spacing: 0.06em;
+  font-weight: 400;
+}
+body[data-room='lich'] .specimen .window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgb(200 192 176 / 0.5) 0 1px, transparent 1.5px) 0 0 / 23px
+      19px,
+    radial-gradient(circle at 70% 60%, rgb(200 192 176 / 0.4) 0 1px, transparent 1.5px) 0 0 / 31px
+      27px,
+    rgb(90 86 78 / 0.55);
+  mask-image: linear-gradient(
+    to bottom,
+    #000 var(--lich-dust),
+    transparent calc(var(--lich-dust) + 18%)
+  );
+  pointer-events: none;
+  animation: lich-dust var(--t-reveal) var(--glass-ease-clear) var(--glass-clear-out) both;
+}
+
+@keyframes lich-dust {
+  0% {
+    opacity: 1;
+    --lich-dust: 0%;
+  }
+  60% {
+    opacity: 1;
+    --lich-dust: 100%;
+  }
+  100% {
+    opacity: 0;
+    --lich-dust: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-room='lich'] .specimen .window::after {
+    display: none;
+  }
+}
+
+/*
+ * The leaf (R-B-LIVE): a reliquary. The shrine holds the case; above the altar stand three tall
+ * lancets of silver tracery, and the predella's low panels run under them. Over each lancet a
+ * line of dead script, turned over and spaced, gives itself up as a gloss once the panel is
+ * found. A pool of candlelight goes with the hand. The longer the reader has been away (the
+ * sky), the more the silver has tarnished and the dust settled. Its entrance is the reliquary's
+ * doors drawn back.
+ */
+body[data-room='lich'] {
+  --silver: #b0b4ba;
+  --lancet-ground: rgb(14 28 25 / 0.74);
+}
+body[data-room='lich'][data-sky='on'] {
+  --silver: color-mix(in srgb, #8e9196, #43b3ae calc(var(--sky, 0) * 35%));
+}
+body[data-room='lich'] .leaf > * {
+  animation: lich-unveil var(--life-draw) var(--glass-ease-clear) backwards;
+}
+body[data-room='lich'] .leaf > .triptych {
+  animation-delay: var(--life-beat);
+}
+body[data-room='lich'] .leaf .room-stack > :nth-child(n + 5) {
+  animation-delay: calc(var(--life-beat) * 3);
+}
+@keyframes lich-unveil {
+  from {
+    opacity: 0;
+    clip-path: inset(0 50% 0 50%);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 -1rem 0 -1rem);
+  }
+}
+
+/* Dust, settled over the whole leaf as long as the reader has been away. */
+body[data-room='lich'] .leaf::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 30%, rgb(200 192 176 / 0.4) 0 1.5px, transparent 2px) 0 0 / 23px
+      19px,
+    radial-gradient(circle at 70% 60%, rgb(200 192 176 / 0.3) 0 1px, transparent 1.5px) 0 0 / 31px
+      27px,
+    linear-gradient(rgb(186 176 156 / calc(0.15 + var(--sky, 0) * 0.12)) 0 0);
+  opacity: 0;
+}
+body[data-room='lich'][data-sky='on'] .leaf::before {
+  opacity: 1;
+}
+
+/* The triptych: three lancets, the account in the tallest, between the parts and the habits. */
+body[data-room='lich'] .triptych {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  align-items: stretch;
+  margin: var(--s-5) 0;
+}
+@media (max-width: 62rem) {
+  body[data-room='lich'] .triptych {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+body[data-room='lich'] .triptych > [data-frame='lancet'] {
+  position: relative;
+  max-width: none;
+  margin: 0;
+  padding: 4.75rem clamp(1rem, 2vw, 1.5rem) 1.75rem;
+  background: linear-gradient(to bottom, transparent 4.5rem, var(--lancet-ground) 4.5rem);
+  border: 2px solid var(--silver);
+  border-top: 0;
+  box-shadow: inset 0 -6px 0 -4px var(--silver);
+}
+body[data-room='lich'] .triptych > [data-frame='lancet']::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: 0;
+  height: 4.5rem;
+  pointer-events: none;
+  background-color: var(--silver);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' preserveAspectRatio='none'%3E%3Cpath d='M1 50V30C1 14 50 1 50 1s49 13 49 29v20' fill='none' stroke='%23000' stroke-width='2' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M12 50V34C12 22 50 10 50 10s38 12 38 24v16' fill='none' stroke='%23000' stroke-width='1' vector-effect='non-scaling-stroke' opacity='.5'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+}
+body[data-room='lich'] .triptych > [data-frame='lancet']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4.5rem;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--lancet-ground);
+  clip-path: polygon(
+    0 100%,
+    0 60%,
+    10% 36%,
+    25% 18%,
+    50% 2%,
+    75% 18%,
+    90% 36%,
+    100% 60%,
+    100% 100%
+  );
+}
+body[data-room='lich'] .triptych > [data-frame='lancet'] {
+  isolation: isolate;
+}
+
+/* The tracery in the head of each arch: a quatrefoil in its roundel, drawn in as it is reached. */
+body[data-room='lich'] .tracery {
+  position: absolute;
+  top: 1.15rem;
+  left: calc(50% - 1.2rem);
+  width: 2.4rem;
+  height: 2.4rem;
+  overflow: visible;
+}
+body[data-room='lich'] .tracery circle {
+  fill: none;
+  stroke: var(--silver);
+  stroke-width: 1.4;
+  stroke-dasharray: 1;
+  animation: lich-tracery var(--life-draw) var(--glass-ease-clear) calc(var(--life-beat) * 2)
+    backwards;
+}
+body[data-room='lich'] .tracery circle + circle {
+  stroke-width: 1;
+  opacity: 0.8;
+  animation-delay: calc(var(--life-beat) * 6);
+}
+@keyframes lich-tracery {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+/* The dead script over each lancet: turned over and spaced until the panel is found, a gloss after. */
+body[data-room='lich'] .gloss {
+  display: block;
+  margin: 0 0 0.6rem;
+  font-style: italic;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: #6fbcb7;
+}
+body[data-room='lich'] .gloss::before {
+  content: '\2767\2002' attr(data-gloss);
+  display: inline-block;
+  transition:
+    transform var(--life-draw) var(--glass-ease-clear),
+    letter-spacing var(--life-draw) var(--glass-ease-clear),
+    opacity var(--life-draw) var(--glass-ease-clear),
+    filter var(--life-draw) var(--glass-ease-clear);
+}
+body[data-room='lich'][data-seeking] .triptych > :not([data-found]) .gloss::before {
+  transform: scaleY(-1);
+  letter-spacing: 0.45em;
+  opacity: 0.45;
+  filter: blur(0.5px);
+}
+
+/* The predella: low panels under the altar, framed in silver above and below. */
+body[data-room='lich'] .leaf [data-frame='predella'] {
+  max-width: none;
+  margin: 0 0 var(--s-4);
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  background: var(--lancet-ground);
+  border-block: 2px solid var(--silver);
+}
+
+/* The shrine: the case under a gable of silver. */
+body[data-room='lich'] .leaf > .case-bay {
+  padding: var(--s-4);
+  border: 1px solid var(--silver);
+  border-top-width: 3px;
+  box-shadow:
+    inset 0 0 0 4px var(--c-ground),
+    inset 0 0 0 5px rgb(176 180 186 / 0.3);
+}
+
+/* The heading hand: small capitals of silver, set wide and dry. */
+body[data-room='lich'] .text h2,
+body[data-room='lich'] .exemplars h2 {
+  font-weight: 400;
+  font-variant-caps: all-small-caps;
+  font-size: 1.45rem;
+  letter-spacing: 0.12em;
+  color: var(--silver);
+}
+
+/* The candlelight: a small warm pool that goes with the hand, lighting the lancets it is carried over. */
+body[data-room='lich'] .candlelight {
+  inset: auto;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 24rem;
+  height: 24rem;
+  translate: calc(var(--cx, -999) * 1px - 12rem) calc(var(--cy, -999) * 1px - 12rem);
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(255 196 120 / 0.4),
+    rgb(255 170 90 / 0.16) 45%,
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: var(--lit, 0);
+  will-change: translate, opacity;
+}
+
+/* The initial: its letter in a lancet of silver, a flame burning in the head of the arch. */
+body[data-room='lich'] .initial .i-lancet {
+  fill: #0e1c19;
+  stroke: var(--silver);
+  stroke-width: 2.5;
+}
+body[data-room='lich'] .initial .i-tracery {
+  fill: none;
+  stroke: var(--silver);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  opacity: 0.6;
+  animation: lich-trace var(--life-draw) var(--glass-ease-clear) both;
+}
+body[data-room='lich'] .initial .i-flame {
+  fill: #ffc478;
+  --glow: #ffaa5a;
+  filter: drop-shadow(0 0 4px var(--glow));
+}
+body[data-room='lich'] .initial-letter {
+  margin-top: 1.2rem;
+  font-size: 2.8rem;
+  color: var(--silver);
+}
+@keyframes lich-trace {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The candle: a stub of wax, its flame the pointer. */
+body.cursor-candle[data-room='lich'],
+body.cursor-candle[data-room='lich'] * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 1c-2 3-2 6 0 8 2-2 2-5 0-8z' fill='%23ffc478' stroke='%230b1614' stroke-width='.8'/%3E%3Cpath d='M3 9v2' stroke='%230b1614' stroke-width='1'/%3E%3Crect x='0.5' y='11' width='5' height='11' rx='1' fill='%23ddd3bd' stroke='%230b1614' stroke-width='.8'/%3E%3C/svg%3E")
+      3 1,
+    auto;
+}
+body.cursor-candle[data-room='lich'] :is(a, button, summary, label, [role='button']),
+body.cursor-candle[data-room='lich'] :is(a, button, summary, label, [role='button']) * {
+  cursor: pointer;
+}
