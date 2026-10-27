@@ -200,6 +200,9 @@ body[data-room='sidhe'] .case-bay::after {
   width: min(18rem, 55%);
   aspect-ratio: 1728 / 2304;
   background: bottom center / contain no-repeat var(--wall-door);
+  /* MAGIC QC: deep shadow frame on door — soft rim-light so alpha opening can glow */
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--bloom, #e8d6c8) 55%, transparent))
+    drop-shadow(0 0 4px rgb(255 240 210 / 0.35));
   pointer-events: none;
   z-index: 0;
 }
@@ -233,6 +236,8 @@ body[data-room='kitsune'] .leaf::before {
   background: center / contain no-repeat var(--wall-torii);
   color: #c8361f;
   opacity: 0.85;
+  /* MAGIC QC: settle far gates into snowfall */
+  filter: blur(0.35px) drop-shadow(0 8px 18px rgb(0 0 0 / 0.35));
 }
 body[data-room='kitsune'] .case-bay::before {
   content: '';
