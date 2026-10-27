@@ -39,28 +39,41 @@ Notes:
 - Night variants: lycanthrope and will-o-the-wisp only. Minotaur and sidhe have none (no day/night divergence).
 - Previews: previews/<slug>.jpg (1440x900), plus lycanthrope-night, will-o-the-wisp-night, sidhe-autumn-tint, minotaur-frieze-seam300, wisp-tussock-edge300.
 
-## Rev 4: SVG stubs (kitsune…succubus) — replace when MAGIC paint lands
+## Rev 4: kitsune, orc, troll, golem, unicorn, fae, ophanim, lich, wraith, succubus
 
-| Path | Layer | CSS hook |
-|---|---|---|
-| public/walls/kitsune/ground.svg | snow path + torii silhouette | `--wall-ground` |
-| public/walls/kitsune/ground-night.svg | night snow + foxfire | `--wall-ground-night` |
-| public/walls/kitsune/posts.svg | foxfire post ornament | `--wall-ornament` |
-| public/walls/orc/ground.svg | soil horizon bands + mycelium | `--wall-ground` |
-| public/walls/orc/mycelium.svg | mycelium overlay | `--wall-mycelium` |
-| public/walls/troll/ground.svg | scree slope | `--wall-ground` |
-| public/walls/troll/rune.svg | runestone | `--wall-rune` |
-| public/walls/golem/ground.svg | clay tablets | `--wall-ground` |
-| public/walls/golem/emet.svg | emet head mark | `--wall-emet` |
-| public/walls/unicorn/ground.svg | millefleurs field + border | `--wall-ground` |
-| public/walls/unicorn/banderole.svg | banderole under title | `--wall-banderole` |
-| public/walls/fae/ground.svg | gilt lattice on dark glass | `--wall-ground` |
-| public/walls/fae/lattice.svg | lattice ornament | `--wall-lattice` |
-| public/walls/ophanim/ground.svg | reticle / observer log | `--wall-ground` |
-| public/walls/ophanim/reticle.svg | reticle glyph | `--wall-reticle` |
-| public/walls/lich/ground.svg | silver-lancet triptych | `--wall-ground` |
-| public/walls/lich/lancet.svg | lancet arch | `--wall-lancet` |
-| public/walls/wraith/ground.svg | transcript lines + reels | `--wall-ground` |
-| public/walls/wraith/reel.svg | reel ornament | `--wall-reel` |
-| public/walls/succubus/ground.svg | smoked drum bands | `--wall-ground` |
-| public/walls/succubus/band.svg | soot band strip | `--wall-band` |
+| Path | Pixel size | File size | Layer | Tileability | CSS hook |
+|---|---|---|---|---|---|
+| public/walls/kitsune/ground.webp | 2048x1152 | 291 KB | ground: snowfall dusk on a shrine approach, cedar rows, faint trodden path; no gate | full-bleed | `--wall-ground` |
+| public/walls/kitsune/ground-night.webp | 2048x1152 | 156 KB | ground (night): cold blue grade, pixel-aligned | full-bleed | `--wall-ground-night` |
+| public/walls/kitsune/torii.svg | vector | 2 KB | ornament: row of 4 receding torii (kasagi, nuki, blank gakuzuka), currentColor, default vermilion #c8361f | vector 1400x760 | `--wall-torii` |
+| public/walls/kitsune/foxfire-post.svg | vector | 1 KB | ornament: stone lantern post with blue-white foxfire; flame path class="foxfire" (animate opacity/scale) | vector 160x420 | `--wall-post` |
+| public/walls/orc/ground.webp | 2048x1152 | 469 KB | ground: soil profile, humus/topsoil with roots, ochre subsoil, grey clay, fractured bedrock | full-bleed | `--wall-ground` |
+| public/walls/orc/mycelium.webp | 2048x1152 | 793 KB | overlay: white mycelium threads, alpha; use opacity .3-.45 | full-bleed, not tileable | `--wall-mycelium` |
+| public/walls/orc/horizon-ticks.svg | vector | 3 KB | ornament: survey rod, graduations, horizon arrows + dashed boundary leaders, no text; ticks at y=130/310/520/700 of 900 match ground bands | vector 560x900 (height = wall) | `--wall-ticks` |
+| public/walls/troll/ground.webp | 2048x1152 | 527 KB | ground: lichened granite scree slope, diagonal fall | full-bleed | `--wall-ground` |
+| public/walls/troll/ground-night.webp | 2048x1152 | 287 KB | ground (night): cold dark grade | full-bleed | `--wall-ground-night` |
+| public/walls/troll/runestone.webp | 2040x1252 | 370 KB | ornament: 3 granite standing stones, abstract serpent bands + notches (no runes), alpha cutout | single object, bottom anchor | `--wall-runestone` |
+| public/walls/golem/ground.webp | 2048x1152 | 469 KB | ground: river clay, dry curling mud-crack plates top to wet sheen bottom | full-bleed | `--wall-ground` |
+| public/walls/golem/tablet.webp | 673x964 | 240 KB | ornament: clay tablet with wedge marks (abstract, cuneiform-like), alpha cutout | single object | `--wall-tablet` |
+| public/walls/golem/head-ornament.svg | vector | 1 KB | ornament: clay head silhouette, blank forehead band (emet slot, no letters), evenodd cut eyes/mouth | vector 300x380 | `--wall-head` |
+| public/walls/unicorn/ground.webp | 2048x1152 | 424 KB | ground: dark green wool weave, sparse millefleurs at edges | full-bleed | `--wall-ground` |
+| public/walls/unicorn/border.webp | 2240x720 | 289 KB | strip: millefleurs border | seamless horizontal tile | `--wall-border` |
+| public/walls/unicorn/border-v.webp | 720x1200 | 159 KB | strip: millefleurs border, vertical (flowers upright) | seamless vertical tile | `--wall-border-v` |
+| public/walls/unicorn/banderole.svg | vector | 1 KB | ornament: curling blank banderole, currentColor fill, dark outline | vector 900x220 | `--wall-banderole` |
+| public/walls/fae/ground.webp | 2048x1152 | 339 KB | ground: mulberry/forest-green blown glass with pale parchment ghosts behind | full-bleed | `--wall-ground` |
+| public/walls/fae/lattice.svg | vector | 17 KB | ornament: gilt diamond cames with hand jitter, bosses, double frame; currentColor default #c9a24a; preserveAspectRatio slice | vector 1600x900 | `--wall-lattice` |
+| public/walls/fae/articles.webp | 1200x1600 | 104 KB | overlay: deckled parchment, numbered clause marks + abstract ink dashes (unreadable), alpha | single object | `--wall-articles` |
+| public/walls/ophanim/ground.webp | 2048x1152 | 275 KB | ground: indigo vellum observer's logbook spread, gold-ruled columns, compass circles; glyph marks inpainted out | full-bleed | `--wall-ground` |
+| public/walls/ophanim/ground-night.webp | 2048x1152 | 139 KB | ground (night): darker cold grade | full-bleed | `--wall-ground-night` |
+| public/walls/ophanim/reticle.svg | vector | 14 KB | ornament: nested rings, 5deg graduations, crosshair, tilted orbit ellipses, 36 rim eyes + centre eye, currentColor default #d4b062 | vector 800x800 | `--wall-reticle` |
+| public/walls/lich/ground.webp | 2048x1152 | 332 KB | ground: black marble slabs, silver veins, cold light upper-left; no panels | full-bleed | `--wall-ground` |
+| public/walls/lich/lancet.svg | vector | 2 KB | ornament: triptych of silver lancet frames (inner rule, quatrefoil, finials) + predella rail, currentColor default #c3c8cf | vector 1400x920 | `--wall-ornament` |
+| public/walls/lich/predella.webp | 2196x850 | 358 KB | strip: carved oak + tarnished silver quatrefoil reliquary frieze, alpha above crest | seamless horizontal tile (period 183px x6 @2x) | `--wall-predella` |
+| public/walls/wraith/ground.webp | 2048x1152 | 404 KB | ground: frosted brushed steel, concentric wire-spool scratches, hoarfrost corners | full-bleed | `--wall-ground` |
+| public/walls/wraith/reel.svg | vector | 5 KB | ornament: twin wire-recorder reels (supply full, take-up thin), head block, trace | vector 800x520 | `--wall-reel` |
+| public/walls/wraith/trace.svg | vector | 8 KB | strip: waveform trace, preserveAspectRatio none | seamless horizontal tile (integer-frequency) | `--wall-trace` |
+| public/walls/succubus/ground.webp | 2048x1152 | 281 KB | ground: soot-black kymograph with ember undertone and scratched white traces | full-bleed | `--wall-ground` |
+| public/walls/succubus/bands.webp | 2048x512 | 34 KB | band: smoked drum bands with 4 scratched pulse traces | seamless horizontal tile | `--wall-band` |
+| public/walls/succubus/soot.webp | 2048x1152 | 357 KB | overlay: soot smudge + edge vignette, alpha | full-bleed | `--wall-soot` |
+
+Notes: night variants only kitsune, troll, ophanim. No baked niches/arches/windows in any ground. Previews: previews/<slug>.jpg (+ kitsune-night, troll-night, ophanim-night).

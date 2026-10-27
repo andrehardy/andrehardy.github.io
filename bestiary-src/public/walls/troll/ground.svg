@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 1152" preserveAspectRatio="xMidYMid slice">
-  <defs><linearGradient id="slope" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3a4248"/><stop offset="100%" stop-color="#1a1e22"/></linearGradient></defs>
-  <rect width="2048" height="1152" fill="url(#slope)"/>
-  <g fill="#2a3036"><ellipse cx="300" cy="900" rx="120" ry="50"/><ellipse cx="600" cy="950" rx="90" ry="40"/><ellipse cx="1000" cy="880" rx="140" ry="55"/><ellipse cx="1400" cy="920" rx="110" ry="45"/><ellipse cx="1750" cy="970" rx="100" ry="42"/><ellipse cx="450" cy="700" rx="70" ry="30"/><ellipse cx="1200" cy="750" rx="85" ry="35"/></g>
-  <g fill="#4a545c" opacity=".7"><polygon points="200,800 260,650 320,800"/><polygon points="800,850 870,680 940,850"/><polygon points="1500,820 1560,660 1620,820"/></g>
-</svg>
