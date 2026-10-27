@@ -38,3 +38,29 @@ Notes:
 - Sidhe seasonal tint: tint petals with `mix-blend-mode:multiply` or a color overlay. winter #cfd8e6 (petals sparse/near-white, low opacity .25), spring #f3c6d3 (.55), summer #f2dc9a (.45), autumn #c8702a (.5); recoil state: opacity 0.
 - Night variants: lycanthrope and will-o-the-wisp only. Minotaur and sidhe have none (no day/night divergence).
 - Previews: previews/<slug>.jpg (1440x900), plus lycanthrope-night, will-o-the-wisp-night, sidhe-autumn-tint, minotaur-frieze-seam300, wisp-tussock-edge300.
+
+## Rev 4: SVG stubs (kitsune…succubus) — replace when MAGIC paint lands
+
+| Path | Layer | CSS hook |
+|---|---|---|
+| public/walls/kitsune/ground.svg | snow path + torii silhouette | `--wall-ground` |
+| public/walls/kitsune/ground-night.svg | night snow + foxfire | `--wall-ground-night` |
+| public/walls/kitsune/posts.svg | foxfire post ornament | `--wall-ornament` |
+| public/walls/orc/ground.svg | soil horizon bands + mycelium | `--wall-ground` |
+| public/walls/orc/mycelium.svg | mycelium overlay | `--wall-mycelium` |
+| public/walls/troll/ground.svg | scree slope | `--wall-ground` |
+| public/walls/troll/rune.svg | runestone | `--wall-rune` |
+| public/walls/golem/ground.svg | clay tablets | `--wall-ground` |
+| public/walls/golem/emet.svg | emet head mark | `--wall-emet` |
+| public/walls/unicorn/ground.svg | millefleurs field + border | `--wall-ground` |
+| public/walls/unicorn/banderole.svg | banderole under title | `--wall-banderole` |
+| public/walls/fae/ground.svg | gilt lattice on dark glass | `--wall-ground` |
+| public/walls/fae/lattice.svg | lattice ornament | `--wall-lattice` |
+| public/walls/ophanim/ground.svg | reticle / observer log | `--wall-ground` |
+| public/walls/ophanim/reticle.svg | reticle glyph | `--wall-reticle` |
+| public/walls/lich/ground.svg | silver-lancet triptych | `--wall-ground` |
+| public/walls/lich/lancet.svg | lancet arch | `--wall-lancet` |
+| public/walls/wraith/ground.svg | transcript lines + reels | `--wall-ground` |
+| public/walls/wraith/reel.svg | reel ornament | `--wall-reel` |
+| public/walls/succubus/ground.svg | smoked drum bands | `--wall-ground` |
+| public/walls/succubus/band.svg | soot band strip | `--wall-band` |

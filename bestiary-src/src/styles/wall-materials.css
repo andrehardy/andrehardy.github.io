@@ -198,3 +198,185 @@ body[data-room='sidhe'] .case-bay::after {
   pointer-events: none;
   z-index: 0;
 }
+
+/* --- Rev 4 stubs (SVG until MAGIC paint lands) --- */
+
+body[data-room='kitsune'] {
+  --wall-ground: url('/magic-registry/bestiary/walls/kitsune/ground.svg');
+  --wall-ground-night: url('/magic-registry/bestiary/walls/kitsune/ground-night.svg');
+  --wall-ornament: url('/magic-registry/bestiary/walls/kitsune/posts.svg');
+  background-image:
+    linear-gradient(180deg, rgb(8 12 18 / 0.25), rgb(0 0 0 / 0.4)),
+    var(--wall-ground);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+}
+html[data-night='on'] body[data-room='kitsune'] {
+  background-image:
+    linear-gradient(180deg, rgb(4 8 14 / 0.35), rgb(0 0 0 / 0.5)),
+    var(--wall-ground-night);
+}
+body[data-room='kitsune'] .case-bay::before {
+  content: '';
+  position: absolute;
+  right: 8%;
+  bottom: 10%;
+  width: 4rem;
+  height: 6rem;
+  background: bottom center / contain no-repeat var(--wall-ornament);
+  color: #c43c2a;
+  pointer-events: none;
+}
+
+body[data-room='orc'] {
+  --wall-ground: url('/magic-registry/bestiary/walls/orc/ground.svg');
+  --wall-mycelium: url('/magic-registry/bestiary/walls/orc/mycelium.svg');
+  background-image:
+    linear-gradient(180deg, rgb(20 14 8 / 0.3), rgb(0 0 0 / 0.45)),
+    var(--wall-ground);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+}
+body[data-room='orc'] .leaf::after {
+  content: '';
+  position: absolute;
+  inset: 10% 5%;
+  z-index: -1;
+  pointer-events: none;
+  background: center / min(28rem, 70%) no-repeat var(--wall-mycelium);
+  color: #8fbf7a;
+  opacity: 0.35;
+}
+
+body[data-room='troll'] {
+  --wall-ground: url('/magic-registry/bestiary/walls/troll/ground.svg');
+  --wall-rune: url('/magic-registry/bestiary/walls/troll/rune.svg');
+  background-image:
+    linear-gradient(180deg, rgb(12 14 16 / 0.35), rgb(0 0 0 / 0.5)),
+    var(--wall-ground);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+}
+body[data-room='troll'] .case-bay::before {
+  content: '';
+  position: absolute;
+  left: 6%;
+  bottom: 8%;
+  width: 5rem;
+  height: 7.5rem;
+  background: bottom center / contain no-repeat var(--wall-rune);
+  color: #a8b0b8;
+  pointer-events: none;
+}
+
+body[data-room='golem'] {
+  --wall-ground: url('/magic-registry/bestiary/walls/golem/ground.svg');
+  --wall-emet: url('/magic-registry/bestiary/walls/golem/emet.svg');
+  background-image:
+    linear-gradient(180deg, rgb(30 20 12 / 0.3), rgb(0 0 0 / 0.45)),
+    var(--wall-ground);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+}
+body[data-room='golem'] h1::before {
+  background: center / contain no-repeat var(--wall-emet) !important;
+  clip-path: none !important;
+  background-color: transparent !important;
+}
+
+body[data-room='unicorn'] {
+  --wall-ground: url('/magic-registry/bestiary/walls/unicorn/ground.svg');
+  --wall-banderole: url('/magic-registry/bestiary/walls/unicorn/banderole.svg');
+  background-image:
+    linear-gradient(180deg, rgb(8 16 12 / 0.3), rgb(0 0 0 / 0.45)),
+    var(--wall-ground);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+}
+body[data-room='unicorn'] .creature-head::after {
+  content: '';
+  display: block;
+  height: 2.5rem;
+  margin-top: var(--s-2);
+  background: center / contain no-repeat var(--wall-banderole);
+  color: #c9a45c;
+}
+
+body[data-room='fae'] {
+  --wall-ground: url('/magic-registry/bestiary/walls/fae/ground.svg');
+  --wall-lattice: url('/magic-registry/bestiary/walls/fae/lattice.svg');
+  background-image:
+    linear-gradient(180deg, rgb(6 8 12 / 0.35), rgb(0 0 0 / 0.5)),
+    var(--wall-ground);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+}
+body[data-room='fae'] .leaf [data-frame='article']::before {
+  background: center / contain no-repeat var(--wall-lattice) !important;
+}
+
+body[data-room='ophanim'] {
+  --wall-ground: url('/magic-registry/bestiary/walls/ophanim/ground.svg');
+  --wall-reticle: url('/magic-registry/bestiary/walls/ophanim/reticle.svg');
+  background-image:
+    linear-gradient(180deg, rgb(6 8 12 / 0.35), rgb(0 0 0 / 0.5)),
+    var(--wall-ground);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+}
+body[data-room='ophanim'] h1::before {
+  background: center / contain no-repeat var(--wall-reticle) !important;
+  clip-path: none !important;
+  background-color: transparent !important;
+}
+
+body[data-room='lich'] {
+  --wall-ground: url('/magic-registry/bestiary/walls/lich/ground.svg');
+  --wall-lancet: url('/magic-registry/bestiary/walls/lich/lancet.svg');
+  background-image:
+    linear-gradient(180deg, rgb(4 10 8 / 0.35), rgb(0 0 0 / 0.5)),
+    var(--wall-ground);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+}
+body[data-room='lich'] .triptych > [data-frame='lancet']::before {
+  background: center top / contain no-repeat var(--wall-lancet) !important;
+}
+
+body[data-room='wraith'] {
+  --wall-ground: url('/magic-registry/bestiary/walls/wraith/ground.svg');
+  --wall-reel: url('/magic-registry/bestiary/walls/wraith/reel.svg');
+  background-image:
+    linear-gradient(180deg, rgb(8 8 10 / 0.35), rgb(0 0 0 / 0.5)),
+    var(--wall-ground);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+}
+body[data-room='wraith'] h1::before {
+  background: center / contain no-repeat var(--wall-reel) !important;
+  clip-path: none !important;
+  background-color: transparent !important;
+}
+
+body[data-room='succubus'] {
+  --wall-ground: url('/magic-registry/bestiary/walls/succubus/ground.svg');
+  --wall-band: url('/magic-registry/bestiary/walls/succubus/band.svg');
+  background-image:
+    linear-gradient(180deg, rgb(16 8 8 / 0.35), rgb(0 0 0 / 0.5)),
+    var(--wall-ground);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+}
+body[data-room='succubus'] .band {
+  background: center top / 100% auto repeat-y var(--wall-band) !important;
+}
