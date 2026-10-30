@@ -121,6 +121,30 @@ a { color: var(--gold-dim); }
   position: relative;
   z-index: 30;
 }
+/* Room lintel: stone/brass/ink bar instead of hall parchment. */
+body[data-room] {
+  --bar: color-mix(in srgb, rgb(28 24 20 / 0.94) calc((1 - var(--night)) * 100%), rgb(6 10 16 / 0.96) calc(var(--night) * 100%));
+  --ink: color-mix(in srgb, #e8dcc4 calc((1 - var(--night)) * 100%), #f0e6d0 calc(var(--night) * 100%));
+  --ink-soft: color-mix(in srgb, #b8a88c calc((1 - var(--night)) * 100%), #9a8c74 calc(var(--night) * 100%));
+}
+body[data-room] .house-bar {
+  color: var(--ink);
+  border-bottom-color: color-mix(in srgb, var(--gold) 55%, transparent);
+  backdrop-filter: blur(6px);
+}
+body[data-room='djinn'] {
+  --bar: color-mix(in srgb, rgb(42 28 12 / 0.94) calc((1 - var(--night)) * 100%), rgb(12 8 4 / 0.96) calc(var(--night) * 100%));
+}
+body[data-room='vampire'],
+body[data-room='lich'],
+body[data-room='wraith'] {
+  --bar: color-mix(in srgb, rgb(18 22 32 / 0.94) calc((1 - var(--night)) * 100%), rgb(4 6 12 / 0.97) calc(var(--night) * 100%));
+}
+body[data-room='kitsune'],
+body[data-room='sidhe'],
+body[data-room='fae'] {
+  --bar: color-mix(in srgb, rgb(22 28 26 / 0.94) calc((1 - var(--night)) * 100%), rgb(6 10 10 / 0.96) calc(var(--night) * 100%));
+}
 .house-mark {
   display: flex;
   flex-direction: column;

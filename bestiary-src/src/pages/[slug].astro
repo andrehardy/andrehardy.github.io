@@ -37,7 +37,31 @@ const ring = `${import.meta.env.BASE_URL}instruments/iron-ring.svg`;
   >
     {/* Room ornaments — B11 leaf layers. Painted grounds from MAGIC Builder hook via --wall-ground. */}
     {slug === 'djinn' && <span class="band" data-ornament aria-hidden="true"></span>}
-    {slug === 'vampire' && <div class="leaf-light warmth" aria-hidden="true"></div>}
+    {slug === 'succubus' && <span class="band" data-ornament aria-hidden="true"></span>}
+    {slug === 'vampire' && (
+      <>
+        <div class="leaf-light warmth" aria-hidden="true"></div>
+        <svg
+          class="thermopile"
+          data-ornament
+          aria-hidden="true"
+          focusable="false"
+          viewBox="-60 -60 120 80"
+        >
+          <path class="t-scale" d="M-46-6A48 48 0 0 1 46-6"></path>
+          <path
+            class="t-ticks"
+            d="M-44-8l-6-3M-38-24l-5-4M-27-36l-4-5M-14-44l-2-6M0-47v-6M14-44l2-6M27-36l4-5M38-24l5-4M44-8l6-3"
+          ></path>
+          <path class="t-hot" d="M27-36A48 48 0 0 1 46-6"></path>
+          <g class="t-needle">
+            <path d="M0 4V-44"></path>
+            <circle r="4"></circle>
+          </g>
+          <path class="t-base" d="M-52 6h104"></path>
+        </svg>
+      </>
+    )}
     {
       slug === 'djinn' && (
         <div class="leaf-light smoke" aria-hidden="true">
@@ -48,15 +72,114 @@ const ring = `${import.meta.env.BASE_URL}instruments/iron-ring.svg`;
       )
     }
     {
-      slug === 'minotaur' && (
-        <svg class="thread" data-ornament aria-hidden="true" focusable="false">
-          <path class="clew-line"></path>
-        </svg>
+      slug === 'kitsune' && (
+        <>
+          <div class="leaf-light snowfall" aria-hidden="true"></div>
+          <div class="foxfires" data-ornament aria-hidden="true">
+            <span class="foxfire" data-n="1"></span>
+            <span class="foxfire" data-n="2"></span>
+            <span class="foxfire" data-n="3"></span>
+            <span class="foxfire" data-n="4"></span>
+            <span class="foxfire" data-n="5"></span>
+            <span class="foxfire" data-n="6"></span>
+            <span class="foxfire" data-n="7"></span>
+            <span class="foxfire" data-n="8"></span>
+            <span class="foxfire" data-n="9"></span>
+          </div>
+        </>
+      )
+    }
+    {
+      slug === 'sidhe' && (
+        <div class="leaf-light glamour" aria-hidden="true">
+          <span class="veil"></span>
+          <span class="bare"></span>
+          <span class="stone"></span>
+          <span class="sheen"></span>
+        </div>
       )
     }
     {
       slug === 'will-o-the-wisp' && (
-        <div class="leaf-light bog-glow" aria-hidden="true"></div>
+        <>
+          <div class="leaf-light lure" aria-hidden="true"></div>
+          <div class="far-lights" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </>
+      )
+    }
+    {
+      slug === 'lycanthrope' && (
+        <>
+          <div class="leaf-light strain" aria-hidden="true"></div>
+          <div class="scores" aria-hidden="true"></div>
+          <div class="pelt" aria-hidden="true"></div>
+          <svg class="cursor-trail" data-cursor="probe" aria-hidden="true" focusable="false">
+            <line class="probe-leader" x1="0" y1="0" x2="0" y2="0"></line>
+            <circle class="probe-bead" r="3"></circle>
+          </svg>
+        </>
+      )
+    }
+    {
+      slug === 'minotaur' && (
+        <svg class="thread" data-ornament aria-hidden="true" focusable="false">
+          <path class="clew-line" id="ariadne-thread" pathLength="1"></path>
+        </svg>
+      )
+    }
+    {
+      slug === 'fae' && (
+        <>
+          <div class="leaf-light binding" aria-hidden="true"></div>
+          <div class="lattice left" data-ornament data-margin aria-hidden="true"></div>
+          <div class="lattice right" data-ornament data-margin aria-hidden="true"></div>
+        </>
+      )
+    }
+    {
+      slug === 'golem' && (
+        <div class="sparks" aria-hidden="true"></div>
+      )
+    }
+    {
+      slug === 'unicorn' && (
+        <div class="leaf-light glare" aria-hidden="true"></div>
+      )
+    }
+    {
+      slug === 'lich' && (
+        <div class="leaf-light candlelight" aria-hidden="true"></div>
+      )
+    }
+    {
+      slug === 'wraith' && (
+        <>
+          <div class="leaf-light static" aria-hidden="true"></div>
+          <div class="wire" data-ornament aria-hidden="true">
+            <span class="clean"></span>
+            <span class="frayed"></span>
+            <span class="head"></span>
+          </div>
+        </>
+      )
+    }
+    {
+      slug === 'succubus' && (
+        <>
+          <div class="leaf-light closing" aria-hidden="true"></div>
+          <div class="leaf-light breathing" aria-hidden="true"></div>
+          <div class="breath" data-ornament aria-hidden="true">
+            <span class="waves"></span>
+            <span class="flat"></span>
+          </div>
+        </>
+      )
+    }
+    {
+      slug === 'ophanim' && (
+        <div class="leaf-light gaze" aria-hidden="true"></div>
       )
     }
 
@@ -108,7 +231,6 @@ const ring = `${import.meta.env.BASE_URL}instruments/iron-ring.svg`;
                 <p class="plate" aria-hidden="true"></p>
               </div>
               <p class="hint">{spec.hint}</p>
-              <p class="frame-note label">{frame.sill} · {frame.shape} · {frame.material}</p>
             </figcaption>
             {lichScript && <div class="script-mount" set:html={lichScript} />}
           </figure>

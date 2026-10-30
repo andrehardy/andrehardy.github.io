@@ -69,8 +69,12 @@ body[data-room='vampire'] .leaf > .thermopile {
   animation: none;
   width: 4.75rem;
 }
-body[data-room='vampire'] .leaf > .case-bay {
-  width: 100%;
+body[data-room='vampire'] .leaf > .case-bay,
+body[data-room='vampire'] .leaf > .case-bay.room {
+  width: min(100%, 36rem);
+  margin-inline: auto;
+  display: block;
+  grid-template-columns: none;
 }
 @keyframes vampire-lit {
   from {

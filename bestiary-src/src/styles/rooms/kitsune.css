@@ -74,8 +74,13 @@ body[data-room='kitsune'] .leaf :is(section, .room, .creature-head, .crumb) {
   width: min(100%, 46rem);
   animation: kitsune-gate var(--life-ink) var(--glass-ease-clear) both;
 }
-body[data-room='kitsune'] .leaf > .case-bay {
-  width: 100%;
+body[data-room='kitsune'] .leaf > .case-bay,
+body[data-room='kitsune'] .leaf > .case-bay.room {
+  width: min(100%, 36rem);
+  margin-inline: auto;
+  padding-block-start: 3.25rem;
+  border-top: none;
+  box-shadow: none;
 }
 body[data-room='kitsune'] .leaf .room-stack > :nth-child(5) {
   animation-delay: var(--life-beat);
@@ -164,16 +169,25 @@ body[data-room='kitsune'] .snowcap {
   transform: scaleY(var(--snow, 0.6));
 }
 
-/* The shrine's board, its name set down it; under it the path begins. */
+/* The shrine's board — wood plaque in the snow, not a cream webpage card. */
 body[data-room='kitsune'] .creature-head {
   padding: var(--s-3);
-  border: 1px solid rgb(28 41 35 / 0.25);
-  background: linear-gradient(to bottom, #e9e2d3, #f2f4f6);
+  border: 1px solid color-mix(in srgb, var(--vermilion) 45%, #1c2923);
+  background:
+    linear-gradient(180deg, rgb(28 41 35 / 0.55), rgb(12 16 18 / 0.72)),
+    linear-gradient(to bottom, #3a2a22, #1c1612);
+  color: #e9e2d3;
+  box-shadow: 0 0 0 1px rgb(200 54 42 / 0.35), 0 12px 28px rgb(0 0 0 / 0.35);
 }
-body[data-room='kitsune'] .room {
-  padding: var(--s-4);
-  border-top: 0.7rem solid var(--beam);
-  box-shadow: inset 0 0.5rem 0 var(--vermilion);
+body[data-room='kitsune'] .creature-head h1 {
+  color: #e8d6a8;
+  border-inline-start-color: var(--vermilion);
+}
+body[data-room='kitsune'] .case-bay.room {
+  /* Do not treat the case as a torii card section. */
+  padding: 3.25rem clamp(0.75rem, 2vw, 1.25rem) 1.25rem;
+  border-top: none;
+  box-shadow: none;
 }
 
 /* The votive plaques: each exemplar on a little wooden board with a pointed roof. */

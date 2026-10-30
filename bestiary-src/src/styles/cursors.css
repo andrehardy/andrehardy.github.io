@@ -185,3 +185,43 @@
     cursor: pointer;
   }
 }
+
+/* Body-level cursor trails (R-B-LIVE) — never intercept input. */
+body > .cursor-trail {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 25;
+  overflow: visible;
+}
+body > .cursor-trail .foxfire-spark,
+body > .cursor-trail .orc-spore,
+body > .cursor-trail .spark {
+  position: fixed;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin: -0.22rem 0 0 -0.22rem;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: nave-mote-fade 0.7s ease-out forwards;
+}
+body > .cursor-trail .foxfire-spark {
+  background: radial-gradient(circle, #eaf2ff, #3d6fc4 70%, transparent);
+  box-shadow: 0 0 8px #6fb7ff;
+}
+body > .cursor-trail .orc-spore {
+  background: radial-gradient(circle, #e8d9b0, #8a6238 70%, transparent);
+}
+body > .cursor-trail .spark {
+  background: radial-gradient(circle, #fff4d0, #c9a45c 65%, transparent);
+  box-shadow: 0 0 6px #ffb347;
+}
+@keyframes nave-mote-fade {
+  from { opacity: 0.9; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.35) translateY(0.4rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body > .cursor-trail { display: none; }
+}

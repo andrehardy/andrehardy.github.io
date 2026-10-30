@@ -2,6 +2,7 @@ import { listen, type InputName } from './input';
 import { mountHall } from './hall';
 import { bindNight } from './night';
 import { createReaction, type Env, type Visit } from './reactions';
+import { mountTrail } from './trail';
 import { mountWindow } from './windows';
 import { a as skyNow, o as rollVisit, r as record } from '../vendor/journal.js';
 import { a as soundOn, i as setSound, n as startVoices, r as bindLevel, t as SOUND_EVENT } from '../vendor/sound.js';
@@ -93,7 +94,9 @@ function mountSpecimen() {
   const reaction = createReaction(slug, root, env, visit);
   if (root.dataset.state) markState(root.dataset.state);
   bindLevel(root, () => reaction.level());
-  const pointer = listen(root, input);
+  const leaf = document.querySelector<HTMLElement>('.creature.leaf') ?? document.body;
+  const pointer = listen(leaf, input, { specimen: root });
+  const dropTrail = mountTrail(slug);
   let raf = 0;
   let running = false;
   let marked = root.dataset.state ?? '';
@@ -127,6 +130,11 @@ function mountSpecimen() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') start();
     else stop();
+  });
+  addEventListener('pagehide', () => {
+    dropTrail();
+    pointer.dispose();
+    reaction.dispose();
   });
   start();
 }

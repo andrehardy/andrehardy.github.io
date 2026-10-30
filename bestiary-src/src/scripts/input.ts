@@ -21,6 +21,9 @@ export type InputName =
 export type Sample = {
   x: number;
   y: number;
+  /** Page / client pixels for leaf CSS vars (--hx/--hy, --lx/--ly, …). */
+  px: number;
+  py: number;
   present: boolean;
   speed: number;
   idle: number;
@@ -73,6 +76,7 @@ const KEYBOARD: Record<InputName, string> = {
 };
 
 const REST = new Set<InputName>(['lead', 'warmth', 'gaze', 'phylactery']);
+const CONTROL = 'a, button, summary, label, [role="button"], input, select, textarea, .house-bar';
 
 const decay = (peak: number, age: number, halfLife: number) => (age <= 0 ? peak : peak * 0.5 ** (age / halfLife));
 
@@ -213,6 +217,8 @@ const isPress = (key: string) => key === ' ' || key === 'Enter';
 export const CALM: Sample = {
   x: 0,
   y: 0,
+  px: -999,
+  py: -999,
   present: false,
   speed: 0,
   idle: 0,
@@ -226,9 +232,19 @@ export const CALM: Sample = {
   upFor: 0,
 };
 
-export function listen(root: HTMLElement, name: InputName) {
+export type ListenOpts = {
+  /** Specimen figure — near/scrub still measured against its window. */
+  specimen?: HTMLElement | null;
+};
+
+/**
+ * Leaf-wide hand: pointer events on the leaf (not only the case). Specimen-normalized x/y
+ * remain for window rituals; px/py are client pixels for leaf CSS blooms.
+ */
+export function listen(leaf: HTMLElement, name: InputName, opts: ListenOpts = {}) {
   if (!(name in CHANNELS)) name = 'calm';
   const channels = new Set(CHANNELS[name]);
+  const specimen = opts.specimen ?? leaf.querySelector<HTMLElement>('[data-specimen]') ?? leaf;
   const now = () => performance.now() / 1000;
   const speed = new Speed();
   const idle = new Idle(now());
@@ -238,37 +254,65 @@ export function listen(root: HTMLElement, name: InputName) {
   const scroll = new ScrollPace();
   let x = 0;
   let y = 0;
+  let px = -999;
+  let py = -999;
   let inside = false;
   let focused = false;
   let touching = false;
   let selected = 0;
   let scrubX = 0;
 
-  const box = () => (root.querySelector('.window') ?? root).getBoundingClientRect();
+  const windowBox = () =>
+    (specimen.querySelector('.window') ?? specimen).getBoundingClientRect();
+  const leafBox = () => leaf.getBoundingClientRect();
+  const isControl = (target: EventTarget | null) =>
+    target instanceof Element && Boolean(target.closest(CONTROL));
+
   const place = (event: PointerEvent) => {
-    const rect = box();
-    const radius = Math.min(rect.width, rect.height) / 2;
+    px = event.clientX;
+    py = event.clientY;
+    const rect = windowBox();
+    const radius = Math.max(1, Math.min(rect.width, rect.height) / 2);
     x = (event.clientX - rect.left - rect.width / 2) / radius;
     y = -(event.clientY - rect.top - rect.height / 2) / radius;
   };
 
+  const overLeaf = (event: PointerEvent) => {
+    const rect = leafBox();
+    return (
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom
+    );
+  };
+
   const onMove = (event: PointerEvent) => {
+    if (isControl(event.target)) {
+      inside = false;
+      speed.lift();
+      scrub.lift();
+      return;
+    }
     place(event);
-    inside = true;
+    inside = overLeaf(event) || event.pointerType === 'touch';
     const t = now();
     speed.sample(x, y, t);
     idle.stir(t);
-    if (channels.has('scrub')) scrub.sample(x, t);
+    if (channels.has('scrub') && inside) scrub.sample(x, t);
   };
-  const onLeave = () => {
+  const onLeave = (event: PointerEvent) => {
+    if (event.relatedTarget instanceof Node && leaf.contains(event.relatedTarget)) return;
     inside = false;
     speed.lift();
     scrub.lift();
   };
   const onDown = (event: PointerEvent) => {
+    if (isControl(event.target)) return;
     idle.stir(now());
     if (event.button !== 0) return;
     place(event);
+    inside = true;
     if (channels.has('hold')) hold.press(now());
     if (event.pointerType === 'touch') touching = true;
   };
@@ -278,7 +322,7 @@ export function listen(root: HTMLElement, name: InputName) {
   };
   const onKey = (event: KeyboardEvent) => {
     idle.stir(now());
-    if (event.target !== root) return;
+    if (event.target !== specimen && event.target !== leaf) return;
     if (channels.has('hold') && isPress(event.key)) {
       event.preventDefault();
       if (event.type === 'keydown') hold.press(now());
@@ -299,6 +343,10 @@ export function listen(root: HTMLElement, name: InputName) {
         x = clamp(x + dx, -1.4, 1.4);
         y = clamp(y + dy, -1.4, 1.4);
         inside = true;
+        const rect = windowBox();
+        const radius = Math.max(1, Math.min(rect.width, rect.height) / 2);
+        px = rect.left + rect.width / 2 + x * radius;
+        py = rect.top + rect.height / 2 - y * radius;
       }
     }
   };
@@ -322,15 +370,15 @@ export function listen(root: HTMLElement, name: InputName) {
         : 0;
   };
 
-  root.addEventListener('pointermove', onMove, { passive: true });
-  root.addEventListener('pointerleave', onLeave, { passive: true });
-  root.addEventListener('pointerdown', onDown);
+  leaf.addEventListener('pointermove', onMove, { passive: true });
+  leaf.addEventListener('pointerleave', onLeave, { passive: true });
+  leaf.addEventListener('pointerdown', onDown);
   addEventListener('pointerup', onUp);
   addEventListener('pointercancel', onUp);
   addEventListener('keydown', onKey);
   addEventListener('keyup', onKey);
-  root.addEventListener('focus', onFocus);
-  root.addEventListener('blur', onBlur);
+  specimen.addEventListener('focus', onFocus);
+  specimen.addEventListener('blur', onBlur);
   addEventListener('scroll', onScroll, { passive: true });
   if (channels.has('selection')) document.addEventListener('selectionchange', onSelect);
   scroll.sample(scrollY / Math.max(1, innerHeight), now());
@@ -345,6 +393,8 @@ export function listen(root: HTMLElement, name: InputName) {
       return {
         x,
         y,
+        px,
+        py,
         present: inside,
         speed: velocity,
         idle: idle.idleFor(t),
@@ -359,15 +409,15 @@ export function listen(root: HTMLElement, name: InputName) {
       };
     },
     dispose() {
-      root.removeEventListener('pointermove', onMove);
-      root.removeEventListener('pointerleave', onLeave);
-      root.removeEventListener('pointerdown', onDown);
+      leaf.removeEventListener('pointermove', onMove);
+      leaf.removeEventListener('pointerleave', onLeave);
+      leaf.removeEventListener('pointerdown', onDown);
       removeEventListener('pointerup', onUp);
       removeEventListener('pointercancel', onUp);
       removeEventListener('keydown', onKey);
       removeEventListener('keyup', onKey);
-      root.removeEventListener('focus', onFocus);
-      root.removeEventListener('blur', onBlur);
+      specimen.removeEventListener('focus', onFocus);
+      specimen.removeEventListener('blur', onBlur);
       removeEventListener('scroll', onScroll);
       document.removeEventListener('selectionchange', onSelect);
     },

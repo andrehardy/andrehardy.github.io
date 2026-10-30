@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "prebuild": "node scripts/generate.mjs",
-    "build": "astro build && rm -f ../magic-registry/bestiary/content-assets.mjs ../magic-registry/bestiary/content-modules.mjs",
+    "build": "astro build && node -e \"for (const f of ['content-assets.mjs','content-modules.mjs']) { try { require('fs').unlinkSync(require('path').join('..','magic-registry','bestiary',f)) } catch {} }\"",
     "dev": "node scripts/generate.mjs && astro dev",
     "generate": "node scripts/generate.mjs"
   },

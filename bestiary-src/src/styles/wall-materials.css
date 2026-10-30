@@ -140,7 +140,9 @@ body[data-room='will-o-the-wisp']::after {
   content: '';
   position: fixed;
   inset: auto 0 0;
-  height: min(42vh, 28rem);
+  /* Cap height so fringe stays below the house bar on short viewports. */
+  height: min(36vh, 22rem, calc(100dvh - 4.5rem));
+  max-height: calc(100dvh - 4.5rem);
   pointer-events: none;
   z-index: 1;
   background: bottom center / 100% auto no-repeat var(--wall-foreground);
@@ -269,7 +271,7 @@ body[data-room='orc'] .leaf::after {
   z-index: -1;
   pointer-events: none;
   background: center / cover no-repeat var(--wall-mycelium);
-  opacity: 0.38;
+  opacity: calc(var(--mycelium, 0) * 0.55);
 }
 body[data-room='orc'] .case-bay::before {
   content: '';
@@ -328,14 +330,20 @@ body[data-room='golem'] .case-bay::before {
   right: 6%;
   bottom: 6%;
   width: min(12rem, 28%);
-  aspect-ratio: 673 / 964;
+  /* Tablet asset ~1012×1400 */
+  aspect-ratio: 1012 / 1400;
   background: bottom center / contain no-repeat var(--wall-tablet);
   pointer-events: none;
 }
-body[data-room='golem'] h1::before {
-  background: center / contain no-repeat var(--wall-head) !important;
-  clip-path: none !important;
-  background-color: transparent !important;
+/* Forehead band uses head ornament; Hebrew אמת stays as h1::before content (golem.css). */
+body[data-room='golem'] .creature-head::before {
+  content: '';
+  display: block;
+  width: min(14rem, 70%);
+  height: 2.4rem;
+  margin: 0 auto 0.35rem;
+  background: center / contain no-repeat var(--wall-head);
+  pointer-events: none;
 }
 
 body[data-room='unicorn'] {
@@ -352,7 +360,25 @@ body[data-room='unicorn'] {
 }
 body[data-room='unicorn'] .leaf {
   border-image: var(--wall-border) 40 fill / 2.5rem / 0 round;
+  /* Vertical side borders from MAGIC border-v asset */
+  box-shadow:
+    inset 1.1rem 0 0 0 transparent,
+    inset -1.1rem 0 0 0 transparent;
 }
+body[data-room='unicorn'] .leaf::before,
+body[data-room='unicorn'] .leaf::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: min(1.35rem, 3.5vw);
+  z-index: 0;
+  pointer-events: none;
+  background: top center / 100% auto repeat-y var(--wall-border-v);
+  opacity: 0.85;
+}
+body[data-room='unicorn'] .leaf::before { left: 0; }
+body[data-room='unicorn'] .leaf::after { right: 0; }
 body[data-room='unicorn'] .creature-head::after {
   content: '';
   display: block;
