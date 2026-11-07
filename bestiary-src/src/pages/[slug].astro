@@ -240,6 +240,45 @@ const ring = `${import.meta.env.BASE_URL}instruments/iron-ring.svg`;
       {/* Inscriptions recessed in the wall — sections already carry data-frame from B11 */}
       <div class="prose" id="text">
         <div class="accession" set:html={entity.accession} />
+        {
+          creature.collar && (
+            <section class="text collar" data-part="collar" data-upgrade5-collar aria-labelledby="collar-title">
+              <h2 id="collar-title" class="label">Cosmological Collar</h2>
+              <dl class="collar-fields">
+                <div>
+                  <dt class="label">Accession &amp; Folio</dt>
+                  <dd>{creature.collar.mark}</dd>
+                </div>
+                <div>
+                  <dt class="label">Ground &amp; Stratum</dt>
+                  <dd>{creature.collar.groundStratum}</dd>
+                </div>
+                <div>
+                  <dt class="label">Cosmological Origin</dt>
+                  <dd>{creature.collar.cosmologicalOrigin}</dd>
+                </div>
+                <div>
+                  <dt class="label">Polarian Aspect</dt>
+                  <dd>{creature.collar.polarianAspect}</dd>
+                </div>
+                <div>
+                  <dt class="label">Observed Window State</dt>
+                  <dd>
+                    {creature.collar.observedWindowState} (`{creature.collar.defaultPlate}`)
+                  </dd>
+                </div>
+                <div>
+                  <dt class="label">Answering Practitioner</dt>
+                  <dd>
+                    <a href={`/magic-registry/archetypes/${creature.collar.answeringSlug}/`}>
+                      {creature.collar.answeringSentence}
+                    </a>
+                  </dd>
+                </div>
+              </dl>
+            </section>
+          )
+        }
         {sections.map((section) => <div class="passage" set:html={section} />)}
       </div>
     </div>

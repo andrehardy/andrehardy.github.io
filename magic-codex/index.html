@@ -1134,23 +1134,24 @@
                 id: "cosmographia",
                 roman: "LIBER VI",
                 shortTitle: "Cosmographia",
-                fullTitle: "Book VI: The Mappa Mundi of Thin Places & Sanctuaries",
-                latinSubtitle: "Cosmographia Locorum Sacrorum",
-                catalogueCode: "HEX-TOM-06 // SANCTUARIES",
-                status: "SEED",
-                liveUrl: "../ChronoMythos/cosmographia/",
+                fullTitle: "Book VI: Cosmographia & Laws of the Axis",
+                latinSubtitle: "Cosmographia Locorum Sacrorum · Leges Axis",
+                catalogueCode: "HEX-TOM-06 // SANCTUARIES & LAWS",
+                status: "LIVE",
+                liveUrl: "./laws-of-the-axis/",
+                mapUrl: "../ChronoMythos/cosmographia/",
                 accentHex: "#f97316",
                 icon: "ph-globe-hemisphere-east",
-                epochTie: "Sunken Doggerland to the Golden Lane of Prague",
-                element: "Stone, Ley & Horizon",
+                epochTie: "Sealed Light to Granite · Sunken Doggerland to Prague",
+                element: "Stone, Ley, Horizon & Cascade",
                 epigraph: "“There are crossroads where the earth's skin is worn so thin that a stone dropped in the grass splashes in the Underworld.”",
-                manuscriptBody: "A sacred gazetteer of the world's mythic geography. Where mundane cartographers draw borders of kingdoms, the Cosmographia charts the places where the Three-Tiered Cosmos converges: drowned post-glacial plains, solstice-aligned passage tombs, sacred oak groves of Anglesey, subterranean acoustic caves, and hidden urban sanctuaries.",
+                manuscriptBody: "The Cosmographia holds two instruments under one seal. First, the Laws of the Axis: five Cosmological Directives and five Parameters that name Source, First Measure, Living Web, Artificer, and Fire-Bringer without erasing the Registry’s Source Bands or Being classes. Second, the sacred gazetteer of thin places—drowned post-glacial plains, solstice tombs, oak groves, acoustic caves, and urban sanctuaries—where that cascade presses close to ordinary ground.",
                 marginalia: [
-                    { book: "Cross-Ref // Book III (ChronoMythos)", note: "Maps the physical locations of every milestone in ChronoMythos—from Chauvet and Ur to Brú na Bóinne.", targetIdx: 2 },
-                    { book: "Cross-Ref // Book IV (The Sighted)", note: "Explores why baseline Sensitives experience overwhelming visions when standing atop megalithic fault lines.", targetIdx: 3 },
-                    { book: "Cross-Ref // Book II (The Bestiary)", note: "Marks the territorial boundaries of genius loci, guardian spirits, and bog-dwelling entities.", targetIdx: 1 }
+                    { book: "Cross-Ref // Book III (ChronoMythos)", note: "Keeps the Rosetta synonym matrix and the in-world Younger Dryas hinge; maps milestones from Chauvet and Ur to Brú na Bóinne.", targetIdx: 2 },
+                    { book: "Cross-Ref // Book I (Magic Registry)", note: "Twelve Chairs and Axis Mundi seats; Being-by-Source Codex remains the Registry’s own taxonomy.", targetIdx: 0 },
+                    { book: "Cross-Ref // Book II (The Bestiary)", note: "Sixteen windows answer by stratum; Folios Fixed and Unhoused keep their accession marks.", targetIdx: 1 }
                 ],
-                blueprint: "Interactive gazetteer of Thin Places, Sunken Lands, Sacred Architecture, and Planar Thresholds with coordinates and field notes."
+                blueprint: "Laws of the Axis (Directives 1–5, Parameters 1–5) plus interactive gazetteer of Thin Places with coordinates and field notes."
             }
         ];
 
@@ -5094,9 +5095,13 @@ totalEmissiveRadiance += vec3(1.0, 0.62, 0.24) * formEdge * 1.5 + vec3(0.55, 0.1
             const footer = folioFooter();
             if (!footer) return;
             if (book.id === "cosmographia" && book.liveUrl) {
+                const mapLink = book.mapUrl
+                    ? `<a href="${book.mapUrl}">Open the gazetteer</a>`
+                    : "";
                 footer.innerHTML = `
-                    <span>The seed is open. The gazetteer is still being written.</span>
-                    <a href="${book.liveUrl}">Enter the Cosmographia</a>
+                    <span>Laws of the Axis are open under this seal.</span>
+                    <a href="${book.liveUrl}">Read the Laws</a>
+                    ${mapLink}
                 `;
             } else if (book.liveUrl) {
                 footer.innerHTML = `

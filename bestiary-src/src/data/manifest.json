@@ -348,8 +348,8 @@
       ],
       "plates": {
         "pod": {
-          "almanac": "The pod in the clay, its threads spreading out through the soil.",
-          "cipher": "Plate I: dormant pod; mycelial growth in progress."
+          "almanac": "In the soil pod, of limestone-vat descent.",
+          "cipher": "Plate I: fungal pod grown from vat-brine chemistry."
         },
         "grown": {
           "almanac": "Grown in full, and standing up out of the broken ground.",
@@ -705,7 +705,7 @@
       "plates": {
         "lit": {
           "almanac": "Lit, over the farthest pool.",
-          "cipher": "Plate I: active, at night."
+          "cipher": "Plate I: default lit state; day shimmer is a listed runtime state."
         },
         "shimmer": {
           "almanac": "By day, a shimmer on the water and nothing more.",

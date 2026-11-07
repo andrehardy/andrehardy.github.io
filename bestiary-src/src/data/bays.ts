@@ -9,6 +9,7 @@ import night1 from './bays/night/bay1.json';
 import night2 from './bays/night/bay2.json';
 import night3 from './bays/night/bay3.json';
 import { findCreature, idleUrl, posterUrl, roster } from './house';
+import { SPECIMEN_COLLARS } from './upgrade5';
 
 export type BayPoint = [number, number];
 
@@ -46,6 +47,8 @@ export type SceneSlot = {
   depth: number | null;
   name: string;
   mark: string;
+  /** Appendix E sub-plaque — floor-side only; never across the aperture. */
+  subPlaque: string;
   href: string | null;
   slug: string | null;
   poster: string | null;
@@ -60,6 +63,10 @@ export type SceneSlot = {
 export type SceneBay = {
   n: number;
   numeral: string;
+  /** Short aria / control title. */
+  wardShort: string;
+  /** Full Ward header with physics parenthetical (canonical engraved form). */
+  wardFull: string;
   daySrc: string;
   nightSrc: string;
   doorDay: [number, number] | null;
@@ -70,6 +77,42 @@ export type SceneBay = {
   /** Night tracery overlay. Null when the rose is already painted into the plate. */
   roseNight: BayBox | null;
   slots: SceneSlot[];
+};
+
+/** Upgrade 5 — Three Ward headers (canonical). */
+export const WARD_HEADERS: Record<1 | 2 | 3, { short: string; full: string }> = {
+  1: {
+    short: 'Bay the First · Of Changed Blood and Heavy Flesh',
+    full: 'Ward the First · The Menagerie of Changed Flesh (Where the Living Web and the Limestone Vat are bound in blood and breath)',
+  },
+  2: {
+    short: 'Bay the Second · Of Clay, Horn, and the Upper Air',
+    full: 'Ward the Second · The Open Crossing (Where inert Clay and agitated Horn give way to the unroofed apertures of the Vault and the Sealed Light)',
+  },
+  3: {
+    short: 'Bay the Third · Of Vessels Sealed, Decoyed, and Unhoused',
+    full: "Ward the Third · The Leaded Chancel (Where that which has no bone—Fire, Decoy, Echo, and Dream—is kept under seal beside the Clerks' Books)",
+  },
+};
+
+/** Appendix E arch sub-plaques keyed by mark. */
+export const ARCH_SUBPLAQUES: Record<string, string> = {
+  'F.1': 'Depth 65 (Limestone) · Answered by The Witch',
+  'F.2': 'Depth 55 (Shale) · Answered by The Enchantress',
+  'F.3': 'Altitude 40 (The Vault) · Answered by The Druid',
+  'F.4': 'Altitude 40 (The Vault) · Answered by The Druid',
+  'F.5': 'Depth 65 (Limestone) · Answered by The Witch',
+  'F.6': 'Depth 75 (Basalt) · Answered by The Warlock',
+  'F.7': 'Depth 90 (Granite) · Answered by The Necromancer',
+  'F.8': 'Altitude 80 (The Vault) · Answered by The Paladin',
+  'F.9': 'On the Horizon · Answered by The Sorcerer',
+  'U.1': 'Altitude 55 (The Vault) · Answered by The Shaman',
+  'U.2': 'Altitude 75 (The Vault) · Answered by The Wizard',
+  'U.3': 'Altitude 100 (The Sealed Light) · Answered by The Cleric',
+  'U.4': 'On the Horizon · Answered by The Alchemist',
+  'U.5': 'Depth 90 (Granite) · Answered by The Necromancer',
+  'U.6': 'Depth 35 (Loess) · Answered by The Bard',
+  'U.7': 'Depth 75 (Basalt) · Answered by The Warlock',
 };
 
 const NUMERALS = ['I', 'II', 'III'];
@@ -164,6 +207,7 @@ export function sceneBays(): SceneBay[] {
           depth: null,
           name: 'Rose window',
           mark: '',
+          subPlaque: '',
           href: null,
           slug: null,
           poster: null,
@@ -183,6 +227,7 @@ export function sceneBays(): SceneBay[] {
           depth: opening.depth,
           name: gate.name,
           mark: gate.mark,
+          subPlaque: '',
           href: gate.href,
           slug: gate.slug,
           poster: null,
@@ -196,13 +241,16 @@ export function sceneBays(): SceneBay[] {
       const creature = creatures[cursor++];
       const state = creature?.states[0] ?? '';
       const found = creature ? findCreature(creature.slug) : null;
+      const mark = found?.entity.mark ?? '';
+      const collar = creature ? SPECIMEN_COLLARS[creature.slug] : undefined;
       return {
         id: opening.id,
         kind: 'creature',
         side: opening.side,
         depth: opening.depth,
         name: found?.entity.name ?? creature?.slug ?? 'Window',
-        mark: found?.entity.mark ?? '',
+        mark,
+        subPlaque: ARCH_SUBPLAQUES[mark] ?? (collar ? `${collar.groundStratum} · Answered by ${collar.answeringPractitioner}` : ''),
         href: creature ? `${creature.slug}/` : null,
         slug: creature?.slug ?? null,
         poster: creature ? posterUrl(creature.slug, state) : null,
@@ -214,9 +262,12 @@ export function sceneBays(): SceneBay[] {
       };
     });
     const rose = slots.find((slot) => slot.kind === 'rose') ?? null;
+    const ward = WARD_HEADERS[n as 1 | 2 | 3];
     return {
       n,
       numeral: NUMERALS[n - 1] ?? String(n),
+      wardShort: ward.short,
+      wardFull: ward.full,
       daySrc: `${BAY_SRC}/day/bay${n}.webp`,
       nightSrc: `${BAY_SRC}/night/bay${n}.webp`,
       doorDay: doorOf(day),

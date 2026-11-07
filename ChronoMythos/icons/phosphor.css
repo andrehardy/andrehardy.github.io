@@ -133,6 +133,9 @@
 .ph.ph-sun-dim:before {
   content: "\e474";
 }
+.ph.ph-table:before {
+  content: "\e476";
+}
 .ph.ph-wave-sine:before {
   content: "\ea9a";
 }
@@ -278,6 +281,9 @@
 .ph-bold.ph-sun-dim:before {
   content: "\e474";
 }
+.ph-bold.ph-table:before {
+  content: "\e476";
+}
 .ph-bold.ph-wave-sine:before {
   content: "\ea9a";
 }
@@ -422,6 +428,9 @@
 }
 .ph-fill.ph-sun-dim:before {
   content: "\e474";
+}
+.ph-fill.ph-table:before {
+  content: "\e476";
 }
 .ph-fill.ph-wave-sine:before {
   content: "\ea9a";

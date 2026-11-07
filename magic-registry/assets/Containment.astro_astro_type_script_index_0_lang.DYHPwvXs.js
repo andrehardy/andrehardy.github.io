@@ -1,1 +1,0 @@
-import{n as e,t}from"./on-view.CuoWBkuk.js";e(),document.addEventListener(`astro:page-load`,()=>t());

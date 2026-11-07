@@ -32,7 +32,13 @@ function floorStyle(box: BayBox, glow: string) {
     <div class="scene-fit" data-scene-fit>
       {
         bays.map((bay) => (
-          <section class="scene-bay" data-scene-bay={bay.n} data-n={bay.n} aria-label={`Bay ${bay.numeral}`}>
+          <section
+            class="scene-bay"
+            data-scene-bay={bay.n}
+            data-n={bay.n}
+            data-ward={bay.wardFull}
+            aria-label={`Bay ${bay.numeral}. ${bay.wardShort}`}
+          >
             {(['day', 'night'] as const).map((phase) => (
               <div
                 class:list={['scene-variant', `variant-${phase}`]}
@@ -124,10 +130,17 @@ function floorStyle(box: BayBox, glow: string) {
                       >
                         <span class="label">{slot.mark}</span>
                         <span class="scene-plate-name">{slot.name}</span>
+                        {slot.subPlaque && (
+                          <span class="scene-plate-sub">{slot.subPlaque}</span>
+                        )}
                       </span>
                     );
                   })}
                 </div>
+                <p class="bay-ward" data-ward-label>
+                  <span class="bay-ward-short">{bay.wardShort}</span>
+                  <span class="bay-ward-full">{bay.wardFull}</span>
+                </p>
               </div>
             ))}
           </section>
@@ -187,6 +200,29 @@ function floorStyle(box: BayBox, glow: string) {
     </script>
   </div>
 
+  <aside class="hall-ledger" data-upgrade5-rubric aria-label="Clerk’s rubric of the sixteen windows">
+    <p>
+      <strong>Of the Sixteen Windows and Their Grounds.</strong> — Nothing held within this Nave is self-born. Every figure behind these arches is spun either from the <em>Sealed Light</em> and <em>First Measure</em> of the upper Vault, from the <em>Living Web</em> of the lower Vault, from the <em>Smokeless Fire</em> of the Horizon, or from the <em>Five Stones</em> laid down by the Artificer below. They are numbered by the Clerks in two Folios according to their housing:
+    </p>
+    <p>
+      <strong>Folio F (F.1 – F.9) · The Fixed</strong> — Those whose life is welded into a single vessel of flesh, horn, blood, or clay. Break the vessel, and the work is undone.
+    </p>
+    <p>
+      <strong>Folio U (U.1 – U.7) · The Unhoused</strong> — Those of unbroken light, stray air, smokeless fire, or bitter echo whose life-seat sits outside the frame shown to the eye. Iron will not quiet them; they answer only to the Practitioner whose mirror is tilted to their depth.
+    </p>
+    <p>
+      <strong>Of the Polarian Spindle and the Nave.</strong> — The sixteen windows of this Hall are arrayed for the Clerks’ Folios and Wards. Specimens whose nature partakes of the Spindle’s unmoving measure—chiefly the Ophanim, the Unicorn, and the Wizard’s stray lantern of calculation—are spoken of as Spindle-stable; those of the outer stones drift with the clocks of the Orrery and the damp weight of the Mantle. This is a relation of nature, not a claim that the present bay order was laid by literal distance from a physical spindle.
+    </p>
+    <ul class="ward-list">
+      {bays.map((bay) => (
+        <li>
+          <span class="ward-numeral">Bay {bay.numeral}</span>
+          <span class="ward-full">{bay.wardFull}</span>
+        </li>
+      ))}
+    </ul>
+  </aside>
+
   <div class="phone">
     <div class="hall-copy">
       <p class="edition label">Edition II</p>
@@ -194,6 +230,9 @@ function floorStyle(box: BayBox, glow: string) {
       <p class="epithet">
         <span data-layer="almanac">Sixteen windows open on the nave, and in each a world is kept.</span>
         <span data-layer="cipher">Sixteen non-human entities, accessioned, each behind its own arch.</span>
+      </p>
+      <p class="hall-rubric-phone">
+        Folios Fixed and Unhoused; three Wards — Menagerie, Open Crossing, Leaded Chancel. Spindle-stable nature is relation, not bay geometry.
       </p>
       <p class="walk walk-touch">Scroll the nave. Tap a window.</p>
     </div>
@@ -222,6 +261,7 @@ function floorStyle(box: BayBox, glow: string) {
             <span class="bay-caption">
               <span class="bay-mark label">{creature.entity.mark}</span>
               <span class="bay-name">{creature.entity.name}</span>
+              <span class="bay-sub">{creature.collar ? `${creature.collar.answeringPractitioner}` : ''}</span>
             </span>
           </a>
         );

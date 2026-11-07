@@ -1,5 +1,6 @@
 import catalogue from './catalogue.json';
 import manifest from './manifest.json';
+import { SPECIMEN_COLLARS, type SpecimenCollar } from './upgrade5';
 
 export type Plate = { almanac: string; cipher: string };
 
@@ -46,6 +47,8 @@ export type EntityFile = {
   accession: string;
   hooks: string[];
   sections: string[];
+  /** Upgrade 5 six-field collar (Pass 0+). Optional on disk; roster always resolves it. */
+  collar?: SpecimenCollar;
 };
 
 type Spec = (typeof catalogue)[keyof typeof catalogue];
@@ -69,6 +72,7 @@ export type Creature = {
   readout: boolean;
   depth: number;
   wall: 'north' | 'south';
+  collar: SpecimenCollar;
 };
 
 export function roster(): Creature[] {
@@ -76,10 +80,18 @@ export function roster(): Creature[] {
     const spec = specs[slug];
     const entity = entities[`./entities/${slug}.json`];
     const assets = creatures[slug];
+    const collar = SPECIMEN_COLLARS[slug];
     if (!entity || !assets) throw new Error(`missing creature data for ${slug}`);
+    if (!collar) throw new Error(`missing Upgrade 5 collar for ${slug}`);
+    if (collar.mark !== entity.mark) {
+      throw new Error(`collar mark ${collar.mark} ≠ entity mark ${entity.mark} for ${slug}`);
+    }
+    if (!assets.states.includes(collar.defaultPlate)) {
+      throw new Error(`default plate ${collar.defaultPlate} missing from states for ${slug}`);
+    }
     return {
       slug,
-      entity,
+      entity: { ...entity, collar },
       spec,
       frame: assets.frame,
       states: [...assets.states],
@@ -87,6 +99,7 @@ export function roster(): Creature[] {
       readout: assets.readout,
       depth: Math.floor(index / 2),
       wall: index % 2 === 0 ? 'north' : 'south',
+      collar,
     };
   });
 }

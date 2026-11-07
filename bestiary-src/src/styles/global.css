@@ -1265,6 +1265,81 @@ html[data-night="on"] .scene-plate {
   display: inline-block;
   width: 0.55em;
 }
+.scene-plate-sub {
+  display: block;
+  margin-top: 0.18rem;
+  max-width: 14rem;
+  font-family: "EB Garamond", Garamond, serif;
+  font-size: clamp(0.58rem, 1.1vw, 0.68rem);
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: #e8dfcf;
+  opacity: 0.92;
+}
+.bay-ward {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: 5.6rem;
+  transform: translateX(-50%);
+  width: min(36rem, 78vw);
+  margin: 0;
+  padding: 0.28rem 0.7rem;
+  text-align: center;
+  pointer-events: none;
+  color: #f0e6d4;
+  background: rgb(12 9 7 / 0.55);
+  border: 1px solid rgb(226 194 122 / 0.28);
+  font-family: "EB Garamond", Garamond, serif;
+  font-size: clamp(0.68rem, 1.2vw, 0.8rem);
+  line-height: 1.3;
+}
+.bay-ward-short { display: block; font-family: Cinzel, serif; letter-spacing: 0.06em; font-size: 0.72em; }
+.bay-ward-full { display: block; margin-top: 0.15rem; opacity: 0.92; }
+.hall-ledger {
+  display: none;
+  width: min(44rem, calc(100% - 2rem));
+  margin: 1.25rem auto 2rem;
+  padding: 1rem 1.15rem 1.2rem;
+  color: var(--ink, #1c1917);
+  background: color-mix(in srgb, var(--ground, #efe5d2) 92%, #fff);
+  border: 1px solid rgb(28 25 23 / 0.18);
+  font-family: "EB Garamond", Garamond, serif;
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+.hall-ledger p { margin: 0.55rem 0; }
+.hall-ledger .ward-list {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+.hall-ledger .ward-numeral {
+  display: block;
+  font-family: Cinzel, serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold, #8a6a28);
+}
+@media (min-width: 900px) {
+  .hall-ledger { display: block; }
+}
+.hall-rubric-phone {
+  margin: 0.55rem 0 0;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: var(--ink-soft, #4a4338);
+}
+.bay-sub {
+  display: block;
+  margin-top: 0.12rem;
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
 .scene-veil {
   position: absolute;
   inset: 0;
@@ -1396,4 +1471,19 @@ html[data-night="on"] .scene-controls button {
 
 @media (prefers-reduced-motion: no-preference) {
   .nave-dolly { transition: transform 0.7s ease; }
+}
+
+.collar { margin: 1.1rem 0 1.4rem; padding-top: 0.35rem; border-top: 1px solid rgb(28 25 23 / 0.16); }
+.collar-fields { margin: 0.4rem 0 0; }
+.collar-fields > div {
+  display: grid;
+  grid-template-columns: 9.5rem 1fr;
+  gap: 0.35rem 0.85rem;
+  margin: 0.35rem 0;
+}
+.collar-fields dt { margin: 0; }
+.collar-fields dd { margin: 0; }
+.collar-fields a { color: inherit; }
+@media (max-width: 640px) {
+  .collar-fields > div { grid-template-columns: 1fr; gap: 0.12rem; }
 }

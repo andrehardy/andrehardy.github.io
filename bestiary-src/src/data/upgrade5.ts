@@ -1,0 +1,297 @@
+/**
+ * Upgrade 5 — authoritative specimen collar + cross-index (Pass 0 freeze).
+ * Public copy is locked; do not invent Origins or Answering Practitioners at coding time.
+ * F.1–F.9 / U.1–U.7 marks and state asset paths remain immutable.
+ */
+
+export type SpecimenCollar = {
+  mark: string;
+  slug: string;
+  groundStratum: string;
+  cosmologicalOrigin: string;
+  polarianAspect: string;
+  observedWindowState: string;
+  defaultPlate: string;
+  answeringPractitioner: string;
+  answeringSlug: string;
+  answeringSentence: string;
+  /** Secondary relations — never a second answering owner. */
+  ancestryNote?: string;
+  sharedMediumNote?: string;
+  secondaryTracking?: string;
+};
+
+export const SPECIMEN_COLLARS: Record<string, SpecimenCollar> = {
+  lycanthrope: {
+    mark: 'F.1',
+    slug: 'lycanthrope',
+    groundStratum: 'Depth 65 · Limestone · Mantle (Source Band: Second Tier)',
+    cosmologicalOrigin:
+      'Mantle Limestone · corrupted Watcher/Nephilim splice in living blood; Witch governs the change, she is not the splice’s source',
+    polarianAspect: 'Subject to the Oblique Turning of the Orrery',
+    observedWindowState: 'I. In the Skin of Man',
+    defaultPlate: 'man',
+    answeringPractitioner: 'The Witch',
+    answeringSlug: 'witch',
+    answeringSentence:
+      'Answered by The Witch (Depth 65, Limestone): For she alone keeps the measure of the root, the fat, and the lunar tide by which the wolf is either called to the skin or quieted within the man.',
+    ancestryNote: 'Watcher/Nephilim corrupted splice (ancestry ≠ answering)',
+  },
+  vampire: {
+    mark: 'F.2',
+    slug: 'vampire',
+    groundStratum: 'Depth 55 · Shale · Mantle (Source Band: Second Tier)',
+    cosmologicalOrigin:
+      'Mantle Shale · grafted contagion of humour and heat-debt under Enchantress instruments',
+    polarianAspect: 'Subject to the Oblique Turning of the Orrery',
+    observedWindowState: 'I. Cold in the House',
+    defaultPlate: 'cold',
+    answeringPractitioner: 'The Enchantress',
+    answeringSlug: 'enchantress',
+    answeringSentence:
+      'Answered by The Enchantress (Depth 55, Shale): For though the house has gone cold, it hunts by her own instruments—voice, aspect, and the persuasion of the blood—and cannot cross a threshold where her art has already barred the will.',
+  },
+  sidhe: {
+    mark: 'F.3',
+    slug: 'sidhe',
+    groundStratum: 'Altitude 40 · Lower Vault · Living Web',
+    cosmologicalOrigin:
+      'Living Web (Cosmological Tier 3) · sky-fed court of the Grid; winter is an observed Aspect, not permanent dormancy',
+    polarianAspect: 'Web-grounded; seasons turn about the Spindle’s soil foot',
+    observedWindowState: 'I. In the Winter Aspect',
+    defaultPlate: 'winter',
+    answeringPractitioner: 'The Druid',
+    answeringSlug: 'druid',
+    answeringSentence:
+      'Answered by The Druid (Altitude 40, The Vault): For their court turns not with the soil below, but with the sky-fed Grid and the hinges of the year that only the Keeper of the Living Web may reckon.',
+  },
+  kitsune: {
+    mark: 'F.4',
+    slug: 'kitsune',
+    groundStratum: 'Altitude 40 · Lower Vault · Living Web',
+    cosmologicalOrigin: 'Living Web (Cosmological Tier 3) · long tally of sky-seasons bound in living fur',
+    polarianAspect: 'Web-grounded; seasons turn about the Spindle’s soil foot',
+    observedWindowState: 'I. Of One Tail',
+    defaultPlate: 'one-tail',
+    answeringPractitioner: 'The Druid',
+    answeringSlug: 'druid',
+    answeringSentence:
+      'Answered by The Druid (Altitude 40, The Vault): For each tail is a long tally of the sky\'s seasons bound into living fur, answering to the law of the Web rather than the law of the snare.',
+  },
+  orc: {
+    mark: 'F.5',
+    slug: 'orc',
+    groundStratum: 'Depth 65 · Limestone · Mantle (Source Band: Second Tier)',
+    cosmologicalOrigin:
+      'Mantle Limestone · vat-brine chemistry cultivated into a fungal soil pod (pot origin + earth growth)',
+    polarianAspect: 'Subject to the Oblique Turning of the Orrery',
+    observedWindowState: 'I. In the Soil Pod, of Vat Descent',
+    defaultPlate: 'pod',
+    answeringPractitioner: 'The Witch',
+    answeringSlug: 'witch',
+    answeringSentence:
+      'Answered by The Witch (Depth 65, Limestone): For what is bred without a mother in the blind chemistry of the pot and the limestone vat, and set to grow in the dark soil, knows no master save the hand that mixed its brine.',
+  },
+  troll: {
+    mark: 'F.6',
+    slug: 'troll',
+    groundStratum: 'Depth 75 · Basalt · Mantle (Source Band: Second Tier)',
+    cosmologicalOrigin:
+      'Mantle Basalt · cooled column given slow breath; granite-looking masonry is Bay material, lore remains Basalt compact',
+    polarianAspect: 'Subject to the Oblique Turning of the Orrery',
+    observedWindowState: 'II. Stone Drawing Breath',
+    defaultPlate: 'breathing',
+    answeringPractitioner: 'The Warlock',
+    answeringSlug: 'warlock',
+    answeringSentence:
+      'Answered by The Warlock (Depth 75, Basalt): For it is the cooled column of the basalt itself given slow breath, and yields neither to iron nor plea, but only to the older compacts signed beneath the hill.',
+  },
+  golem: {
+    mark: 'F.7',
+    slug: 'golem',
+    groundStratum: 'Depth 90 · Granite · Mantle (Source Band: Second Tier)',
+    cosmologicalOrigin:
+      'Mantle Granite · fabricated Emptied House of river-clay and inscription; animated under Necromancer string',
+    polarianAspect: 'Subject to the Oblique Turning of the Orrery',
+    observedWindowState: 'I. Unstrung / Asleep',
+    defaultPlate: 'asleep',
+    answeringPractitioner: 'The Necromancer',
+    answeringSlug: 'necromancer',
+    answeringSentence:
+      'Answered by The Necromancer (Depth 90, Granite): For though it was never born of woman, it is an Emptied House of river-clay and crushed granite that wakes or sleeps by the same heavy string that moves the dead.',
+  },
+  unicorn: {
+    mark: 'F.8',
+    slug: 'unicorn',
+    groundStratum: 'Altitude 80 · Upper Vault · First Measure',
+    cosmologicalOrigin:
+      'Upper Vault · First Measure probability walking in clean water and Grid; Paladin favour reveals the horn',
+    polarianAspect: 'Centered upon the Spindle (Timeless)',
+    observedWindowState: 'I. Hidden in the Probable',
+    defaultPlate: 'hidden',
+    answeringPractitioner: 'The Paladin',
+    answeringSlug: 'paladin',
+    answeringSentence:
+      'Answered by The Paladin (Altitude 80, The Vault): For no hound nor spear may corner a beast that walks inside the sky\'s improbability; it shows its horn only where the favour of the Vault is already held.',
+    secondaryTracking: 'Wizard may note probability threads; answering remains Paladin',
+  },
+  minotaur: {
+    mark: 'F.9',
+    slug: 'minotaur',
+    groundStratum: 'Horizon 0 · Threshold · Fire-Bringer seat',
+    cosmologicalOrigin:
+      'Horizon · congenital Fire-Bringer thickening of Watcher-line blood-fire (not a craft-made tourist graft); contained is an interaction fallback, not idle cosmology',
+    polarianAspect: 'Unspooled Horizon current; Orrery cannot throttle it',
+    observedWindowState: 'II. Agitated in the Frame',
+    defaultPlate: 'agitated',
+    answeringPractitioner: 'The Sorcerer',
+    answeringSlug: 'sorcerer',
+    answeringSentence:
+      'Answered by The Sorcerer (On the Horizon): For the heat that thickens its brow and agitates its frame is the same congenital fire that runs unbidden in the Sorcerer\'s own blood.',
+    ancestryNote: 'Watcher-line blood-fire (ancestry aligns with Sorcerer seat)',
+  },
+  fae: {
+    mark: 'U.1',
+    slug: 'fae',
+    groundStratum: 'Altitude 55 · Lower Vault · Living Web',
+    cosmologicalOrigin:
+      'Living Web (Cosmological Tier 3) · unbodied threshold presence; waiting is active absence of open agreement',
+    polarianAspect: 'Web-threshold; Spindle seen by ingestion, not command',
+    observedWindowState: 'I. Waiting at the Threshold of Sight',
+    defaultPlate: 'waiting',
+    answeringPractitioner: 'The Shaman',
+    answeringSlug: 'shaman',
+    answeringSentence:
+      'Answered by The Shaman (Altitude 55, The Vault): For they stand perpetually at the edge of common sight, waiting until the Keys of Ingestion have opened the door of the eye to the Living Web.',
+  },
+  'will-o-the-wisp': {
+    mark: 'U.2',
+    slug: 'will-o-the-wisp',
+    groundStratum: 'Altitude 75 · Upper Vault · First Measure',
+    cosmologicalOrigin:
+      'Upper Vault · First Measure stray calculation in wetland Grid; Wizard answers; Shaman may track secondarily',
+    polarianAspect: 'Spindle-stable reckoning fallen to marsh',
+    observedWindowState: 'I. Lit Upon the Marsh',
+    defaultPlate: 'lit',
+    answeringPractitioner: 'The Wizard',
+    answeringSlug: 'wizard',
+    answeringSentence:
+      'Answered by The Wizard (Altitude 75, The Vault): For it is a stray lantern of ungrounded calculation fallen from the upper air, and only the Reckoner of Probable Things may distinguish its false marsh-beacon from a true star.',
+    secondaryTracking: 'Shaman may perceive wetland charge; answering remains Wizard',
+  },
+  ophanim: {
+    mark: 'U.3',
+    slug: 'ophanim',
+    groundStratum: 'Altitude 100 · Sealed Light · First Measure access',
+    cosmologicalOrigin:
+      'First Measure (Cosmological Tier 2) of Sealed Light access · revolving rings; Cleric endures, does not command',
+    polarianAspect: 'Centered upon the Spindle (Timeless)',
+    observedWindowState: 'II. Watching in the Rings',
+    defaultPlate: 'watching',
+    answeringPractitioner: 'The Cleric',
+    answeringSlug: 'cleric',
+    answeringSentence:
+      'Answered by The Cleric (Altitude 100, The Sealed Light): For no unvetted eye may look upon the revolving rings of the Sealed Light and remain whole; only the bearer of the restorative signal may endure their watching.',
+  },
+  djinn: {
+    mark: 'U.4',
+    slug: 'djinn',
+    groundStratum: 'Horizon 0 · Threshold · Smokeless Fire',
+    cosmologicalOrigin:
+      'Horizon · smokeless Fire-Bringer plasma under eight-point seal; chance-bending lore bridges to thermal containment medium',
+    polarianAspect: 'Indifferent to the Spindle; bound to Furnace and brass',
+    observedWindowState: 'I. Sealed in Brass',
+    defaultPlate: 'sealed',
+    answeringPractitioner: 'The Alchemist',
+    answeringSlug: 'alchemist',
+    answeringSentence:
+      'Answered by The Alchemist (On the Horizon): For smokeless fire owes no fealty to sky or stone, yet it may be weighed, cooled, and bound within leaded brass by one who serves nothing but the Furnace.',
+  },
+  lich: {
+    mark: 'U.5',
+    slug: 'lich',
+    groundStratum: 'Depth 90 · Granite · Mantle (Source Band: Second Tier)',
+    cosmologicalOrigin:
+      'Mantle Granite · Emptied House decoy whose life-seat rests in external reliquary after operator externalization or Watcher overwrite',
+    polarianAspect: 'Subject to the Oblique Turning of the Orrery',
+    observedWindowState: 'I. The Walking Decoy',
+    defaultPlate: 'decoy',
+    answeringPractitioner: 'The Necromancer',
+    answeringSlug: 'necromancer',
+    answeringSentence:
+      'Answered by The Necromancer (Depth 90, Granite): For only a master of the Emptied House can look upon a robed king and see that the figure before him is merely a dressed decoy, pulled by a thread from ninety fathoms down.',
+  },
+  wraith: {
+    mark: 'U.6',
+    slug: 'wraith',
+    groundStratum: 'Depth 35 · Loess · Mantle (Source Band: Second Tier)',
+    cosmologicalOrigin:
+      'Mantle Loess · bitter acoustic imprint in wind-laid silt; nobody captive inside; Bard resolves the note',
+    polarianAspect: 'Acoustic column parallel to the Spindle',
+    observedWindowState: 'I. Playing in the Silt',
+    defaultPlate: 'playing',
+    answeringPractitioner: 'The Bard',
+    answeringSlug: 'bard',
+    answeringSentence:
+      'Answered by The Bard (Depth 35, Loess): For a Wraith is no body at all, but a bitter note pressed into the wind-laid silt, which plays on without rest until the Acoustician strikes the chord that resolves it.',
+  },
+  succubus: {
+    mark: 'U.7',
+    slug: 'succubus',
+    groundStratum: 'Depth 75 · Basalt · Mantle (Source Band: Second Tier)',
+    cosmologicalOrigin:
+      'Mantle Basalt · clause/consent intrusion via sleeper’s desire; Warlock answers only; bridge low-sound/heavy-air to Counter-Contract law',
+    polarianAspect: 'Deep shadow where the Spindle’s light fails',
+    observedWindowState: 'I. Upon the Sleeper',
+    defaultPlate: 'sleeping',
+    answeringPractitioner: 'The Warlock',
+    answeringSlug: 'warlock',
+    answeringSentence:
+      'Answered by The Warlock (Depth 75, Basalt): For she enters the chamber not by the latch, but by an unguarded clause in the sleeper\'s own desire, and is dismissed only by the law of the Counter-Contract.',
+    sharedMediumNote:
+      'Enchantress may bar will by persuasion medium; Answering Practitioner remains Warlock only',
+  },
+};
+
+/** Exactly one answering slug per specimen — Gate 0 invariant. */
+export function answeringIndex(): Record<string, string[]> {
+  const map: Record<string, string[]> = {};
+  for (const c of Object.values(SPECIMEN_COLLARS)) {
+    (map[c.answeringSlug] ??= []).push(c.slug);
+  }
+  return map;
+}
+
+export const EXPECTED_MARKS = [
+  'F.1',
+  'F.2',
+  'F.3',
+  'F.4',
+  'F.5',
+  'F.6',
+  'F.7',
+  'F.8',
+  'F.9',
+  'U.1',
+  'U.2',
+  'U.3',
+  'U.4',
+  'U.5',
+  'U.6',
+  'U.7',
+] as const;
+
+export const PRACTITIONER_SLUGS = [
+  'cleric',
+  'paladin',
+  'wizard',
+  'shaman',
+  'druid',
+  'alchemist',
+  'sorcerer',
+  'bard',
+  'enchantress',
+  'witch',
+  'warlock',
+  'necromancer',
+] as const;
