@@ -23,7 +23,7 @@
   "input": "selection",
   "link": "fire-festivals",
   "voice": "music-box-odd-mode",
-  "setting": "vitrine",
+  "setting": "habitat",
   "ariaLabel": "The Fae, under glass. The arrow keys lower the fluoroscope and move it over the specimen; Escape lifts it. Words selected from the text, all at once and then narrowed with Shift and the arrows, are taken up by it.",
   "colors": {
     "--c-ground": "#0b0b10",

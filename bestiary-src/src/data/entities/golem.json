@@ -23,7 +23,7 @@
   "input": "friction",
   "link": "sabbath",
   "voice": "struck-tone-clay-thud",
-  "setting": "vitrine",
+  "setting": "habitat",
   "ariaLabel": "The Golem, under glass. Left and Right in turn rub it.",
   "colors": {
     "--c-ground": "#1d1a16",

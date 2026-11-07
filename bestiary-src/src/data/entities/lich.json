@@ -23,7 +23,7 @@
   "input": "phylactery",
   "link": "absence",
   "voice": "dry-whisper",
-  "setting": "vitrine",
+  "setting": "habitat",
   "ariaLabel": "The Lich, under glass. The arrow keys lower the fluoroscope and move it over the specimen; Escape lifts it.",
   "colors": {
     "--c-ground": "#0b1614",

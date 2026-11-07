@@ -1234,13 +1234,14 @@ img.rose-tracery:not([src]) { visibility: hidden; }
   max-width: 13rem;
   padding: 0.18rem 0.55rem 0.28rem;
   text-align: center;
-  opacity: 0;
+  /* Upgrade 5 restart: Operator/Stratum badges visible at rest (Pass 3). */
+  opacity: 0.94;
   color: #f7f1e6;
   background: rgb(14 10 7 / 0.62);
   border: 1px solid rgb(226 194 122 / 0.38);
   box-shadow: 0 6px 16px rgb(0 0 0 / 0.35);
   text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transition: opacity 0.35s ease, transform 0.35s ease, background 0.35s ease;
 }
 html[data-night="on"] .scene-plate {
   background: rgb(6 10 20 / 0.7);
@@ -1250,7 +1251,9 @@ html[data-night="on"] .scene-plate {
 .scene-plate.is-portal {
   opacity: 1;
   transform: translate(-50%, 0.85rem);
+  background: rgb(14 10 7 / 0.78);
 }
+
 .scene-plate .label { display: block; color: var(--gold); margin-bottom: 0.04rem; font-size: 0.58rem; }
 .scene-plate-name {
   display: inline-block;
@@ -1298,7 +1301,8 @@ html[data-night="on"] .scene-plate {
 .bay-ward-short { display: block; font-family: Cinzel, serif; letter-spacing: 0.06em; font-size: 0.72em; }
 .bay-ward-full { display: block; margin-top: 0.15rem; opacity: 0.92; }
 .hall-ledger {
-  display: none;
+  /* Upgrade 5 restart: full Clerk rubric on phone and desktop (Pass 3). */
+  display: block;
   width: min(44rem, calc(100% - 2rem));
   margin: 1.25rem auto 2rem;
   padding: 1rem 1.15rem 1.2rem;
@@ -1308,6 +1312,12 @@ html[data-night="on"] .scene-plate {
   font-family: "EB Garamond", Garamond, serif;
   font-size: 1.05rem;
   line-height: 1.45;
+}
+@media (max-width: 899px) {
+  .hall-ledger {
+    font-size: 0.98rem;
+    padding: 0.85rem 0.95rem 1rem;
+  }
 }
 .hall-ledger p { margin: 0.55rem 0; }
 .hall-ledger .ward-list {
@@ -1324,9 +1334,6 @@ html[data-night="on"] .scene-plate {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--gold, #8a6a28);
-}
-@media (min-width: 900px) {
-  .hall-ledger { display: block; }
 }
 .hall-rubric-phone {
   margin: 0.55rem 0 0;
