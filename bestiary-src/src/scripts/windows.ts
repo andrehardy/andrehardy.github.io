@@ -63,11 +63,15 @@ export function mountWindow(el: HTMLElement) {
     }
     el.classList.remove('is-empty');
     if (outgoing.src.endsWith(src) && outgoing.classList.contains('is-show')) return;
-    incoming.onload = () => {
+    let revealed = false;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
       incoming.classList.add('is-show');
       outgoing.classList.remove('is-show');
       shown ^= 1;
     };
+    incoming.onload = reveal;
     incoming.onerror = () => {
       el.classList.add('is-empty');
       incoming.removeAttribute('src');
@@ -75,16 +79,23 @@ export function mountWindow(el: HTMLElement) {
     if (!fade || reducedMotion()) incoming.classList.add('is-cut');
     else incoming.classList.remove('is-cut');
     incoming.src = src;
+    /* Cached stills often skip onload — force reveal when already complete. */
+    if (incoming.complete && incoming.naturalWidth > 0) reveal();
   };
 
   const settleIdle = (name: string) => {
     const idle = assets.idles[name];
-    if (!video) return;
+    if (!video) {
+      paintPoster(name, true);
+      return;
+    }
     if (!idle || reducedMotion() || (mode === 'hall' && !hovered)) {
       video.pause();
       video.removeAttribute('src');
+      video.load();
       video.classList.remove('is-show');
-      paintPoster(name, true);
+      /* Still plate must win — reverse clips can leave a black video frame over the arch. */
+      paintPoster(name, false);
       return;
     }
     video.loop = true;
@@ -150,12 +161,16 @@ export function mountWindow(el: HTMLElement) {
     el.dataset.state = next;
     publishCaption(next);
     const clip = findTransition(assets, from, next);
-    if (!clip || reducedMotion() || mode === 'hall') {
+    /* Still-only destinations (no idle) must not rely on reverse clips — they leave a black video frame. */
+    const stillOnly = !assets.idles[next];
+    if (!clip || reducedMotion() || mode === 'hall' || stillOnly) {
       if (video) {
         video.pause();
+        video.removeAttribute('src');
+        video.load();
         video.classList.remove('is-show');
       }
-      paintPoster(next, true);
+      paintPoster(next, !stillOnly);
       return;
     }
     playing = true;

@@ -1,6 +1,6 @@
 ---
 import Window from './Window.astro';
-import { ROSE_FRAME, sceneBays, type BayBox } from '../data/bays';
+import { ARCH_SUBPLAQUES, ROSE_FRAME, WARD_HEADERS, sceneBays, type BayBox } from '../data/bays';
 import { hallFrame, hallLayers, roster } from '../data/house';
 
 const bays = sceneBays();
@@ -16,7 +16,8 @@ function boxStyle(box: BayBox) {
 function plateStyle(box: BayBox) {
   const cx = (box.x + box.w / 2) * 100;
   const top = (box.y + box.h) * 100;
-  return `left:${cx.toFixed(3)}%;top:${top.toFixed(3)}%`;
+  const width = box.w * 100;
+  return `left:${cx.toFixed(3)}%;top:${top.toFixed(3)}%;width:${width.toFixed(3)}%`;
 }
 
 function floorStyle(box: BayBox, glow: string) {
@@ -120,19 +121,18 @@ function floorStyle(box: BayBox, glow: string) {
                 )}
                 <div class="scene-names">
                   {bay.slots.map((slot) => {
-                    if (slot.kind === 'rose') return null;
+                    /* Floor-side only: nearest sill (depth 0). Farther marks live in the ledger. */
+                    if (slot.kind !== 'creature' || slot.depth !== 0) return null;
                     const box = phase === 'day' ? slot.day : slot.night;
                     return (
                       <span
-                        class:list={['scene-plate', slot.kind === 'portal' ? 'is-portal' : '']}
+                        class="scene-plate"
                         data-for={slot.id}
                         style={plateStyle(box)}
                       >
                         <span class="label">{slot.mark}</span>
                         <span class="scene-plate-name">{slot.name}</span>
-                        {slot.subPlaque && (
-                          <span class="scene-plate-sub">{slot.subPlaque}</span>
-                        )}
+                        {slot.subPlaque && <span class="scene-plate-sub">{slot.subPlaque}</span>}
                       </span>
                     );
                   })}
@@ -217,7 +217,19 @@ function floorStyle(box: BayBox, glow: string) {
       {bays.map((bay) => (
         <li>
           <span class="ward-numeral">Bay {bay.numeral}</span>
+          <span class="bay-ward-short">{bay.wardShort}</span>
           <span class="ward-full">{bay.wardFull}</span>
+          <ul class="arch-subs">
+            {bay.slots
+              .filter((slot) => slot.kind !== 'rose')
+              .map((slot) => (
+                <li>
+                  <span class="label">{slot.mark}</span>
+                  <span class="scene-plate-name">{slot.name}</span>
+                  {slot.subPlaque && <span class="scene-plate-sub">{slot.subPlaque}</span>}
+                </li>
+              ))}
+          </ul>
         </li>
       ))}
     </ul>
@@ -238,32 +250,42 @@ function floorStyle(box: BayBox, glow: string) {
     </div>
     {
       creatures.map((creature, index) => {
+        const wardAt = index === 0 ? 1 : index === 6 ? 2 : index === 12 ? 3 : 0;
+        const ward = wardAt ? WARD_HEADERS[wardAt as 1 | 2 | 3] : null;
         const frame = hallFrame(creature.frame.glow, creature.frame.particle, creature.frame.opening);
         return (
-          <a
-            class="bay"
-            href={`${base}${creature.slug}/`}
-            data-phone-bay
-            data-slug={creature.slug}
-            data-seq={index}
-            tabindex="0"
-            style={`--seq:${index};--glow:${creature.frame.glow}`}
-          >
-            <span class="bay-pool" aria-hidden="true" />
-            <Window
-              slug={creature.slug}
-              mode="hall"
-              frame={frame}
-              state={creature.states[0] ?? ''}
-              name={creature.entity.name}
-              priority={index < 2}
-            />
-            <span class="bay-caption">
-              <span class="bay-mark label">{creature.entity.mark}</span>
-              <span class="bay-name">{creature.entity.name}</span>
-              <span class="bay-sub">{creature.collar ? `${creature.collar.answeringPractitioner}` : ''}</span>
-            </span>
-          </a>
+          <>
+            {ward && (
+              <p class="phone-ward" style={`--seq:${index}`}>
+                <span class="bay-ward-short">{ward.short}</span>
+                <span class="bay-ward-full">{ward.full}</span>
+              </p>
+            )}
+            <a
+              class="bay"
+              href={`${base}${creature.slug}/`}
+              data-phone-bay
+              data-slug={creature.slug}
+              data-seq={index}
+              tabindex="0"
+              style={`--seq:${index};--glow:${creature.frame.glow}`}
+            >
+              <span class="bay-pool" aria-hidden="true" />
+              <Window
+                slug={creature.slug}
+                mode="hall"
+                frame={frame}
+                state={creature.states[0] ?? ''}
+                name={creature.entity.name}
+                priority={index < 2}
+              />
+              <span class="bay-caption">
+                <span class="bay-mark label">{creature.entity.mark}</span>
+                <span class="bay-name">{creature.entity.name}</span>
+                <span class="bay-sub">{ARCH_SUBPLAQUES[creature.entity.mark] ?? ''}</span>
+              </span>
+            </a>
+          </>
         );
       })
     }

@@ -140,7 +140,7 @@ export const SPECIMEN_COLLARS: Record<string, SpecimenCollar> = {
     slug: 'minotaur',
     groundStratum: 'Horizon 0 · Threshold · Fire-Bringer seat',
     cosmologicalOrigin:
-      'Horizon · congenital Fire-Bringer thickening of Watcher-line blood-fire (not a craft-made tourist graft); contained is an interaction fallback, not idle cosmology',
+      'Horizon · congenital Fire-Bringer thickening of Watcher-line blood-fire (not a craft-made tourist graft); migrate live craft-graft wording',
     polarianAspect: 'Unspooled Horizon current; Orrery cannot throttle it',
     observedWindowState: 'II. Agitated in the Frame',
     defaultPlate: 'agitated',
@@ -198,7 +198,7 @@ export const SPECIMEN_COLLARS: Record<string, SpecimenCollar> = {
     slug: 'djinn',
     groundStratum: 'Horizon 0 · Threshold · Smokeless Fire',
     cosmologicalOrigin:
-      'Horizon · smokeless Fire-Bringer plasma under eight-point seal; chance-bending lore bridges to thermal containment medium',
+      'Horizon · smokeless Fire-Bringer plasma under eight-point seal; chance-bending live lore bridges to thermal containment medium',
     polarianAspect: 'Indifferent to the Spindle; bound to Furnace and brass',
     observedWindowState: 'I. Sealed in Brass',
     defaultPlate: 'sealed',
@@ -240,7 +240,7 @@ export const SPECIMEN_COLLARS: Record<string, SpecimenCollar> = {
     slug: 'succubus',
     groundStratum: 'Depth 75 · Basalt · Mantle (Source Band: Second Tier)',
     cosmologicalOrigin:
-      'Mantle Basalt · clause/consent intrusion via sleeper’s desire; Warlock answers only; bridge low-sound/heavy-air to Counter-Contract law',
+      'Mantle Basalt · clause/consent intrusion via sleeper’s desire; Warlock answers only; bridge live low-sound/heavy-air to Counter-Contract law',
     polarianAspect: 'Deep shadow where the Spindle’s light fails',
     observedWindowState: 'I. Upon the Sleeper',
     defaultPlate: 'sleeping',
@@ -252,6 +252,15 @@ export const SPECIMEN_COLLARS: Record<string, SpecimenCollar> = {
       'Enchantress may bar will by persuasion medium; Answering Practitioner remains Warlock only',
   },
 };
+
+/**
+ * Appendix F plate token for the collar (`01-man`, `02-watching`).
+ * Display only — state keys and `.webp` paths stay on `defaultPlate`.
+ */
+export function observedPlateToken(collar: SpecimenCollar): string {
+  const prefix = collar.observedWindowState.startsWith('II.') ? '02' : '01';
+  return `${prefix}-${collar.defaultPlate}`;
+}
 
 /** Exactly one answering slug per specimen — Gate 0 invariant. */
 export function answeringIndex(): Record<string, string[]> {

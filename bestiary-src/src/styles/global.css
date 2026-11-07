@@ -1083,6 +1083,33 @@ html[data-cipher] p.epithet [data-layer="cipher"] { display: inline; }
   container-type: size;
   color: #f6f0e4;
 }
+/* Desktop: nave stays 100dvh; Clerk ledger scrolls beneath (Pass 3 placement). */
+@media (min-width: 761px) and (min-height: 521px) {
+  body:has(.hall) {
+    height: auto;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .hall {
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+  .scene {
+    position: relative;
+    inset: auto;
+    flex: 0 0 auto;
+    width: 100%;
+    height: 100dvh;
+  }
+  .hall-ledger {
+    position: relative;
+    z-index: 2;
+    flex: none;
+  }
+}
 html[data-night="on"] .scene { background: #05060c; }
 .scene-fit {
   position: absolute;
@@ -1231,7 +1258,8 @@ img.rose-tracery:not([src]) { visibility: hidden; }
   position: absolute;
   transform: translate(-50%, 0.55rem);
   width: max-content;
-  max-width: 13rem;
+  max-width: none;
+  box-sizing: border-box;
   padding: 0.18rem 0.55rem 0.28rem;
   text-align: center;
   /* Upgrade 5 restart: Operator/Stratum badges visible at rest (Pass 3). */
@@ -1282,11 +1310,12 @@ html[data-night="on"] .scene-plate {
 }
 .bay-ward {
   position: absolute;
-  z-index: 5;
+  z-index: 6;
   left: 50%;
-  bottom: 5.6rem;
+  top: 0.55rem;
+  bottom: auto;
   transform: translateX(-50%);
-  width: min(36rem, 78vw);
+  width: min(42rem, 86vw);
   margin: 0;
   padding: 0.28rem 0.7rem;
   text-align: center;
@@ -1302,16 +1331,22 @@ html[data-night="on"] .scene-plate {
 .bay-ward-full { display: block; margin-top: 0.15rem; opacity: 0.92; }
 .hall-ledger {
   /* Upgrade 5 restart: full Clerk rubric on phone and desktop (Pass 3). */
+  /* Keep parchment ink under hall night scheme — never inherit body #f3ead7. */
   display: block;
   width: min(44rem, calc(100% - 2rem));
   margin: 1.25rem auto 2rem;
   padding: 1rem 1.15rem 1.2rem;
-  color: var(--ink, #1c1917);
-  background: color-mix(in srgb, var(--ground, #efe5d2) 92%, #fff);
+  color: #1c1917;
+  background: color-mix(in srgb, #efe5d2 92%, #fff);
   border: 1px solid rgb(28 25 23 / 0.18);
   font-family: "EB Garamond", Garamond, serif;
   font-size: 1.05rem;
   line-height: 1.45;
+  color-scheme: light;
+}
+html[data-night="on"] .hall-ledger,
+html[data-night="on"] .hall-ledger a {
+  color: #1c1917;
 }
 @media (max-width: 899px) {
   .hall-ledger {
@@ -1320,6 +1355,43 @@ html[data-night="on"] .scene-plate {
   }
 }
 .hall-ledger p { margin: 0.55rem 0; }
+.hall-ledger .arch-subs {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+.hall-ledger .arch-subs li { display: grid; gap: 0.05rem; }
+.hall-ledger .arch-subs .label {
+  font-family: Cinzel, serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--gold, #8a6a28);
+}
+.hall-ledger .arch-subs .scene-plate-name {
+  color: inherit;
+  font-size: 0.95rem;
+}
+.hall-ledger .arch-subs .scene-plate-sub {
+  max-width: none;
+  color: var(--ink-soft, #4a4338);
+  opacity: 1;
+  font-size: 0.92rem;
+}
+.phone-ward {
+  order: var(--seq, 0);
+  width: min(40rem, calc(100% - 2rem));
+  margin: 0.75rem auto 0;
+  padding: 0.4rem 0.8rem;
+  text-align: center;
+  color: var(--ink, #1c1917);
+  background: color-mix(in srgb, var(--ground, #efe5d2) 92%, #fff);
+  border: 1px solid rgb(28 25 23 / 0.18);
+  font-family: "EB Garamond", Garamond, serif;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
 .hall-ledger .ward-list {
   list-style: none;
   margin: 0.85rem 0 0;
@@ -1491,6 +1563,8 @@ html[data-night="on"] .scene-controls button {
 .collar-fields dt { margin: 0; }
 .collar-fields dd { margin: 0; }
 .collar-fields a { color: inherit; }
+.collar-fields .interfacing { display: block; margin-top: 0.35rem; }
+.collar-fields code { font-family: inherit; font-size: inherit; }
 @media (max-width: 640px) {
   .collar-fields > div { grid-template-columns: 1fr; gap: 0.12rem; }
 }

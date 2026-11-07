@@ -36,7 +36,7 @@ function injectThesisNote(section, almanac, cipher) {
     injectThesisNote(
       s.replaceAll('shakes its case', 'shakes against the walls'),
       'Its origin in this Registry is congenital Horizon blood-fire along a Watcher line, not a tourist craft of the maze-makers.',
-      'Upgrade 5 origin: congenital Fire-Bringer thickening; contained is an interaction fallback.',
+      'Congenital Fire-Bringer thickening along a Watcher line. Contained is how the house holds the fire.',
     ),
   );
   save('minotaur', j);
@@ -55,7 +55,7 @@ function injectThesisNote(section, almanac, cipher) {
     injectThesisNote(
       s,
       'What the Witch mixes in the limestone vat is set into the dark soil to fruit as a pod; the fungal ground is the growth medium, not a denial of the brine.',
-      'Vat-brine origin cultivated into fungal soil pod.',
+      'One cultivation: limestone-vat brine set in the dark soil to fruit as a fungal pod.',
     ),
   );
   save('orc', j);
@@ -67,8 +67,8 @@ function injectThesisNote(section, almanac, cipher) {
   j.sections = j.sections.map((s) =>
     injectThesisNote(
       s,
-      "The heavy air and low sound of the chamber are the first signs of an unguarded clause in desire; she is dismissed only by the Warlock's Counter-Contract, not by the Enchantress as answering owner.",
-      'Low-sound/heavy-air bridges to clause/consent law; answering = Warlock only.',
+      "The heavy air and low sound of the chamber are the first signs of an unguarded clause in the sleeper's desire. She is dismissed only by the Warlock's Counter-Contract. The Enchantress may bar a will by the same persuasion, and that note is a shared medium, not an answering claim.",
+      "Low sound and heavy air mark an unguarded clause. Dismissal is the Warlock's Counter-Contract. Enchantress persuasion may bar the will; answering remains the Warlock.",
     ),
   );
   save('succubus', j);
@@ -88,7 +88,7 @@ function injectThesisNote(section, almanac, cipher) {
     injectThesisNote(
       s,
       'It walks the clean waters and the Grid, but shows its horn only inside the sky’s improbability where Paladin favour already holds.',
-      'Clean-water/Grid ecology preserved; probability layer explains revelation.',
+      'Clean water and the Grid remain its ground. The horn is shown only inside Vault probability, where Paladin favour already holds.',
     ),
   );
   save('unicorn', j);

@@ -2,6 +2,7 @@
 import Window from '../components/Window.astro';
 import { architectureOf } from '../data/architectures';
 import { findCreature, openingCaption, orderedSections, roster } from '../data/house';
+import { observedPlateToken } from '../data/upgrade5';
 import House from '../layouts/House.astro';
 
 export function getStaticPaths() {
@@ -23,6 +24,7 @@ const { entity, frame, spec } = creature;
 const arch = architectureOf(slug);
 const state = creature.states[0] ?? '';
 const caption = openingCaption(creature);
+const plateToken = observedPlateToken(creature.collar);
 const sections = orderedSections(entity.sections);
 const vessel = entity.hooks.find((hook) => hook.includes('data-vessel'));
 const lichScript = entity.hooks.find((hook) => hook.includes('data-lich-script'));
@@ -264,7 +266,7 @@ const ring = `${import.meta.env.BASE_URL}instruments/iron-ring.svg`;
                 <div>
                   <dt class="label">Observed Window State</dt>
                   <dd>
-                    {creature.collar.observedWindowState} (`{creature.collar.defaultPlate}`)
+                    {creature.collar.observedWindowState} (<code>{plateToken}</code>)
                   </dd>
                 </div>
                 <div>
@@ -273,23 +275,21 @@ const ring = `${import.meta.env.BASE_URL}instruments/iron-ring.svg`;
                     <a href={`/magic-registry/archetypes/${creature.collar.answeringSlug}/`}>
                       {creature.collar.answeringSentence}
                     </a>
-                  </dd>
-                </div>
-                <div>
-                  <dt class="label">Interfacing Class</dt>
-                  <dd>
-                    <a href={`/magic-registry/archetypes/${creature.collar.answeringSlug}/`}>
-                      {creature.collar.answeringPractitioner}
-                    </a>
-                    {creature.collar.ancestryNote && (
-                      <span class="marginalia"> — Ancestry: {creature.collar.ancestryNote}</span>
-                    )}
-                    {creature.collar.sharedMediumNote && (
-                      <span class="marginalia"> — {creature.collar.sharedMediumNote}</span>
-                    )}
-                    {creature.collar.secondaryTracking && (
-                      <span class="marginalia"> — {creature.collar.secondaryTracking}</span>
-                    )}
+                    <span class="interfacing">
+                      Interfacing Class:{' '}
+                      <a href={`/magic-registry/archetypes/${creature.collar.answeringSlug}/`}>
+                        {creature.collar.answeringPractitioner}
+                      </a>
+                      {creature.collar.ancestryNote && (
+                        <span class="marginalia"> — Ancestry: {creature.collar.ancestryNote}</span>
+                      )}
+                      {creature.collar.sharedMediumNote && (
+                        <span class="marginalia"> — {creature.collar.sharedMediumNote}</span>
+                      )}
+                      {creature.collar.secondaryTracking && (
+                        <span class="marginalia"> — {creature.collar.secondaryTracking}</span>
+                      )}
+                    </span>
                   </dd>
                 </div>
               </dl>
