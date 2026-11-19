@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+  <!-- niche arch: outer voussoir ring + inner reveal, both broken by the keystone -->
+  <path d="M20 290 V110 A80 80 0 0 1 86 31.23 M114 31.23 A80 80 0 0 1 180 110 V290"/>
+  <path d="M36 290 V112 A64 64 0 0 1 89 46.95 M111 46.95 A64 64 0 0 1 164 112 V290" stroke-width="1"/>
+  <g stroke-width="1"><path d="M27 70 L41 80"/><path d="M52 42 L62 56"/><path d="M148 42 L138 56"/><path d="M173 70 L159 80"/></g>
+  <!-- keystone with carved eight-petal rosette (neutral) -->
+  <path d="M84 18 H116 L110 56 H90 Z" fill="currentColor" fill-opacity=".12"/>
+  <g stroke-width="1"><ellipse cx="100" cy="30.5" rx="2" ry="4.2" transform="rotate(0 100 36)"/><ellipse cx="100" cy="30.5" rx="2" ry="4.2" transform="rotate(45 100 36)"/><ellipse cx="100" cy="30.5" rx="2" ry="4.2" transform="rotate(90 100 36)"/><ellipse cx="100" cy="30.5" rx="2" ry="4.2" transform="rotate(135 100 36)"/><ellipse cx="100" cy="30.5" rx="2" ry="4.2" transform="rotate(180 100 36)"/><ellipse cx="100" cy="30.5" rx="2" ry="4.2" transform="rotate(225 100 36)"/><ellipse cx="100" cy="30.5" rx="2" ry="4.2" transform="rotate(270 100 36)"/><ellipse cx="100" cy="30.5" rx="2" ry="4.2" transform="rotate(315 100 36)"/><circle cx="100" cy="36" r="1.8" fill="currentColor"/></g>
+  <path d="M12 290 H188" stroke-width="2.5"/>
+</svg>

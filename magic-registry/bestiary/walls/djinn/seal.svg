@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-linejoin="miter">
+  <!-- eight-point seal (Rub el Hizb silhouette: two squares at 45 deg, outline only) matching the djinn stopper engraving -->
+  <path d="M100.00 8.00 L126.95 34.95 L165.05 34.95 L165.05 73.05 L192.00 100.00 L165.05 126.95 L165.05 165.05 L126.95 165.05 L100.00 192.00 L73.05 165.05 L34.95 165.05 L34.95 126.95 L8.00 100.00 L34.95 73.05 L34.95 34.95 L73.05 34.95 Z" stroke-width="4"/>
+  <path d="M100.00 20.00 L123.43 43.43 L156.57 43.43 L156.57 76.57 L180.00 100.00 L156.57 123.43 L156.57 156.57 L123.43 156.57 L100.00 180.00 L76.57 156.57 L43.43 156.57 L43.43 123.43 L20.00 100.00 L43.43 76.57 L43.43 43.43 L76.57 43.43 Z" stroke-width="2.5"/>
+  <circle cx="100" cy="100" r="25" stroke-width="3.5"/>
+  <circle cx="100" cy="100" r="12" stroke-width="3"/>
+</svg>

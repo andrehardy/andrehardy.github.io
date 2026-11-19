@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="">
+  <defs>
+    <radialGradient id="stone" cx="50%" cy="42%" r="62%">
+      <stop offset="0" stop-color="#f4ead8"/>
+      <stop offset="0.55" stop-color="#cbb892"/>
+      <stop offset="1" stop-color="#6e5a3e"/>
+    </radialGradient>
+    <radialGradient id="night" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#3a2c18"/>
+      <stop offset="1" stop-color="#100e0c"/>
+    </radialGradient>
+  </defs>
+  <circle cx="200" cy="200" r="188" fill="url(#stone)"/>
+  <circle cx="200" cy="200" r="168" fill="none" stroke="#8a6a32" stroke-width="6"/>
+  <circle cx="200" cy="200" r="150" fill="url(#night)"/>
+  <g fill="none" stroke="#e2c27a" stroke-width="2.2">
+    <circle cx="200" cy="200" r="46"/>
+    <circle cx="200" cy="200" r="92"/>
+    <path d="M200 54 v292 M54 200 h292 M96 96 l208 208 M304 96 L96 304"/>
+    <path d="M200 108 A92 92 0 0 1 292 200"/>
+    <path d="M200 108 A92 92 0 0 0 108 200"/>
+    <path d="M200 292 A92 92 0 0 1 108 200"/>
+    <path d="M200 292 A92 92 0 0 0 292 200"/>
+  </g>
+  <circle cx="200" cy="200" r="18" fill="#e2c27a"/>
+  <circle cx="200" cy="200" r="8" fill="#2a2116"/>
+</svg>
