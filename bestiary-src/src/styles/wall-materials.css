@@ -492,3 +492,55 @@ body[data-room='succubus'] .band,
 body[data-room='succubus'] .leaf [data-frame='band'] {
   background: center top / 100% auto repeat-y var(--wall-band) !important;
 }
+
+/*
+  B6 L4 — photographic grounds attach to WINDOW (case-bay) only.
+  Body niches sit on palette --c-ground; photos do not run under translucent body text.
+*/
+body[data-room] {
+  background-image: none !important;
+  background-color: var(--c-ground, var(--stone));
+  background-attachment: scroll !important;
+}
+body[data-room] .case-bay {
+  background-image:
+    linear-gradient(180deg, rgb(0 0 0 / 0.28), rgb(0 0 0 / 0.12)),
+    var(--wall-ground, none);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat;
+}
+html[data-night='on'] body[data-room] .case-bay {
+  background-image:
+    linear-gradient(180deg, rgb(0 0 0 / 0.4), rgb(0 0 0 / 0.18)),
+    var(--wall-ground-night, var(--wall-ground, none));
+}
+
+/* B6 L4 strict — no photographic webp outside the WINDOW (.case-bay). */
+body[data-room] .band,
+body[data-room] .leaf [data-frame='band'],
+body[data-room] .leaf [data-frame='article'],
+body[data-room] .leaf [data-frame='predella'],
+body[data-room] .leaf [data-frame='cartouche'],
+body[data-room] .keystone,
+body[data-room] .frieze,
+body[data-room] .tussocks,
+body[data-room] .petals,
+body[data-room] .mycelium,
+body[data-room] .articles,
+body[data-room] .predella,
+body[data-room] .banderole,
+body[data-room] .leaf::before,
+body[data-room] .leaf::after,
+body[data-room] h1::before,
+body[data-room] .text h2::before,
+body[data-room='unicorn'] .leaf,
+body[data-room='sidhe'] .case-bay::after {
+  background-image: none !important;
+}
+/* Sidhe door image may live on the opening only — re-allow on case-bay::after after the blanket clear: */
+body[data-room='sidhe'] .case-bay::after {
+  background-image: var(--wall-door, none) !important;
+  background-size: cover;
+  background-position: center;
+}

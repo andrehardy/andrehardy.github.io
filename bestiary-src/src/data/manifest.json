@@ -4,8 +4,8 @@
     "material": "limestone",
     "ornament": "leaf",
     "sill": "Limestone",
-    "overlay": "/magic-registry/bestiary/hall/arch-frame-hall.webp",
-    "overlayNight": "/magic-registry/bestiary/hall/arch-frame-hall.webp",
+    "overlay": "/magic-registry/bestiary/frames/hall/frame.svg",
+    "overlayNight": "/magic-registry/bestiary/frames/hall/frame.svg",
     "mask": "/magic-registry/bestiary/frames/hall/opening-mask.png",
     "hole": {
       "x": 0.2488,
@@ -15,28 +15,28 @@
     },
     "layers": {
       "nave": {
-        "day": "/magic-registry/bestiary/hall/nave-back.webp",
-        "night": "/magic-registry/bestiary/hall/nave-back-night.webp"
+        "day": null,
+        "night": null
       },
       "wall": {
-        "day": "/magic-registry/bestiary/hall/wall-tile.webp",
-        "night": "/magic-registry/bestiary/hall/wall-tile-night.webp"
+        "day": null,
+        "night": null
       },
       "floor": {
-        "day": "/magic-registry/bestiary/hall/floor.webp",
-        "night": "/magic-registry/bestiary/hall/floor-night.webp"
+        "day": null,
+        "night": null
       },
       "vault": {
-        "day": "/magic-registry/bestiary/hall/vault.webp",
-        "night": "/magic-registry/bestiary/hall/vault-night.webp"
+        "day": null,
+        "night": null
       },
       "arch": {
-        "day": "/magic-registry/bestiary/hall/arch-frame-hall.webp",
-        "night": "/magic-registry/bestiary/hall/arch-frame-hall.webp"
+        "day": null,
+        "night": null
       },
       "rose": {
-        "day": "/magic-registry/bestiary/hall/rose-frame.webp",
-        "night": "/magic-registry/bestiary/hall/rose-frame.webp"
+        "day": null,
+        "night": null
       }
     }
   },

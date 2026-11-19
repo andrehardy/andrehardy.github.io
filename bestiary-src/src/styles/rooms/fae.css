@@ -141,12 +141,6 @@ body[data-room='fae'] .leaf {
 body[data-room='fae'] .leaf :is(section, .room, .creature-head) {
   animation: fae-engross var(--life-ink) var(--glass-ease-clear) backwards;
 }
-body[data-room='fae'] .leaf .room-stack > :nth-child(n + 5) {
-  animation-delay: var(--life-beat);
-}
-body[data-room='fae'] .leaf .room-stack > :nth-child(n + 7) {
-  animation-delay: calc(var(--life-beat) * 2);
-}
 @keyframes fae-engross {
   from {
     opacity: 0;

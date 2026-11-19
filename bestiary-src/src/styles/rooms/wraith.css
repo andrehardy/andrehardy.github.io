@@ -70,9 +70,6 @@ body[data-room='wraith'] .leaf {
 body[data-room='wraith'] .leaf :is(section, .room, .creature-head) {
   animation: wraith-play var(--life-ink) steps(9, jump-end) backwards;
 }
-body[data-room='wraith'] .leaf .room-stack > :nth-child(n + 5) {
-  animation-delay: calc(var(--life-beat) * 2);
-}
 @keyframes wraith-play {
   from {
     clip-path: inset(0 0 100% 0);

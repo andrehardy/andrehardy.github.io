@@ -101,9 +101,6 @@ body[data-room='djinn'] .leaf {
 body[data-room='djinn'] .leaf :is(section, .room, .creature-head) {
   animation: djinn-gather var(--life-ink) var(--glass-ease-clear) backwards;
 }
-body[data-room='djinn'] .leaf .room-stack > :nth-child(n + 6) {
-  animation-delay: var(--life-beat);
-}
 @keyframes djinn-gather {
   from {
     opacity: 0;

@@ -9,8 +9,6 @@ import night1 from './bays/night/bay1.json';
 import night2 from './bays/night/bay2.json';
 import night3 from './bays/night/bay3.json';
 import { findCreature, idleUrl, posterUrl, roster } from './house';
-import { SPECIMEN_COLLARS } from './upgrade5';
-
 export type BayPoint = [number, number];
 
 export type BayBox = {
@@ -95,24 +93,27 @@ export const WARD_HEADERS: Record<1 | 2 | 3, { short: string; full: string }> = 
   },
 };
 
-/** Appendix E arch sub-plaques keyed by mark. */
+/**
+ * Arch sub-plaques keyed by mark — Ward / seat language only (INV-06).
+ * No answering practitioner occupation; Axis holds co-presence.
+ */
 export const ARCH_SUBPLAQUES: Record<string, string> = {
-  'F.1': 'Depth 65 (Limestone) · Answered by The Witch',
-  'F.2': 'Depth 55 (Shale) · Answered by The Enchantress',
-  'F.3': 'Altitude 40 (The Vault) · Answered by The Druid',
-  'F.4': 'Altitude 40 (The Vault) · Answered by The Druid',
-  'F.5': 'Depth 65 (Limestone) · Answered by The Witch',
-  'F.6': 'Depth 75 (Basalt) · Answered by The Warlock',
-  'F.7': 'Depth 90 (Granite) · Answered by The Necromancer',
-  'F.8': 'Altitude 80 (The Vault) · Answered by The Paladin',
-  'F.9': 'On the Horizon · Answered by The Sorcerer',
-  'U.1': 'Altitude 55 (The Vault) · Answered by The Shaman',
-  'U.2': 'Altitude 75 (The Vault) · Answered by The Wizard',
-  'U.3': 'Altitude 100 (The Sealed Light) · Answered by The Cleric',
-  'U.4': 'On the Horizon · Answered by The Alchemist',
-  'U.5': 'Depth 90 (Granite) · Answered by The Necromancer',
-  'U.6': 'Depth 35 (Loess) · Answered by The Bard',
-  'U.7': 'Depth 75 (Basalt) · Answered by The Warlock',
+  'F.1': 'Depth 65 · Limestone',
+  'F.2': 'Depth 55 · Shale',
+  'F.3': 'Altitude 40 · The Vault',
+  'F.4': 'Altitude 40 · The Vault',
+  'F.5': 'Depth 65 · Limestone',
+  'F.6': 'Depth 75 · Basalt',
+  'F.7': 'Depth 90 · Granite',
+  'F.8': 'Altitude 80 · The Vault',
+  'F.9': 'On the Horizon',
+  'U.1': 'Altitude 55 · The Vault',
+  'U.2': 'Altitude 75 · The Vault',
+  'U.3': 'Altitude 100 · The Sealed Light',
+  'U.4': 'On the Horizon',
+  'U.5': 'Depth 90 · Granite',
+  'U.6': 'Depth 35 · Loess',
+  'U.7': 'Depth 75 · Basalt',
 };
 
 const NUMERALS = ['I', 'II', 'III'];
@@ -242,7 +243,6 @@ export function sceneBays(): SceneBay[] {
       const state = creature?.states[0] ?? '';
       const found = creature ? findCreature(creature.slug) : null;
       const mark = found?.entity.mark ?? '';
-      const collar = creature ? SPECIMEN_COLLARS[creature.slug] : undefined;
       return {
         id: opening.id,
         kind: 'creature',
@@ -250,7 +250,7 @@ export function sceneBays(): SceneBay[] {
         depth: opening.depth,
         name: found?.entity.name ?? creature?.slug ?? 'Window',
         mark,
-        subPlaque: ARCH_SUBPLAQUES[mark] ?? (collar ? `${collar.groundStratum} · Answered by ${collar.answeringPractitioner}` : ''),
+        subPlaque: ARCH_SUBPLAQUES[mark] ?? '',
         href: creature ? `${creature.slug}/` : null,
         slug: creature?.slug ?? null,
         poster: creature ? posterUrl(creature.slug, state) : null,

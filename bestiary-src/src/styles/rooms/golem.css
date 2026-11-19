@@ -76,12 +76,6 @@ body[data-room='golem'] .leaf :is(section, .room) {
   transform-origin: 50% 100%;
   animation: golem-press var(--life-press) var(--glass-ease-clear) both;
 }
-body[data-room='golem'] .leaf .room-stack > :nth-child(5) {
-  animation-delay: var(--life-beat);
-}
-body[data-room='golem'] .leaf .room-stack > :nth-child(n + 6) {
-  animation-delay: calc(var(--life-beat) * 2);
-}
 @keyframes golem-press {
   from {
     opacity: 0;

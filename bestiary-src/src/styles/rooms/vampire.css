@@ -52,15 +52,6 @@ body[data-room='vampire'] .leaf > * {
   width: min(100%, 44rem);
   animation: vampire-lit var(--life-ink) var(--glass-ease-phosphor) both;
 }
-body[data-room='vampire'] .leaf .room-stack > :nth-child(3) {
-  animation-delay: var(--life-beat);
-}
-body[data-room='vampire'] .leaf .room-stack > :nth-child(4) {
-  animation-delay: calc(var(--life-beat) * 2);
-}
-body[data-room='vampire'] .leaf .room-stack > :nth-child(n + 5) {
-  animation-delay: calc(var(--life-beat) * 3);
-}
 body[data-room='vampire'] .leaf > .leaf-light {
   animation: none;
   width: auto;

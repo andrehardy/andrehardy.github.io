@@ -87,9 +87,6 @@ body[data-room='lich'] .leaf > * {
 body[data-room='lich'] .leaf > .triptych {
   animation-delay: var(--life-beat);
 }
-body[data-room='lich'] .leaf .room-stack > :nth-child(n + 5) {
-  animation-delay: calc(var(--life-beat) * 3);
-}
 @keyframes lich-unveil {
   from {
     opacity: 0;

@@ -109,15 +109,10 @@ body[data-room] .creature-head {
   background: linear-gradient(to bottom, rgb(0 0 0 / 0.28), transparent);
 }
 
-/* Retire the two-column card: window | prose. The wall is one vertical leaf. */
-body[data-room] .room-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* B1: flat leaf owns the column (no .room-stack). */
+body[data-room] .leaf {
   gap: var(--s-5);
-  width: 100%;
-  max-width: none;
-  padding: 0 clamp(0.75rem, 3vw, 2rem);
+  padding-inline: clamp(0.75rem, 3vw, 2rem);
 }
 
 /*
@@ -168,22 +163,17 @@ body[data-room] .specimen .window[data-art] {
   max-width: none;
 }
 
-/* Inscriptions: recessed into the wall under the opening — full wall width, measure inside niches. */
-body[data-room] .prose {
+/* Inscriptions: direct .leaf children under the opening (B1 flat contract). */
+body[data-room] .leaf > .accession,
+body[data-room] .leaf > section[data-frame],
+body[data-room] .leaf > section.text {
   width: 100%;
   max-width: min(44rem, 100%);
-  margin: 0 auto;
-  padding: 0 0 2rem;
+  margin: 0 auto var(--s-5);
+  padding: 0;
   background: none;
   border: none;
-  columns: 1;
   font-size: clamp(1.12rem, 0.95rem + 0.4vw, 1.28rem);
-}
-
-body[data-room] .prose > .accession,
-body[data-room] .prose > .passage {
-  max-width: none;
-  margin: 0 0 var(--s-5);
 }
 
 body[data-room] .colophon {

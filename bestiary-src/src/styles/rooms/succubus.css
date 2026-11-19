@@ -90,9 +90,6 @@ body[data-room='succubus'][data-sky='on'] .leaf {
 body[data-room='succubus'] .leaf :is(section, .room) {
   animation: succubus-band var(--life-ink) var(--glass-ease-clear) backwards;
 }
-body[data-room='succubus'] .leaf .room-stack > :nth-child(n + 6) {
-  animation-delay: var(--life-beat);
-}
 @keyframes succubus-band {
   from {
     opacity: 0;

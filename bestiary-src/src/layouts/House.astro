@@ -21,6 +21,7 @@ import '../styles/rooms/vampire.css';
 import '../styles/rooms/will-o-the-wisp.css';
 import '../styles/rooms/wraith.css';
 import HouseBar from '../components/HouseBar.astro';
+import { roomStyle, type EntityId } from '../data/palettes';
 
 interface Props {
   title: string;
@@ -32,6 +33,7 @@ interface Props {
 
 const { title, description, og = {}, current, room } = Astro.props;
 const canonical = og['og:url'] ?? new URL(Astro.url.pathname, Astro.site).toString();
+const palette = room ? roomStyle(room as EntityId) : undefined;
 ---
 
 <!doctype html>
@@ -64,7 +66,7 @@ const canonical = og['og:url'] ?? new URL(Astro.url.pathname, Astro.site).toStri
       }
     </script>
   </head>
-  <body data-room={room}>
+  <body data-room={room} style={palette}>
     <a class="skip-link" href="#text">Skip to the text</a>
     <HouseBar current={current} />
     <slot />

@@ -121,14 +121,18 @@ a { color: var(--gold-dim); }
   position: relative;
   z-index: 30;
 }
-/* Room lintel: stone/brass/ink bar instead of hall parchment. */
+/*
+  Room lintel bar only. Do NOT flip --ink to Hall cream here (B1 I3).
+  Leaf ink/ground come from roomStyle() on body[style] via palettes.ts.
+*/
 body[data-room] {
   --bar: color-mix(in srgb, rgb(28 24 20 / 0.94) calc((1 - var(--night)) * 100%), rgb(6 10 16 / 0.96) calc(var(--night) * 100%));
-  --ink: color-mix(in srgb, #e8dcc4 calc((1 - var(--night)) * 100%), #f0e6d0 calc(var(--night) * 100%));
-  --ink-soft: color-mix(in srgb, #b8a88c calc((1 - var(--night)) * 100%), #9a8c74 calc(var(--night) * 100%));
+  background: var(--c-ground, var(--stone));
+  color: var(--c-ink, var(--ink));
 }
 body[data-room] .house-bar {
-  color: var(--ink);
+  /* Bar is always dark stone; keep lintel type light even when leaf ink is daylight-dark. */
+  color: #e8dcc4;
   border-bottom-color: color-mix(in srgb, var(--gold) 55%, transparent);
   backdrop-filter: blur(6px);
 }
@@ -1550,21 +1554,4 @@ html[data-night="on"] .scene-controls button {
 
 @media (prefers-reduced-motion: no-preference) {
   .nave-dolly { transition: transform 0.7s ease; }
-}
-
-.collar { margin: 1.1rem 0 1.4rem; padding-top: 0.35rem; border-top: 1px solid rgb(28 25 23 / 0.16); }
-.collar-fields { margin: 0.4rem 0 0; }
-.collar-fields > div {
-  display: grid;
-  grid-template-columns: 9.5rem 1fr;
-  gap: 0.35rem 0.85rem;
-  margin: 0.35rem 0;
-}
-.collar-fields dt { margin: 0; }
-.collar-fields dd { margin: 0; }
-.collar-fields a { color: inherit; }
-.collar-fields .interfacing { display: block; margin-top: 0.35rem; }
-.collar-fields code { font-family: inherit; font-size: inherit; }
-@media (max-width: 640px) {
-  .collar-fields > div { grid-template-columns: 1fr; gap: 0.12rem; }
 }
