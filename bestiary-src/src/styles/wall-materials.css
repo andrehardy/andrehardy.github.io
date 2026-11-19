@@ -544,3 +544,48 @@ body[data-room='sidhe'] .case-bay::after {
   background-size: cover;
   background-position: center;
 }
+
+/* B6 L4 r3 — kill remaining photo hosts outside case-bay */
+body[data-room='minotaur'] .creature-head::before,
+body[data-room='will-o-the-wisp']::after,
+body[data-room='will-o-the-wisp'] body::after,
+html body[data-room='will-o-the-wisp']::after {
+  background-image: none !important;
+  content: none !important;
+}
+body[data-room='unicorn'] .leaf {
+  border-image: none !important;
+  border-image-source: none !important;
+}
+
+/* B6 L4 r4 — explicit host kill (shorthand + border-image + fixed ::after) */
+body[data-room='minotaur'] .creature-head::before {
+  background: none !important;
+  content: none !important;
+  display: none !important;
+}
+body[data-room='will-o-the-wisp']::after {
+  background: none !important;
+  background-image: none !important;
+  content: none !important;
+  display: none !important;
+}
+body[data-room='unicorn'] .leaf {
+  border-image: none !important;
+  border-image-source: none !important;
+}
+body[data-room='unicorn'] .leaf::before,
+body[data-room='unicorn'] .leaf::after {
+  background: none !important;
+  background-image: none !important;
+  content: none !important;
+  display: none !important;
+}
+body[data-room='golem'] .creature-head::before {
+  background: none !important;
+  content: none !important;
+  display: none !important;
+}
+body[data-room='minotaur'] h1::before {
+  background: none !important;
+}
